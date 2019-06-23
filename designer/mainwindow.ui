@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <author>Damian Krawczyk</author>
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>750</width>
+    <height>681</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>750</width>
+    <height>620</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>750</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="groupBox_settings">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>230</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>230</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Settings</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QTabWidget" name="tabWidget_settings">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tab_files_source">
+          <attribute name="title">
+           <string>Source files</string>
+          </attribute>
+          <widget class="QLabel" name="label_report_type">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>10</y>
+             <width>201</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Select one or more report type:</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox_report_scan">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>30</y>
+             <width>61</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to get spreadsheet with &lt;span style=&quot; font-weight:600;&quot;&gt;scan sum-up&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>scan</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox_report_host">
+           <property name="geometry">
+            <rect>
+             <x>160</x>
+             <y>30</y>
+             <width>61</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to get spreadsheet with &lt;span style=&quot; font-weight:600;&quot;&gt;host sum-up&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>host</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox_report_vulnerabilities">
+           <property name="geometry">
+            <rect>
+             <x>310</x>
+             <y>30</y>
+             <width>121</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to get spreadsheet with &lt;span style=&quot; font-weight:600;&quot;&gt;vulnerabilities sum-up&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>vulnerabilities</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox_report_noncompliance">
+           <property name="geometry">
+            <rect>
+             <x>500</x>
+             <y>30</y>
+             <width>131</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to get spreadsheet with &lt;span style=&quot; font-weight:600;&quot;&gt;noncompliance sum-up&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>noncompliance</string>
+           </property>
+          </widget>
+          <widget class="QGroupBox" name="groupBox_options_scan">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>50</y>
+             <width>141</width>
+             <height>91</height>
+            </rect>
+           </property>
+           <property name="title">
+            <string>Scan tab options</string>
+           </property>
+           <widget class="QCheckBox" name="checkBox_debug_data_scan">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>30</y>
+              <width>121</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to get additional columns for selected report type like source file name with path, policy name and more. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Debug columns name are marked in &lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#0000ff;&quot;&gt;blue color&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>add debug data</string>
+            </property>
+           </widget>
+          </widget>
+          <widget class="QGroupBox" name="groupBox_options_host">
+           <property name="geometry">
+            <rect>
+             <x>160</x>
+             <y>50</y>
+             <width>141</width>
+             <height>91</height>
+            </rect>
+           </property>
+           <property name="title">
+            <string>Host tab options</string>
+           </property>
+           <widget class="QCheckBox" name="checkBox_debug_data_host">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>30</y>
+              <width>121</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to get additional columns for selected report type like source file name with path, policy name and more. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Debug columns name are marked in &lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#0000ff;&quot;&gt;blue color&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>add debug data</string>
+            </property>
+           </widget>
+          </widget>
+          <widget class="QGroupBox" name="groupBox_options_vulnerabilities">
+           <property name="geometry">
+            <rect>
+             <x>310</x>
+             <y>50</y>
+             <width>181</width>
+             <height>91</height>
+            </rect>
+           </property>
+           <property name="title">
+            <string>Vulnerabilities tab options</string>
+           </property>
+           <widget class="QCheckBox" name="checkBox_debug_data_vulnerabilities">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>30</y>
+              <width>121</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to get additional columns for selected report type like source file name with path, policy name and more. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Debug columns name are marked in &lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#0000ff;&quot;&gt;blue color&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>add debug data</string>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="checkBox_vulnerabilities_none_filter_out">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>50</y>
+              <width>161</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to automatically filter out plugins results with None Risk Factor and see only these which Risk Factor is equal Low, Medium, High or Critical.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Plugins results with None Risk Factor are not removed from report, to see them use filter in column Risk Factor.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>filter out None results</string>
+            </property>
+           </widget>
+          </widget>
+          <widget class="QGroupBox" name="groupBox_options_noncompliance">
+           <property name="geometry">
+            <rect>
+             <x>500</x>
+             <y>50</y>
+             <width>171</width>
+             <height>91</height>
+            </rect>
+           </property>
+           <property name="title">
+            <string>Noncompliance tab options</string>
+           </property>
+           <widget class="QCheckBox" name="checkBox_debug_data_noncompliance">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>30</y>
+              <width>121</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to get additional columns for selected report type like source file name with path, policy name and more. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Debug columns name are marked in &lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#0000ff;&quot;&gt;blue color&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>add debug data</string>
+            </property>
+           </widget>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="tab_files_target">
+          <attribute name="title">
+           <string>Target files</string>
+          </attribute>
+          <widget class="QLabel" name="label_target_directory">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>8</y>
+             <width>120</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>110</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>120</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Target directory:</string>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="lineEdit_target_directory">
+           <property name="geometry">
+            <rect>
+             <x>130</x>
+             <y>8</y>
+             <width>441</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>450</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current target directory for output file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_target_dir_change">
+           <property name="geometry">
+            <rect>
+             <x>590</x>
+             <y>3</y>
+             <width>80</width>
+             <height>32</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to &lt;span style=&quot; font-weight:600;&quot;&gt;change target directory&lt;/span&gt; for output file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>Change</string>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="lineEdit_suffix_custom_value">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="geometry">
+            <rect>
+             <x>160</x>
+             <y>98</y>
+             <width>150</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Key-in text here and than mark checkbox on the left if you want to add suffix taken from this field into target filename.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Take a look below to see target filename example received that way.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox_suffix_timestamp">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>68</y>
+             <width>300</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to add suffix with &amp;quot;_YYYYMMDD_HHMMSS&amp;quot; into target filename.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Take a look below to see target filename example received that way.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>add suffix with &quot;_YYYYMMDD_HHMMSS&quot;</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox_suffix_custom">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>98</y>
+             <width>150</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to add suffix taken from field on the right into target filename.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Take a look below to see target filename example received that way.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>add custom suffix</string>
+           </property>
+          </widget>
+          <widget class="QCheckBox" name="checkBox_set_source_directory_as_target_directory">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>30</y>
+             <width>281</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to automatically change target directory each time when you select new source file/-s and set target directory to be the same as source file/-s directory.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: If you use Open directory to open source files this directory will be use as target directory for all files including these from subdirectories.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string>set source directory as target directory</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_target_file_name">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>130</y>
+             <width>121</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Target filename:</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_target_file_name_value">
+           <property name="geometry">
+            <rect>
+             <x>130</x>
+             <y>130</y>
+             <width>431</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Target filename example.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Use two checkboxes above interchangeably to change the order in target filename.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_action">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>70</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Action</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QPushButton" name="pushButton_start">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>80</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to &lt;span style=&quot; font-weight:600;&quot;&gt;start &lt;/span&gt;conversion of selected *.nessus files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="toolTipDuration">
+          <number>-1</number>
+         </property>
+         <property name="statusTip">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Start</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="pushButton_target_dir_open">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>80</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to &lt;span style=&quot; font-weight:600;&quot;&gt;open target diregtory&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Open</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_progress">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>100</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Progress preview</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QTextEdit" name="textEdit_progress">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <family>Courier New</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Here you will see whole progress preview for any action taken.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: You can mark and copy text from this field.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QProgressBar" name="progressBar">
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>750</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_file"/>
+    <addaction name="actionOpen_directory"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuAction">
+    <property name="title">
+     <string>Action</string>
+    </property>
+    <addaction name="actionStart_conversion"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="actionChange_target_directory"/>
+    <addaction name="actionOpen_target_directory"/>
+   </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuAction"/>
+   <addaction name="menuAbout"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionOpen_directory">
+   <property name="text">
+    <string>Open directory</string>
+   </property>
+  </action>
+  <action name="actionOpen_file">
+   <property name="text">
+    <string>Open file\-s</string>
+   </property>
+  </action>
+  <action name="actionStart_conversion">
+   <property name="text">
+    <string>Start conversion</string>
+   </property>
+  </action>
+  <action name="actionChange_separator">
+   <property name="text">
+    <string>Change separator</string>
+   </property>
+  </action>
+  <action name="actionChange_target_directory">
+   <property name="text">
+    <string>Change target directory</string>
+   </property>
+  </action>
+  <action name="actionOpen_target_directory">
+   <property name="text">
+    <string>Open target directory</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>textEdit_progress</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

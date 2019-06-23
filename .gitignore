@@ -1,0 +1,7 @@
+*.nessus
+*.xlsx
+*.spec
+.idea/
+__pycache__
+build/
+dist

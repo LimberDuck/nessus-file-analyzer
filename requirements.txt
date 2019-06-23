@@ -1,0 +1,7 @@
+chardet==3.0.4
+imageio==2.5.0
+numpy==1.16.2
+Pillow==5.4.1
+PyQt5==5.12.1
+PyQt5-sip==4.19.15
+XlsxWriter==1.1.5
