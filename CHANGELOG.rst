@@ -6,6 +6,14 @@ This document records all notable changes to `nessus file analyzer by LimberDuck
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 
+0.1.1 (2019-07-21)
+---------------------
+
+* From now on if source file or source directory has been already selected target directory will be set base on path from selected source file or base on path from first file from selected source directory if you use option "set source directory as target directory".
+* Typo in tooltip for "Open" button to open target directory fixed.
+* Naming convention changed everywhere from "conversion" to "analysis".
+
+
 0.1.0 (2019-06-23)
 ---------------------
 

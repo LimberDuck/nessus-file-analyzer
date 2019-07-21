@@ -110,7 +110,7 @@ Windows
 
 .. code-block:: powershell
 
- pyinstaller --onefile --windowed --icon=.\icons\LimberDuck-nessus-file-analyzer.ico nfa.py
+ pyinstaller --onefile --windowed --version-file=.\version.rc --icon=.\icons\LimberDuck-nessus-file-analyzer.ico nfa.py
 
 9. Go to dist catalog to find executable file *nfa.exe*
 

@@ -536,7 +536,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to &lt;span style=&quot; font-weight:600;&quot;&gt;start &lt;/span&gt;conversion of selected *.nessus files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to &lt;span style=&quot; font-weight:600;&quot;&gt;start &lt;/span&gt;analysis of selected *.nessus files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="toolTipDuration">
           <number>-1</number>
@@ -567,7 +567,7 @@
           </size>
          </property>
          <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to &lt;span style=&quot; font-weight:600;&quot;&gt;open target diregtory&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Click to &lt;span style=&quot; font-weight:600;&quot;&gt;open target directory&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
           <string>Open</string>
@@ -648,7 +648,7 @@
     <property name="title">
      <string>Action</string>
     </property>
-    <addaction name="actionStart_conversion"/>
+    <addaction name="actionStart_analysis"/>
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="actionChange_target_directory"/>
@@ -680,9 +680,9 @@
     <string>Open file\-s</string>
    </property>
   </action>
-  <action name="actionStart_conversion">
+  <action name="actionStart_analysis">
    <property name="text">
-    <string>Start conversion</string>
+    <string>Start analysis</string>
    </property>
   </action>
   <action name="actionChange_separator">

@@ -46,7 +46,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.__parsing_settings = {}
         self.__target_directory = ''
         self.__target_directory_changed = False
-        self.__file_conversion_counter = 0
+        self.__file_analysis_counter = 0
         self.__suffix = ''
         self.update_parsing_settings('suffix', self.__suffix)
         self.__suffix_template = ''
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.actionOpen_directory.triggered.connect(self.open_directory)
         self.actionExit.triggered.connect(self.exit_application)
 
-        self.actionStart_conversion.triggered.connect(self.parsing_thread_start)
+        self.actionStart_analysis.triggered.connect(self.parsing_thread_start)
         self.actionChange_target_directory.triggered.connect(self.change_target_directory)
         self.actionOpen_target_directory.triggered.connect(self.open_target_directory)
         self.actionAbout.triggered.connect(self.open_dialog_about)
@@ -125,7 +125,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.groupBox_options_vulnerabilities.setDisabled(True)
         self.groupBox_options_noncompliance.setDisabled(True)
         self.pushButton_start.setDisabled(True)
-        self.actionStart_conversion.setDisabled(True)
+        self.actionStart_analysis.setDisabled(True)
         self.progressBar.setHidden(True)
 
         cwd = os.getcwd()
@@ -181,14 +181,14 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             or self.__report_noncompliance_enabled) \
                 and self.__files_to_pars:
             self.pushButton_start.setEnabled(True)
-            self.actionStart_conversion.setEnabled(True)
+            self.actionStart_analysis.setEnabled(True)
 
         if not self.__report_scan_enabled \
                 and not self.__report_host_enabled \
                 and not self.__report_vulnerabilities_enabled \
                 and not self.__report_noncompliance_enabled:
             self.pushButton_start.setDisabled(True)
-            self.actionStart_conversion.setDisabled(True)
+            self.actionStart_analysis.setDisabled(True)
 
     def report_scan_setting_debug_changed(self):
         """
@@ -229,14 +229,14 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             or self.__report_noncompliance_enabled) \
                 and self.__files_to_pars:
             self.pushButton_start.setEnabled(True)
-            self.actionStart_conversion.setEnabled(True)
+            self.actionStart_analysis.setEnabled(True)
 
         if not self.__report_scan_enabled \
                 and not self.__report_host_enabled \
                 and not self.__report_vulnerabilities_enabled \
                 and not self.__report_noncompliance_enabled:
             self.pushButton_start.setDisabled(True)
-            self.actionStart_conversion.setDisabled(True)
+            self.actionStart_analysis.setDisabled(True)
 
     def report_host_setting_debug_changed(self):
         """
@@ -277,14 +277,14 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             or self.__report_noncompliance_enabled) \
                 and self.__files_to_pars:
             self.pushButton_start.setEnabled(True)
-            self.actionStart_conversion.setEnabled(True)
+            self.actionStart_analysis.setEnabled(True)
 
         if not self.__report_scan_enabled \
                 and not self.__report_host_enabled \
                 and not self.__report_vulnerabilities_enabled \
                 and not self.__report_noncompliance_enabled:
             self.pushButton_start.setDisabled(True)
-            self.actionStart_conversion.setDisabled(True)
+            self.actionStart_analysis.setDisabled(True)
 
     def report_vulnerabilities_setting_debug_changed(self):
         """
@@ -343,14 +343,14 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             or self.__report_noncompliance_enabled) \
                 and self.__files_to_pars:
             self.pushButton_start.setEnabled(True)
-            self.actionStart_conversion.setEnabled(True)
+            self.actionStart_analysis.setEnabled(True)
 
         if not self.__report_scan_enabled \
                 and not self.__report_host_enabled \
                 and not self.__report_vulnerabilities_enabled \
                 and not self.__report_noncompliance_enabled:
             self.pushButton_start.setDisabled(True)
-            self.actionStart_conversion.setDisabled(True)
+            self.actionStart_analysis.setDisabled(True)
 
     def report_noncompliance_setting_debug_changed(self):
         """
@@ -385,6 +385,39 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.print_log(info, color)
         self.update_parsing_settings('report_set_source_directory_as_target_directory_enabled',
                                      self.__report_set_source_directory_as_target_directory_enabled)
+
+        self.set_source_directory_as_target_directory()
+
+    def set_source_directory_as_target_directory(self):
+        """
+        Function sets target directory base on path from selected source file or base on path from first file from
+        selected source directory, works only if source file or directory has been already selected.
+        """
+        files_to_pars = self.__files_to_pars
+
+        if files_to_pars:
+            if self.__report_set_source_directory_as_target_directory_enabled:
+                old_target_directory = self.__target_directory
+                first_file_path = os.path.dirname(files_to_pars[0])
+                first_file_path_normalized = os.path.normpath(first_file_path)
+                self.set_target_directory(first_file_path_normalized)
+                self.lineEdit_target_directory.setText(self.__target_directory)
+                color = 'green'
+                info2 = 'Target directory changed from "' + old_target_directory + \
+                        '" to "' + self.__target_directory + '"'
+                self.print_log(info2, color)
+                self.__target_directory_changed = True
+            else:
+                old_target_directory = self.__target_directory
+                cwd = os.getcwd()
+                cwd_normalized = os.path.normpath(cwd)
+                self.set_target_directory(cwd_normalized)
+                self.lineEdit_target_directory.setText(self.__target_directory)
+                color = 'green'
+                info2 = 'Target directory changed from "' + old_target_directory + \
+                        '" to "' + self.__target_directory + '"'
+                self.print_log(info2, color)
+                self.__target_directory_changed = True
 
     def suffix_timestamp_changed(self):
         """
@@ -483,11 +516,11 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         """
         Function starts separate thread to pars selected files.
         """
-        self.__file_conversion_counter = 0
+        self.__file_analysis_counter = 0
         self.statusbar.clearMessage()
         self.progressBar.setVisible(True)
 
-        info = 'Conversion started.'
+        info = 'Analysis started.'
         color = 'blue'
         self.print_log(info, color=color)
         try:
@@ -535,7 +568,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             self.parsing_thread.start()
             self.parsing_thread.signal.connect(self.parsing_thread_done)
 
-            self.parsing_thread.progress.connect(self.conversion_progress)
+            self.parsing_thread.progress.connect(self.analysis_progress)
             self.parsing_thread.print_status_bar_info.connect(self.print_status_bar_info)
 
         except Exception as e:
@@ -546,16 +579,16 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
 
     def print_status_bar_info(self, text):
         """
-        Function sends notification via status bar about progress of conversion for each input file.
+        Function sends notification via status bar about progress of analysis for each input file.
         :param text: text send to status bar
         """
         self.statusbar.clearMessage()
         self.statusbar.showMessage(text)
         self.statusbar.repaint()
 
-    def conversion_progress(self, host_number, all_hosts_number):
+    def analysis_progress(self, host_number, all_hosts_number):
         """
-        Function shows conversion progress for each input file.
+        Function shows analysis progress for each input file.
         Input parameters are used to set progress bar values.
         :param host_number: number of currently processed host in input file currently processed
         :param all_hosts_number: number of all hosts in input file currently processed
@@ -703,7 +736,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
                     or self.__report_vulnerabilities_enabled
                     or self.__report_noncompliance_enabled):
                 self.pushButton_start.setEnabled(True)
-                self.actionStart_conversion.setEnabled(True)
+                self.actionStart_analysis.setEnabled(True)
         else:
             number_of_files = 0
             info = 'Selected {0} files.'.format(str(number_of_files))
@@ -763,7 +796,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
                     or self.__report_vulnerabilities_enabled
                     or self.__report_noncompliance_enabled):
                 self.pushButton_start.setEnabled(True)
-                self.actionStart_conversion.setEnabled(True)
+                self.actionStart_analysis.setEnabled(True)
         else:
             number_of_files = 0
             info = 'Selected {0} files.'.format(str(number_of_files))
@@ -829,7 +862,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         """
         Function sets private variables:
         __files_to_pars with list of selected files,
-        __file_conversion_counter reset to 0
+        __file_analysis_counter reset to 0
         :param files: list of selected files.
         """
         number_of_files = len(files)
@@ -850,13 +883,13 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             notification_info = '[action={0}] [source_file={1}]'.format(action_name, file_to_pars)
             self.print_log(notification_info, color=color)
 
-        self.__file_conversion_counter = 0
+        self.__file_analysis_counter = 0
 
 
 class ParsingThread(QThread):
     signal = pyqtSignal('PyQt_PyObject')
     progress = pyqtSignal(int, int)
-    file_conversion_started = pyqtSignal(int)
+    file_analysis_started = pyqtSignal(int)
     print_status_bar_info = pyqtSignal('QString')
 
     def __init__(self, files_to_pars, target_directory, target_directory_changed, parsing_settings, parent=None):
@@ -1124,7 +1157,7 @@ class ParsingThread(QThread):
                 nessus_scan_file = nfr.file.nessus_scan_file_name_with_path(nessus_scan_file)
                 start_time = time.time()
                 self.log_emitter('start', nessus_scan_file)
-                self.file_conversion_started.emit(1)
+                self.file_analysis_started.emit(1)
 
                 source_file_size = nfa.utilities.size_of_file_human(nessus_scan_file)
                 self.log_emitter('info ', nessus_scan_file, '[source_file_size={0}]'.format(source_file_size))
@@ -1443,7 +1476,7 @@ class ParsingThread(QThread):
                 nessus_scan_file = nfr.file.nessus_scan_file_name_with_path(nessus_scan_file)
                 start_time = time.time()
                 self.log_emitter('start', nessus_scan_file)
-                self.file_conversion_started.emit(1)
+                self.file_analysis_started.emit(1)
 
                 source_file_size = nfa.utilities.size_of_file_human(nessus_scan_file)
                 self.log_emitter('info ', nessus_scan_file, '[source_file_size={0}]'.format(source_file_size))
@@ -1981,7 +2014,7 @@ class ParsingThread(QThread):
 
                 start_time = time.time()
                 self.log_emitter('start', nessus_scan_file)
-                self.file_conversion_started.emit(1)
+                self.file_analysis_started.emit(1)
 
                 source_file_size = nfa.utilities.size_of_file_human(nessus_scan_file)
                 self.log_emitter('info ', nessus_scan_file, '[source_file_size={0}]'.format(source_file_size))
@@ -2261,7 +2294,7 @@ class ParsingThread(QThread):
 
                 start_time = time.time()
                 self.log_emitter('start', nessus_scan_file)
-                self.file_conversion_started.emit(1)
+                self.file_analysis_started.emit(1)
 
                 source_file_size = nfa.utilities.size_of_file_human(nessus_scan_file)
                 self.log_emitter('info ', nessus_scan_file, '[source_file_size={0}]'.format(source_file_size))
