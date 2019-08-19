@@ -60,7 +60,8 @@ Options
 "Source files" tab:
 
 * Mark checkbox "add debug data" to get additional columns for selected report type like source file name with path, policy name and more. *Note: Debug columns names are marked in blue color.*
-* Mark checkbox "filter out None results" available for vulnerabilities report type to automatically filter out plugins results with None Risk Factor and see only these which Risk Factor is equal Low, Medium, High or Critical. *Note: Plugins results with None Risk Factor are not removed from report, to see them use filter in column Risk Factor.*
+* Mark checkbox "filter out None results" available for vulnerabilities report type to automatically filter out plugins results with None Risk Factor and see in final report only these which Risk Factor is equal Low, Medium, High or Critical. *Note: Plugins results with None Risk Factor are not removed from report, to see them use filter in column Risk Factor.*
+* Mark checkbox "skip None results" available for vulnerabilities report type to completely skip plugins results with None Risk Factor and see in final report only these which Risk Factor is equal Low, Medium, High or Critical. *Note: To see plugins results with None Risk Factor in report you need disable this option and analyze selected files again.*
 
 "Target files" tab:
 

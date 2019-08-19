@@ -6,6 +6,13 @@ This document records all notable changes to `nessus file analyzer by LimberDuck
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 
+0.2.0 (2019-08-19)
+---------------------
+
+* New option: Settings > Source files > vulnerabilities > skip None results - now you can skip findings reported by plugins with None Risk Factor, thanks to this, the resulting file size will be smaller.
+* Updated option: Settings > Target files > add custom suffix - now input field for custom suffix is disabled by default. If you check this option input field becomes editable. Any text entered will result in automatic suffix change. Suffix will be cleared out if you uncheck this option or delete the entered text.
+
+
 0.1.1 (2019-07-21)
 ---------------------
 

@@ -33,8 +33,8 @@ __summary__ = "nessus file analyzer by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*)
               "of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed" \
               "data to a Microsoft Excel Workbook for effortless analysis."
 __uri__ = "https://github.com/LimberDuck"
-__version__ = "0.1.1"
-__release_date__ = "2019.07.21"
+__version__ = "0.2.0"
+__release_date__ = "2019.08.19"
 __author__ = u"Damian Krawczyk"
 __email__ = "damian.krawczyk@limberduck.org"
 __license_name__ = "GNU GPLv3"

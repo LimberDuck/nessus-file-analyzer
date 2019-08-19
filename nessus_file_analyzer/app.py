@@ -77,6 +77,9 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.__report_vulnerabilities_setting_none_filter_out = False
         self.update_parsing_settings('report_vulnerabilities_none_filter_out',
                                      self.__report_vulnerabilities_setting_none_filter_out)
+        self.__report_vulnerabilities_setting_none_skip = False
+        self.update_parsing_settings('report_vulnerabilities_none_skip',
+                                     self.__report_vulnerabilities_setting_none_skip)
         self.__report_noncompliance_setting_debug_data_enabled = False
         self.update_parsing_settings('report_noncompliance_debug_data_enabled',
                                      self.__report_noncompliance_enabled)
@@ -103,17 +106,21 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.checkBox_report_host.stateChanged.connect(self.report_host_changed)
         self.checkBox_debug_data_host.stateChanged.connect(self.report_host_setting_debug_changed)
         self.checkBox_report_vulnerabilities.stateChanged.connect(self.report_vulnerabilities_changed)
-        self.checkBox_vulnerabilities_none_filter_out.stateChanged.connect(
-            self.report_vulnerabilities_setting_none_filter_out_changed)
         self.checkBox_debug_data_vulnerabilities.stateChanged.connect(
             self.report_vulnerabilities_setting_debug_changed)
+        self.checkBox_vulnerabilities_none_filter_out.stateChanged.connect(
+            self.report_vulnerabilities_setting_none_filter_out_changed)
+        self.checkBox_vulnerabilities_none_skip.stateChanged.connect(
+            self.report_vulnerabilities_setting_none_skip_changed)
         self.checkBox_report_noncompliance.stateChanged.connect(self.report_noncompliance_changed)
         self.checkBox_debug_data_noncompliance.stateChanged.connect(self.report_noncompliance_setting_debug_changed)
 
         self.checkBox_set_source_directory_as_target_directory.stateChanged.connect(
             self.set_source_directory_as_target_directory_changed)
         self.checkBox_suffix_timestamp.stateChanged.connect(self.suffix_timestamp_changed)
-        self.checkBox_suffix_custom.stateChanged.connect(self.suffix_custom_changed)
+        self.lineEdit_suffix_custom_value.setDisabled(True)
+        self.checkBox_suffix_custom.stateChanged.connect(self.check_box_suffix_state_changed)
+        self.lineEdit_suffix_custom_value.textChanged.connect(self.line_edit_suffix_custom_value_changed)
 
         self.pushButton_start.clicked.connect(self.parsing_thread_start)
         self.pushButton_target_dir_change.clicked.connect(self.change_target_directory)
@@ -309,15 +316,36 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         filtered out vulnerabilities with Risk Factor equal None.
         """
         if self.checkBox_vulnerabilities_none_filter_out.isChecked():
-            info = 'Vulnerabilities report None filter out enabled.'
+            info = 'Vulnerabilities report None plugins filter out enabled.'
             self.__report_vulnerabilities_setting_none_filter_out = True
+            if self.checkBox_vulnerabilities_none_skip.isChecked():
+                self.checkBox_vulnerabilities_none_skip.setChecked(False)
         else:
-            info = 'Vulnerabilities report None filter out data disabled.'
+            info = 'Vulnerabilities report None plugins filter out disabled.'
             self.__report_vulnerabilities_setting_none_filter_out = False
         color = 'green'
         self.print_log(info, color)
         self.update_parsing_settings('report_vulnerabilities_none_filter_out',
                                      self.__report_vulnerabilities_setting_none_filter_out)
+        # self.print_settings()
+
+    def report_vulnerabilities_setting_none_skip_changed(self):
+        """
+        Function enables or disables setting which allow generation of spreadsheet with vulnerabilities sum-up with out
+        vulnerabilities with Risk Factor equal None.
+        """
+        if self.checkBox_vulnerabilities_none_skip.isChecked():
+            info = 'Vulnerabilities report None plugins skip enabled.'
+            self.__report_vulnerabilities_setting_none_skip = True
+            if self.checkBox_vulnerabilities_none_filter_out.isChecked():
+                self.checkBox_vulnerabilities_none_filter_out.setChecked(False)
+        else:
+            info = 'Vulnerabilities report None plugins skip disabled.'
+            self.__report_vulnerabilities_setting_none_skip = False
+        color = 'green'
+        self.print_log(info, color)
+        self.update_parsing_settings('report_vulnerabilities_none_skip',
+                                     self.__report_vulnerabilities_setting_none_skip)
         # self.print_settings()
 
     def report_noncompliance_changed(self):
@@ -462,11 +490,12 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             self.label_target_file_name_value.setText(self.__target_file_name_prefix + '.xlsx')
             self.__suffix_template = 'empty'
 
-    def suffix_custom_changed(self):
+    def check_box_suffix_state_changed(self):
         """
-        Function sets suffix appropriately if checkBox_suffix_custom has changed.
+        Function enables and disables lineEdit_suffix_custom_value and sets suffix appropriately.
         """
         if self.checkBox_suffix_custom.isChecked() and not self.checkBox_suffix_timestamp.isChecked():
+            self.lineEdit_suffix_custom_value.setEnabled(True)
             suffix_custom_value = self.lineEdit_suffix_custom_value.text()
             if suffix_custom_value:
                 space = '_'
@@ -478,12 +507,50 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             self.change_suffix(suffix)
             self.label_target_file_name_value.setText(self.__target_file_name_prefix + suffix + '.xlsx')
 
+        elif self.checkBox_suffix_custom.isChecked() and self.checkBox_suffix_timestamp.isChecked():
+            self.lineEdit_suffix_custom_value.setEnabled(True)
+            time_now = datetime.datetime.now()
+            time_now_formatted = time_now.strftime('%Y%m%d_%H%M%S')
+            suffix_custom_value = self.lineEdit_suffix_custom_value.text()
+            if suffix_custom_value:
+                space = '_'
+                self.__suffix_template = 'suffix_timestamp_custom'
+            else:
+                space = ''
+                self.__suffix_template = 'suffix_timestamp_custom_empty'
+            suffix = '_' + time_now_formatted + space + suffix_custom_value
+            self.change_suffix(suffix)
+            self.label_target_file_name_value.setText(self.__target_file_name_prefix + suffix + '.xlsx')
+
         elif not self.checkBox_suffix_custom.isChecked() and self.checkBox_suffix_timestamp.isChecked():
+            self.lineEdit_suffix_custom_value.setDisabled(True)
             time_now = datetime.datetime.now()
             time_now_formatted = time_now.strftime('%Y%m%d_%H%M%S')
             suffix = '_' + time_now_formatted
             self.change_suffix(suffix)
             self.__suffix_template = 'suffix_timestamp'
+            self.label_target_file_name_value.setText(self.__target_file_name_prefix + suffix + '.xlsx')
+
+        elif not self.checkBox_suffix_custom.isChecked() and not self.checkBox_suffix_timestamp.isChecked():
+            self.lineEdit_suffix_custom_value.setDisabled(True)
+            self.change_suffix('')
+            self.label_target_file_name_value.setText(self.__target_file_name_prefix + '.xlsx')
+            self.__suffix_template = 'empty'
+
+    def line_edit_suffix_custom_value_changed(self):
+        """
+        Function sets suffix appropriately if lineEdit_suffix_custom_value has changed.
+        """
+        if self.checkBox_suffix_custom.isChecked() and not self.checkBox_suffix_timestamp.isChecked():
+            suffix_custom_value = self.lineEdit_suffix_custom_value.text()
+            if suffix_custom_value:
+                space = '_'
+                self.__suffix_template = 'suffix_custom'
+            else:
+                space = ''
+                self.__suffix_template = 'suffix_custom_empty'
+            suffix = space + suffix_custom_value
+            self.change_suffix(suffix)
             self.label_target_file_name_value.setText(self.__target_file_name_prefix + suffix + '.xlsx')
 
         elif self.checkBox_suffix_custom.isChecked() and self.checkBox_suffix_timestamp.isChecked():
@@ -499,11 +566,6 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             suffix = '_' + time_now_formatted + space + suffix_custom_value
             self.change_suffix(suffix)
             self.label_target_file_name_value.setText(self.__target_file_name_prefix + suffix + '.xlsx')
-
-        else:
-            self.change_suffix('')
-            self.label_target_file_name_value.setText(self.__target_file_name_prefix + '.xlsx')
-            self.__suffix_template = 'empty'
 
     @staticmethod
     def open_dialog_about():
@@ -918,8 +980,11 @@ class ParsingThread(QThread):
         self.report_vulnerabilities_debug_data_enabled = self.parsing_settings[
             'report_vulnerabilities_debug_data_enabled']
         self.report_vulnerabilities_none_filter_out = self.parsing_settings['report_vulnerabilities_none_filter_out']
+        self.report_vulnerabilities_none_skip = self.parsing_settings['report_vulnerabilities_none_skip']
         self.report_noncompliance_debug_data_enabled = self.parsing_settings[
             'report_noncompliance_debug_data_enabled']
+        # print(self.report_vulnerabilities_none_filter_out)
+        # print(self.report_vulnerabilities_none_skip)
 
     def run(self):
         files_to_pars = self.files_to_pars
@@ -2076,7 +2141,8 @@ class ParsingThread(QThread):
                         solution = nfr.plugin.report_item_value(report_item, 'solution')
                         plugin_output = nfr.plugin.report_item_value(report_item, 'plugin_output')
 
-                        if not self.report_vulnerabilities_debug_data_enabled:
+                        if not self.report_vulnerabilities_debug_data_enabled and not \
+                                self.report_vulnerabilities_none_skip:
                             worksheet.write(row_index, 0, host_report_host_name)
                             worksheet.write(row_index, 1, host_resolved_hostname)
                             worksheet.write(row_index, 2, host_resolved_fqdn)
@@ -2111,7 +2177,45 @@ class ParsingThread(QThread):
                                 worksheet.write_string(row_index, 19, plugin_output)
                             else:
                                 worksheet.write_blank(row_index, 19, None)
-                        else:
+                        elif not self.report_vulnerabilities_debug_data_enabled and \
+                                self.report_vulnerabilities_none_skip:
+                            if risk_factor == 'None':
+                                number_of_rows -= 1
+                                row_index -= 1
+                            elif risk_factor != 'None':
+                                worksheet.write(row_index, 0, host_report_host_name)
+                                worksheet.write(row_index, 1, host_resolved_hostname)
+                                worksheet.write(row_index, 2, host_resolved_fqdn)
+                                worksheet.write(row_index, 3, host_resolved_ip)
+                                worksheet.write(row_index, 4, 'yes')
+                                worksheet.write(row_index, 5, host_credentialed_checks)
+                                worksheet.write(row_index, 6, protocol)
+                                worksheet.write(row_index, 7, service_name)
+                                worksheet.write(row_index, 8, port)
+                                worksheet.write(row_index, 9, plugin_id)
+                                worksheet.write(row_index, 10, plugin_name)
+                                worksheet.write(row_index, 11, plugin_type)
+                                worksheet.write(row_index, 12, risk_factor)
+                                worksheet.write(row_index, 13, plugin_family)
+                                worksheet.write(row_index, 14, plugin_version)
+                                if plugin_publication_date is not None:
+                                    worksheet.write_datetime(row_index, 15,
+                                                             nfr.plugin.plugin_date(plugin_publication_date), date_format)
+                                else:
+                                    worksheet.write_blank(row_index, 15, None)
+                                if plugin_modification_date is not None:
+                                    worksheet.write_datetime(row_index, 16,
+                                                             nfr.plugin.plugin_date(plugin_modification_date), date_format)
+                                else:
+                                    worksheet.write_blank(row_index, 16, None)
+                                worksheet.write(row_index, 17, plugin_description)
+                                worksheet.write(row_index, 18, solution)
+                                if plugin_output is not None:
+                                    worksheet.write_string(row_index, 19, plugin_output)
+                                else:
+                                    worksheet.write_blank(row_index, 19, None)
+                        elif self.report_vulnerabilities_debug_data_enabled and not \
+                                self.report_vulnerabilities_none_skip:
                             worksheet.write(row_index, 0, host_scanner_ip)
                             worksheet.write(row_index, 1, scan_report_name)
                             worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
@@ -2151,6 +2255,48 @@ class ParsingThread(QThread):
                                 worksheet.write_string(row_index, 24, plugin_output)
                             else:
                                 worksheet.write_blank(row_index, 24, None)
+                        elif self.report_vulnerabilities_debug_data_enabled and \
+                                self.report_vulnerabilities_none_skip:
+                            if risk_factor == 'None':
+                                number_of_rows -= 1
+                                row_index -= 1
+                            elif risk_factor != 'None':
+                                worksheet.write(row_index, 0, host_scanner_ip)
+                                worksheet.write(row_index, 1, scan_report_name)
+                                worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
+                                worksheet.write(row_index, 3, host_report_host_name)
+                                worksheet.write(row_index, 4, host_resolved_hostname)
+                                worksheet.write(row_index, 5, host_resolved_fqdn)
+                                worksheet.write(row_index, 6, host_resolved_ip)
+                                worksheet.write(row_index, 7, 'yes')
+                                worksheet.write(row_index, 8, host_credentialed_checks)
+                                worksheet.write(row_index, 9, scan_policy_name)
+                                worksheet.write(row_index, 10, protocol)
+                                worksheet.write(row_index, 11, service_name)
+                                worksheet.write(row_index, 12, port)
+                                worksheet.write(row_index, 13, plugin_id)
+                                worksheet.write(row_index, 14, plugin_name)
+                                worksheet.write(row_index, 15, plugin_type)
+                                worksheet.write(row_index, 16, risk_factor)
+                                worksheet.write(row_index, 17, plugin_family)
+                                worksheet.write(row_index, 18, plugin_file_name)
+                                worksheet.write(row_index, 19, plugin_version)
+                                if plugin_publication_date is not None:
+                                    worksheet.write_datetime(row_index, 20,
+                                                             nfr.plugin.plugin_date(plugin_publication_date), date_format)
+                                else:
+                                    worksheet.write_blank(row_index, 20, None)
+                                if plugin_modification_date is not None:
+                                    worksheet.write_datetime(row_index, 21,
+                                                             nfr.plugin.plugin_date(plugin_modification_date), date_format)
+                                else:
+                                    worksheet.write_blank(row_index, 21, None)
+                                worksheet.write(row_index, 22, plugin_description)
+                                worksheet.write(row_index, 23, solution)
+                                if plugin_output is not None:
+                                    worksheet.write_string(row_index, 24, plugin_output)
+                                else:
+                                    worksheet.write_blank(row_index, 24, None)
 
                 end_time = time.time()
                 elapsed_time = end_time - start_time

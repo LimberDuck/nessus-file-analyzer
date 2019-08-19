@@ -166,7 +166,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>30</y>
+              <y>25</y>
               <width>121</width>
               <height>20</height>
              </rect>
@@ -195,7 +195,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>30</y>
+              <y>25</y>
               <width>121</width>
               <height>20</height>
              </rect>
@@ -224,7 +224,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>30</y>
+              <y>25</y>
               <width>121</width>
               <height>20</height>
              </rect>
@@ -240,16 +240,32 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>50</y>
+              <y>45</y>
               <width>161</width>
               <height>20</height>
              </rect>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to automatically filter out plugins results with None Risk Factor and see only these which Risk Factor is equal Low, Medium, High or Critical.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Plugins results with None Risk Factor are not removed from report, to see them use filter in column Risk Factor.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to automatically filter out plugins results with None Risk Factor and see in final report only these which Risk Factor is equal Low, Medium, High or Critical.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Plugins results with None Risk Factor are not removed from report, to see them use filter in column Risk Factor.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string>filter out None results</string>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="checkBox_vulnerabilities_none_skip">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>65</y>
+              <width>161</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mark this checkbox if you want to completely skip plugins results with None Risk Factor and see in final report only these which Risk Factor is equal Low, Medium, High or Critical.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: To see plugins results with None Risk Factor in report you need disable this option and analyze selected files again.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>skip None results</string>
             </property>
            </widget>
           </widget>
@@ -269,7 +285,7 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>30</y>
+              <y>25</y>
               <width>121</width>
               <height>20</height>
              </rect>
