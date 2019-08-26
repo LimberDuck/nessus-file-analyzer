@@ -34,6 +34,8 @@ import subprocess
 import platform
 import nessus_file_reader as nfr
 import nessus_file_analyzer as nfa
+import urllib.parse
+import fnmatch
 
 
 class MainWindow(QMainWindow, nfa.Ui_MainWindow):
@@ -118,9 +120,14 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.checkBox_set_source_directory_as_target_directory.stateChanged.connect(
             self.set_source_directory_as_target_directory_changed)
         self.checkBox_suffix_timestamp.stateChanged.connect(self.suffix_timestamp_changed)
+
         self.lineEdit_suffix_custom_value.setDisabled(True)
         self.checkBox_suffix_custom.stateChanged.connect(self.check_box_suffix_state_changed)
         self.lineEdit_suffix_custom_value.textChanged.connect(self.line_edit_suffix_custom_value_changed)
+        # Match any character but \/:*?"<>|
+        reg_ex = QRegExp("[^\\\\/:*?\"<>|]+")
+        line_edit_suffix_custom_value_validator = QRegExpValidator(reg_ex, self.lineEdit_suffix_custom_value)
+        self.lineEdit_suffix_custom_value.setValidator(line_edit_suffix_custom_value_validator)
 
         self.pushButton_start.clicked.connect(self.parsing_thread_start)
         self.pushButton_target_dir_change.clicked.connect(self.change_target_directory)
@@ -152,6 +159,19 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
                        'hover mouse pointer on option for which you have any doubts to see tooltip. '
                        'Hover mouse pointer here, to see tooltip for progress preview.',
                        'red')
+
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, e):
+
+        if e.mimeData().hasFormat('text/uri-list'):
+            e.accept()
+        else:
+            e.ignore()
+
+    def dropEvent(self, e):
+        qurls = e.mimeData().urls()
+        self.open_files_by_drag_and_drop(qurls)
 
     def print_settings(self):
         """
@@ -763,7 +783,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         Function get list of files via dialog window.
         Possible to select one or more files.
         """
-        info = 'File\-s opening.'
+        info = 'File\\-s opening.'
         color = 'black'
         self.print_log(info, color=color)
 
@@ -865,6 +885,48 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             color = 'black'
             self.print_log(info, color=color)
 
+    def open_files_by_drag_and_drop(self, qurls):
+        """
+        Function get list of files via Drag and Drop.
+        Possible to select one or more files or directories.
+        """
+        info = 'File\\-s opening by Drag & Drop.'
+        color = 'black'
+        self.print_log(info, color=color)
+
+        paths = []
+        for qurl in qurls:
+            url = qurl.toString()
+            url_data = urllib.parse.urlparse(url)
+            path = urllib.parse.unquote(url_data.path)
+            os_name = platform.system()
+            if os_name == 'Windows':
+                path = os.path.abspath(path[1:])
+
+            extension = '*.nessus'
+
+            if os.path.isfile(path):
+                if fnmatch.fnmatch(path, extension):
+                    paths.append(path)
+                    if self.checkBox_set_source_directory_as_target_directory.isChecked():
+                        target_directory = os.path.dirname(os.path.abspath(path))
+                        self.set_target_directory(target_directory)
+                        self.get_target_directory_from_file()
+
+            elif os.path.isdir(path):
+                os_separator = os.path.sep
+                target_directory = os.path.abspath(path)
+                if self.checkBox_set_source_directory_as_target_directory.isChecked():
+                    self.set_target_directory(target_directory)
+                    self.get_target_directory_from_directory()
+
+                files = glob.glob(target_directory + os_separator + '**' + os_separator + extension, recursive=True)
+                for file in files:
+                    paths.append(file)
+
+        if len(paths) > 0:
+            self.list_of_files_to_pars(paths)
+
     def open_target_directory(self):
         """
         Function open target directory taking into account Operating system:
@@ -933,7 +995,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         else:
             suffix = 's'
         info = 'Selected {0} file{1}.'.format(str(number_of_files), suffix)
-        color = 'black'
+        color = 'blue'
         self.print_log(info, color=color)
         self.print_status_bar_info(info)
         self.__files_to_pars = files
@@ -2200,12 +2262,14 @@ class ParsingThread(QThread):
                                 worksheet.write(row_index, 14, plugin_version)
                                 if plugin_publication_date is not None:
                                     worksheet.write_datetime(row_index, 15,
-                                                             nfr.plugin.plugin_date(plugin_publication_date), date_format)
+                                                             nfr.plugin.plugin_date(plugin_publication_date),
+                                                             date_format)
                                 else:
                                     worksheet.write_blank(row_index, 15, None)
                                 if plugin_modification_date is not None:
                                     worksheet.write_datetime(row_index, 16,
-                                                             nfr.plugin.plugin_date(plugin_modification_date), date_format)
+                                                             nfr.plugin.plugin_date(plugin_modification_date),
+                                                             date_format)
                                 else:
                                     worksheet.write_blank(row_index, 16, None)
                                 worksheet.write(row_index, 17, plugin_description)
@@ -2283,12 +2347,14 @@ class ParsingThread(QThread):
                                 worksheet.write(row_index, 19, plugin_version)
                                 if plugin_publication_date is not None:
                                     worksheet.write_datetime(row_index, 20,
-                                                             nfr.plugin.plugin_date(plugin_publication_date), date_format)
+                                                             nfr.plugin.plugin_date(plugin_publication_date),
+                                                             date_format)
                                 else:
                                     worksheet.write_blank(row_index, 20, None)
                                 if plugin_modification_date is not None:
                                     worksheet.write_datetime(row_index, 21,
-                                                             nfr.plugin.plugin_date(plugin_modification_date), date_format)
+                                                             nfr.plugin.plugin_date(plugin_modification_date),
+                                                             date_format)
                                 else:
                                     worksheet.write_blank(row_index, 21, None)
                                 worksheet.write(row_index, 22, plugin_description)

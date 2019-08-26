@@ -35,25 +35,27 @@ Main features
 
 Usage
 =====
-1. Go to Menu "File".
-2. Choose:
+1. To open nessus files:
+    1.1 Open *nessus file analyzer by LimberDuck*, go to Menu "File" and choose:
+        - "Open file\\-s" if you want to open one or more nessus files at once.
+        - "Open directory" if you want to open all nessus files from selected directory and its subdirectories.
+    1.2 On OS level select one or more nessus files:
+        a. Click RMB (Right Mouse Button) on them and choose from contextual menu option "Open with..."
+        b. Choose *nessus file analyzer by LimberDuck* to open selected files.
+    1.3 On OS level select one or more nessus files or directories containing nessus files:
+        - simple drag and drop selected file\\-s on *nessus file analyzer by LimberDuck* window.
+        - simple drag and drop selected directory or directories on *nessus file analyzer by LimberDuck* window.
 
-    - "Open file\\-s" if you want to open one or more nessus files at once.
-
-    or
-
-    - "Open directory" if you want to open all nessus files from selected directory and its subdirectories.
-
-3. Select one or more report type:
+2. Select one or more report type:
 
     - "scan" - if you want to see sum-up from point of view of whole scan
     - "host" - if you want to see sum-up from point of view of particular host from given scan
     - "vulnerabilities" - if you want to see list of vulnerabilities reported in this scan for all scanned hosts
     - "noncompliance" - if you want to see list of noncompliance reported in this scan for all scanned hosts
 
-4. Click "Start" button to initiate analyze of all selected files.
+3. Click "Start" button to initiate analyze of all selected files.
 
-5. Click "Open" button to open target directory where output file has been placed.
+4. Click "Open" button to open target directory where output file has been placed.
 
 Options
 =======
