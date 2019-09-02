@@ -36,7 +36,7 @@ Main features
 Usage
 =====
 1. To open nessus files:
-    1.1 Open *nessus file analyzer by LimberDuck*, go to Menu "File" and choose:
+    1.1 Open nessus file analyzer by LimberDuck, go to Menu "File" and choose:
         - "Open file\\-s" if you want to open one or more nessus files at once.
         - "Open directory" if you want to open all nessus files from selected directory and its subdirectories.
     1.2 On OS level select one or more nessus files:
@@ -47,7 +47,6 @@ Usage
         - simple drag and drop selected directory or directories on *nessus file analyzer by LimberDuck* window.
 
 2. Select one or more report type:
-
     - "scan" - if you want to see sum-up from point of view of whole scan
     - "host" - if you want to see sum-up from point of view of particular host from given scan
     - "vulnerabilities" - if you want to see list of vulnerabilities reported in this scan for all scanned hosts

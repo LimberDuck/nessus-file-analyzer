@@ -811,8 +811,9 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
 
                 self.get_target_directory_from_file()
 
-            self.list_of_files_to_pars(files_only)
+        self.list_of_files_to_pars(files_only)
 
+        if len(files_only) > 0:
             if (self.__report_scan_enabled
                     or self.__report_host_enabled
                     or self.__report_vulnerabilities_enabled
@@ -820,10 +821,8 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
                 self.pushButton_start.setEnabled(True)
                 self.actionStart_analysis.setEnabled(True)
         else:
-            number_of_files = 0
-            info = 'Selected {0} files.'.format(str(number_of_files))
-            color = 'black'
-            self.print_log(info, color=color)
+            self.pushButton_start.setDisabled(True)
+            self.actionStart_analysis.setDisabled(True)
 
     @staticmethod
     def check_if_subdirectory_exist(main_directory):
@@ -863,6 +862,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         os_separator = os.path.sep
         target_directory = os.path.abspath(directories)
 
+        files =[]
         if directories:
             if self.checkBox_set_source_directory_as_target_directory.isChecked():
                 self.set_target_directory(target_directory)
@@ -871,8 +871,10 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
 
             files = glob.glob(target_directory + os_separator + '**' + os_separator + extension, recursive=True)
             # print(files)
-            self.list_of_files_to_pars(files)
 
+        self.list_of_files_to_pars(files)
+
+        if len(files) > 0:
             if (self.__report_scan_enabled
                     or self.__report_host_enabled
                     or self.__report_vulnerabilities_enabled
@@ -880,10 +882,8 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
                 self.pushButton_start.setEnabled(True)
                 self.actionStart_analysis.setEnabled(True)
         else:
-            number_of_files = 0
-            info = 'Selected {0} files.'.format(str(number_of_files))
-            color = 'black'
-            self.print_log(info, color=color)
+            self.pushButton_start.setDisabled(True)
+            self.actionStart_analysis.setDisabled(True)
 
     def open_files_by_drag_and_drop(self, qurls):
         """
@@ -924,8 +924,19 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
                 for file in files:
                     paths.append(file)
 
-        if len(paths) > 0:
             self.list_of_files_to_pars(paths)
+
+        if len(paths) > 0:
+            if (self.__report_scan_enabled
+                    or self.__report_host_enabled
+                    or self.__report_vulnerabilities_enabled
+                    or self.__report_noncompliance_enabled):
+                self.pushButton_start.setEnabled(True)
+                self.actionStart_analysis.setEnabled(True)
+
+        else:
+            self.pushButton_start.setDisabled(True)
+            self.actionStart_analysis.setDisabled(True)
 
     def open_target_directory(self):
         """
@@ -994,7 +1005,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             suffix = ''
         else:
             suffix = 's'
-        info = 'Selected {0} file{1}.'.format(str(number_of_files), suffix)
+        info = 'Selected {0} nessus file{1}.'.format(str(number_of_files), suffix)
         color = 'blue'
         self.print_log(info, color=color)
         self.print_status_bar_info(info)

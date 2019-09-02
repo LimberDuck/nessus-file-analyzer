@@ -5,6 +5,14 @@ Change Log
 This document records all notable changes to `nessus file analyzer by LimberDuck <https://github.com/LimberDuck/nessus-file-analyzer>`_.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+
+0.3.1 (2019-09-02)
+---------------------
+
+Bug Fixes
+    - **Start button and menu option Start analysis** - will be set to disabled if you do not provide nessus files during the next selection (e.g. cancelling nessus files selection, cancelling source directory selection, selecting directory without nessus files, dropping files with extension different than .nessus, dropping directory without nessus files)
+    - **List of files to pars** - will be correctly cleared out if you do not provide nessus files during the next selection (e.g. cancelling nessus files selection, cancelling source directory selection, selecting directory without nessus files, dropping files with extension different than .nessus, dropping directory without nessus files)
+
 0.3.0 (2019-08-26)
 ---------------------
 
