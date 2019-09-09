@@ -1,6 +1,6 @@
 chardet==3.0.4
 imageio==2.5.0
-nessus-file-reader==0.1.0
+nessus-file-reader==0.2.0
 numpy==1.16.2
 Pillow==5.4.1
 PyQt5==5.12.1

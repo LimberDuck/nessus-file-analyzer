@@ -2086,7 +2086,9 @@ class ParsingThread(QThread):
                 'Plugin modification date',
                 'Plugin description',
                 'Solution',
-                'Plugin output'
+                'Plugin output',
+                'CVE counter',
+                'CVE number'
             ]
         else:
             headers = [
@@ -2114,7 +2116,9 @@ class ParsingThread(QThread):
                 'Plugin modification date',
                 'Plugin description',
                 'Solution',
-                'Plugin output'
+                'Plugin output',
+                'CVE counter',
+                'CVE number'
             ]
         number_of_columns = len(headers)
         # print('Number of columns: ' + str(number_of_columns))
@@ -2213,6 +2217,7 @@ class ParsingThread(QThread):
                         plugin_description = nfr.plugin.report_item_value(report_item, 'description')
                         solution = nfr.plugin.report_item_value(report_item, 'solution')
                         plugin_output = nfr.plugin.report_item_value(report_item, 'plugin_output')
+                        plugin_cves = nfr.plugin.report_item_values(report_item, 'cve')
 
                         if not self.report_vulnerabilities_debug_data_enabled and not \
                                 self.report_vulnerabilities_none_skip:
@@ -2250,6 +2255,12 @@ class ParsingThread(QThread):
                                 worksheet.write_string(row_index, 19, plugin_output)
                             else:
                                 worksheet.write_blank(row_index, 19, None)
+                            if plugin_cves:
+                                worksheet.write_number(row_index, 20, len(plugin_cves))
+                                worksheet.write_string(row_index, 21, ','.join(plugin_cves))
+                            else:
+                                worksheet.write_number(row_index, 20, 0)
+                                worksheet.write_blank(row_index, 21, None)
                         elif not self.report_vulnerabilities_debug_data_enabled and \
                                 self.report_vulnerabilities_none_skip:
                             if risk_factor == 'None':
@@ -2289,6 +2300,12 @@ class ParsingThread(QThread):
                                     worksheet.write_string(row_index, 19, plugin_output)
                                 else:
                                     worksheet.write_blank(row_index, 19, None)
+                                if plugin_cves:
+                                    worksheet.write_number(row_index, 20, len(plugin_cves))
+                                    worksheet.write_string(row_index, 21, ','.join(plugin_cves))
+                                else:
+                                    worksheet.write_number(row_index, 20, 0)
+                                    worksheet.write_blank(row_index, 21, None)
                         elif self.report_vulnerabilities_debug_data_enabled and not \
                                 self.report_vulnerabilities_none_skip:
                             worksheet.write(row_index, 0, host_scanner_ip)
@@ -2330,6 +2347,12 @@ class ParsingThread(QThread):
                                 worksheet.write_string(row_index, 24, plugin_output)
                             else:
                                 worksheet.write_blank(row_index, 24, None)
+                            if plugin_cves:
+                                worksheet.write_number(row_index, 25, len(plugin_cves))
+                                worksheet.write_string(row_index, 26, ','.join(plugin_cves))
+                            else:
+                                worksheet.write_number(row_index, 25, 0)
+                                worksheet.write_blank(row_index, 26, None)
                         elif self.report_vulnerabilities_debug_data_enabled and \
                                 self.report_vulnerabilities_none_skip:
                             if risk_factor == 'None':
@@ -2374,6 +2397,12 @@ class ParsingThread(QThread):
                                     worksheet.write_string(row_index, 24, plugin_output)
                                 else:
                                     worksheet.write_blank(row_index, 24, None)
+                                if plugin_cves:
+                                    worksheet.write_number(row_index, 25, len(plugin_cves))
+                                    worksheet.write_string(row_index, 26, ','.join(plugin_cves))
+                                else:
+                                    worksheet.write_number(row_index, 25, 0)
+                                    worksheet.write_blank(row_index, 26, None)
 
                 end_time = time.time()
                 elapsed_time = end_time - start_time

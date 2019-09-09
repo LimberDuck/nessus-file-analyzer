@@ -6,6 +6,15 @@ This document records all notable changes to `nessus file analyzer by LimberDuck
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 
+0.4.0 (2019-09-09)
+---------------------
+
+New Features
+    - **CVE information in vulnerabilities report** - now you will have two additional columns at the end:
+        - CVE counter - with number of all CVE numbers assigned to particular plugin, if there is no CVE assigned cell has value 0
+        - CVE number - with list of CVE numbers assigned to particular plugin, if there is no CVE assigned cell is empty
+
+
 0.3.1 (2019-09-02)
 ---------------------
 
