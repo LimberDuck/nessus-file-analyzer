@@ -86,20 +86,50 @@ def check_file_encoding(file):
     return char_enc
 
 
+def size_human(size, suffix='B'):
+    """
+    Function convert provided size into human readable form
+    :param size:  number
+    :param suffix: suffix
+    :return: file size in human readable form
+    """
+
+    for unit in [' b', ' Ki', ' Mi', ' Gi', ' Ti', ' Pi', ' Ei', ' Zi']:
+        if abs(size) < 1024.0:
+            return '%3.1f%s%s' % (size, unit, suffix)
+        size /= 1024.0
+    return '%.1f%s%s' % (size, 'Yi', suffix)
+
+
 def size_of_file_human(file, suffix='B'):
     """
-    Function convert provided file size into human readable form
+    Function convert size of provided file into human readable form
     :param file:  source file name with path
     :param suffix: suffix
     :return: file size in human readable form
     """
-    num = os.path.getsize(file)
+    file_real_size = os.path.getsize(file)
+    file_real_size_human = size_human(file_real_size, suffix)
 
-    for unit in [' b', ' Ki', ' Mi', ' Gi', ' Ti', ' Pi', ' Ei', ' Zi']:
-        if abs(num) < 1024.0:
-            return '%3.1f%s%s' % (num, unit, suffix)
-        num /= 1024.0
-    return '%.1f%s%s' % (num, 'Yi', suffix)
+    return file_real_size_human
+
+
+def size_of_file_inside_zip_human(zip_file, file_inside_zip, suffix='B'):
+    """
+    Function convert size of file from inside of provided zip file into human readable form
+    :param zip_file: source zip file
+    :param file_inside_zip:  source file name from inside of provided zip file
+    :param suffix: suffix
+    :return: file size in human readable form
+    """
+
+    file_real_size = zip_file.getinfo(file_inside_zip).file_size
+    file_real_size_human = size_human(file_real_size, suffix)
+
+    file_compress_size = zip_file.getinfo(file_inside_zip).compress_size
+    file_compress_size_human = size_human(file_compress_size, suffix)
+
+    return f'{file_compress_size_human} [{file_real_size_human}]'
 
 
 def csv_file_row_counter(file, source_file_delimiter):
