@@ -36,6 +36,7 @@ import nessus_file_reader as nfr
 import nessus_file_analyzer as nfa
 import urllib.parse
 import fnmatch
+import zipfile
 
 
 class MainWindow(QMainWindow, nfa.Ui_MainWindow):
@@ -787,11 +788,11 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         color = 'black'
         self.print_log(info, color=color)
 
-        extension = '*.nessus'
+        extension = ['nessus', 'zip']
 
-        title = 'Open {0} files'.format(extension)
+        title = f'Open {extension[0]} or {extension[1]} containing {extension[0]} files'
         starting_directory = ''
-        file_filter = 'nessus ({0})'.format(extension)
+        file_filter = f'Nessus scan file (*.{extension[0]});;ZIP Archive (*.{extension[1]})'
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
 
@@ -799,8 +800,9 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         file_dialog.setFileMode(QFileDialog.ExistingFiles)
 
         files = file_dialog.getOpenFileNames(self, title, starting_directory, filter=file_filter, options=options)
-        files_only = files[0]
-        # print(len(files_only),files_only)
+        files_only = [os.path.abspath(item) for item in files[0]]
+        # print(f'File open, after map {len(files_only)} {files_only}')
+
         if len(files_only):
             if self.checkBox_set_source_directory_as_target_directory.isChecked():
                 for file_name in files_only:
@@ -850,9 +852,9 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         color = 'black'
         self.print_log(info, color=color)
 
-        extension = '*.nessus'
+        extension = ['nessus', 'zip']
 
-        title = 'Open {0} files directory'.format(extension)
+        title = f'Open {extension[0]} or {extension[1]} containing {extension[0]} files directory'
         starting_directory = ''
         options = QFileDialog.Options()
         options |= QFileDialog.ShowDirsOnly
@@ -862,15 +864,19 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         os_separator = os.path.sep
         target_directory = os.path.abspath(directories)
 
-        files =[]
+        files = []
         if directories:
             if self.checkBox_set_source_directory_as_target_directory.isChecked():
                 self.set_target_directory(target_directory)
                 self.get_target_directory_from_directory()
                 # print(target_directory)
 
-            files = glob.glob(target_directory + os_separator + '**' + os_separator + extension, recursive=True)
-            # print(files)
+            nessus_files = glob.glob(target_directory + os_separator + '**' + os_separator + '*.' + extension[0],
+                                     recursive=True)
+            zip_files = glob.glob(target_directory + os_separator + '**' + os_separator + '*.' + extension[1],
+                                  recursive=True)
+            files = nessus_files + zip_files
+            # print(f'Dir open, {len(files)} {files}')
 
         self.list_of_files_to_pars(files)
 
@@ -903,10 +909,10 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             if os_name == 'Windows':
                 path = os.path.abspath(path[1:])
 
-            extension = '*.nessus'
+            extension = ['nessus', 'zip']
 
             if os.path.isfile(path):
-                if fnmatch.fnmatch(path, extension):
+                if fnmatch.fnmatch(path, f'*.{extension[0]}') or fnmatch.fnmatch(path, f'*.{extension[1]}'):
                     paths.append(path)
                     if self.checkBox_set_source_directory_as_target_directory.isChecked():
                         target_directory = os.path.dirname(os.path.abspath(path))
@@ -920,7 +926,11 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
                     self.set_target_directory(target_directory)
                     self.get_target_directory_from_directory()
 
-                files = glob.glob(target_directory + os_separator + '**' + os_separator + extension, recursive=True)
+                nessus_files = glob.glob(target_directory + os_separator + '**' + os_separator + '*.' + extension[0],
+                                         recursive=True)
+                zip_files = glob.glob(target_directory + os_separator + '**' + os_separator + '*.' + extension[1],
+                                      recursive=True)
+                files = nessus_files + zip_files
                 for file in files:
                     paths.append(file)
 
@@ -954,8 +964,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         elif os_name == 'Linux':
             subprocess.call(['nautilus', self.__target_directory])
         else:
-            info = 'Can\'t open directory, your Operating System {0} is not supported. Please report it to us.'.format(
-                os_name)
+            info = f'Can\'t open directory, your Operating System {os_name} is not supported. Please report it to us.'
             color = 'red'
             self.print_log(info, color=color)
 
@@ -1005,18 +1014,41 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             suffix = ''
         else:
             suffix = 's'
-        info = 'Selected {0} nessus file{1}.'.format(str(number_of_files), suffix)
+        info = f'Selected {str(number_of_files)} file{suffix}.'
         color = 'blue'
         self.print_log(info, color=color)
         self.print_status_bar_info(info)
         self.__files_to_pars = files
 
-        color = 'black'
         for file_to_pars in self.__files_to_pars:
             file_to_pars = nfr.file.nessus_scan_file_name_with_path(file_to_pars)
+            color = 'black'
             action_name = 'info '
-            notification_info = '[action={0}] [source_file={1}]'.format(action_name, file_to_pars)
+            notification_info = f'[action={action_name}] [source_file={file_to_pars}]'
             self.print_log(notification_info, color=color)
+
+            nessus_files_only = []
+            if fnmatch.fnmatch(file_to_pars, '*.zip'):
+                zip_file_to_pars = zipfile.ZipFile(file_to_pars)
+                nessus_file_names = zip_file_to_pars.namelist()
+                for nessus_file_name in nessus_file_names:
+                    if fnmatch.fnmatch(nessus_file_name, '*.nessus'):
+                        # print('nessus file')
+                        nessus_files_only.append(nessus_file_name)
+
+                # print(len(nessus_files_only), nessus_files_only)
+
+                if len(nessus_files_only) == 0:
+                    color = 'red'
+                    action_name = 'info '
+                    notification_info = f'[action={action_name}] [There is no nessus files inside this zip archive.]'
+                    self.print_log(notification_info, color=color)
+                else:
+                    for nessus_file_only in nessus_files_only:
+                        color = 'black'
+                        action_name = 'info '
+                        notification_info = f'[action={action_name}] [source_file={nessus_file_only}]'
+                        self.print_log(notification_info, color=color)
 
         self.__file_analysis_counter = 0
 
@@ -1282,170 +1314,200 @@ class ParsingThread(QThread):
         number_of_files_with_errors = 0
 
         number_of_rows = 0
-        for row_index, nessus_scan_file in enumerate(list_of_source_files):
-            row_index += 1
-            number_of_rows += 1
-            nessus_scan_file_number = nessus_scan_file_number + 1
+        row_index = 0
+        for scan_file in list_of_source_files:
+            source_file_type = ''
+            files_to_pars = []
+            if fnmatch.fnmatch(scan_file, '*.nessus'):
+                files_to_pars.append(scan_file)
+                source_file_type = 'nessus'
+            elif fnmatch.fnmatch(scan_file, '*.zip'):
+                source_file_type = 'zip'
+                zip_source = zipfile.ZipFile(scan_file)
+                zip_files_list = zip_source.namelist()
+                for zip_file in zip_files_list:
+                    if fnmatch.fnmatch(zip_file, '*.nessus'):
+                        files_to_pars.append(zip_file)
 
-            info_file = ', File: ' + str(row_index) + '/' + str(len(list_of_source_files))
+            print(files_to_pars)
+            for file_to_pars in files_to_pars:
+                # print(row_index, number_of_rows, nessus_scan_file_number)
+                row_index += 1
+                number_of_rows += 1
+                nessus_scan_file_number += 1
 
-            try:
-                root = nfr.file.nessus_scan_file_root_element(nessus_scan_file)
+                info_file = ', File: ' + str(row_index) + '/' + str(len(list_of_source_files))
 
-                nessus_scan_file = nfr.file.nessus_scan_file_name_with_path(nessus_scan_file)
-                start_time = time.time()
-                self.log_emitter('start', nessus_scan_file)
-                self.file_analysis_started.emit(1)
+                try:
+                    file_to_pars_full_name = ''
+                    source_file_size = 0
+                    if source_file_type == 'nessus':
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        file_to_pars_full_name = nfr.file.nessus_scan_file_name_with_path(file_to_pars)
+                        source_file_size = nfa.utilities.size_of_file_human(file_to_pars_full_name)
+                    elif source_file_type == 'zip':
+                        source_file_size = nfa.utilities.size_of_file_inside_zip_human(zip_source, file_to_pars)
+                        file_to_pars_full_name = f'{nfr.file.nessus_scan_file_name_with_path(scan_file)} ' \
+                            f'[{zip_source.getinfo(file_to_pars).filename}]'
+                        file_to_pars = zip_source.open(file_to_pars)
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
 
-                source_file_size = nfa.utilities.size_of_file_human(nessus_scan_file)
-                self.log_emitter('info ', nessus_scan_file, '[source_file_size={0}]'.format(source_file_size))
-                self.log_emitter('info ', nessus_scan_file, '[report_type={0}]'.format(report_name))
-                self.log_emitter('info ', nessus_scan_file,
-                                 '[number_of_target_hosts={0}]'.format(nfr.scan.number_of_target_hosts(root)))
-                self.log_emitter('info ', nessus_scan_file,
-                                 '[number_of_scanned_hosts={0}]'.format(nfr.scan.number_of_scanned_hosts(root)))
-                self.log_emitter('info ', nessus_scan_file, '[number_of_scanned_hosts_with_credentials={0}]'.format(
-                    nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root)))
+                    start_time = time.time()
+                    self.log_emitter('start', file_to_pars_full_name)
+                    self.file_analysis_started.emit(1)
 
-                date_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
+                    self.log_emitter('info ', file_to_pars_full_name, f'[source_file_size={source_file_size}]')
+                    self.log_emitter('info ', file_to_pars_full_name, f'[report_type={report_name}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_target_hosts={nfr.scan.number_of_target_hosts(root)}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_scanned_hosts={nfr.scan.number_of_scanned_hosts(root)}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_scanned_hosts_with_credentials='
+                                     f'{nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root)}]')
 
-                login_used = None
-                number_of_plugins = 0
-                number_of_plugins_critical = 0
-                number_of_plugins_high = 0
-                number_of_plugins_medium = 0
-                number_of_plugins_low = 0
-                number_of_plugins_none = 0
-                number_of_compliance_plugins = 0
-                number_of_compliance_plugins_passed = 0
-                number_of_compliance_plugins_failed = 0
-                number_of_compliance_plugins_warning = 0
+                    date_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
 
-                policy_max_hosts = int(nfr.scan.policy_max_hosts(root))
-                policy_max_checks = int(nfr.scan.policy_max_checks(root))
-                policy_checks_read_timeout = int(nfr.scan.policy_checks_read_timeout(root))
+                    login_used = None
+                    number_of_plugins = 0
+                    number_of_plugins_critical = 0
+                    number_of_plugins_high = 0
+                    number_of_plugins_medium = 0
+                    number_of_plugins_low = 0
+                    number_of_plugins_none = 0
+                    number_of_compliance_plugins = 0
+                    number_of_compliance_plugins_passed = 0
+                    number_of_compliance_plugins_failed = 0
+                    number_of_compliance_plugins_warning = 0
 
-                report_host_counter = 0
-                number_of_report_hosts = nfr.scan.number_of_scanned_hosts(root)
+                    policy_max_hosts = int(nfr.scan.policy_max_hosts(root))
+                    policy_max_checks = int(nfr.scan.policy_max_checks(root))
+                    policy_checks_read_timeout = int(nfr.scan.policy_checks_read_timeout(root))
 
-                info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
-                info_final = info_report + info_file + info_host
-                self.print_status_bar_info.emit(info_final)
-
-                for report_host in nfr.scan.report_hosts(root):
-                    report_host_counter += 1
-                    self.progress.emit(report_host_counter, number_of_report_hosts)
+                    report_host_counter = 0
+                    number_of_report_hosts = nfr.scan.number_of_scanned_hosts(root)
 
                     info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
                     info_final = info_report + info_file + info_host
                     self.print_status_bar_info.emit(info_final)
 
-                    login_used = nfr.host.login_used(report_host)
+                    for report_host in nfr.scan.report_hosts(root):
+                        report_host_counter += 1
+                        self.progress.emit(report_host_counter, number_of_report_hosts)
 
-                    number_of_plugins += nfr.host.number_of_plugins(report_host)
-                    number_of_plugins_critical += nfr.host.number_of_plugins_per_risk_factor(report_host, 'Critical')
-                    number_of_plugins_high += nfr.host.number_of_plugins_per_risk_factor(report_host, 'High')
-                    number_of_plugins_medium += nfr.host.number_of_plugins_per_risk_factor(report_host, 'Medium')
-                    number_of_plugins_low += nfr.host.number_of_plugins_per_risk_factor(report_host, 'Low')
-                    number_of_plugins_none += nfr.host.number_of_plugins_per_risk_factor(report_host, 'None')
-                    number_of_compliance_plugins += nfr.host.number_of_compliance_plugins(report_host)
-                    number_of_compliance_plugins_passed += \
-                        nfr.host.number_of_compliance_plugins_per_result(report_host, 'PASSED')
-                    number_of_compliance_plugins_failed += \
-                        nfr.host.number_of_compliance_plugins_per_result(report_host, 'FAILED')
-                    number_of_compliance_plugins_warning += nfr.host.number_of_compliance_plugins_per_result(
-                        report_host, 'WARNING')
+                        info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
+                        info_final = info_report + info_file + info_host
+                        self.print_status_bar_info.emit(info_final)
 
-                if not self.report_scan_debug_data_enabled:
-                    worksheet.write(row_index, 0, nfr.scan.number_of_target_hosts(root))
-                    worksheet.write(row_index, 1, nfr.scan.number_of_target_hosts_without_duplicates(root))
-                    worksheet.write(row_index, 2, nfr.scan.number_of_scanned_hosts(root))
-                    worksheet.write(row_index, 3, nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root))
-                    worksheet.write(row_index, 4, nfr.scan.number_of_not_scanned_hosts(root))
+                        login_used = nfr.host.login_used(report_host)
 
-                    scan_start_time = nfr.scan.scan_time_start(root)
-                    if scan_start_time is not None:
-                        worksheet.write_datetime(row_index, 5, scan_start_time, date_format)
+                        number_of_plugins += nfr.host.number_of_plugins(report_host)
+                        number_of_plugins_critical += nfr.host.number_of_plugins_per_risk_factor(report_host,
+                                                                                                 'Critical')
+                        number_of_plugins_high += nfr.host.number_of_plugins_per_risk_factor(report_host, 'High')
+                        number_of_plugins_medium += nfr.host.number_of_plugins_per_risk_factor(report_host, 'Medium')
+                        number_of_plugins_low += nfr.host.number_of_plugins_per_risk_factor(report_host, 'Low')
+                        number_of_plugins_none += nfr.host.number_of_plugins_per_risk_factor(report_host, 'None')
+                        number_of_compliance_plugins += nfr.host.number_of_compliance_plugins(report_host)
+                        number_of_compliance_plugins_passed += \
+                            nfr.host.number_of_compliance_plugins_per_result(report_host, 'PASSED')
+                        number_of_compliance_plugins_failed += \
+                            nfr.host.number_of_compliance_plugins_per_result(report_host, 'FAILED')
+                        number_of_compliance_plugins_warning += nfr.host.number_of_compliance_plugins_per_result(
+                            report_host, 'WARNING')
+
+                    if not self.report_scan_debug_data_enabled:
+                        worksheet.write(row_index, 0, nfr.scan.number_of_target_hosts(root))
+                        worksheet.write(row_index, 1, nfr.scan.number_of_target_hosts_without_duplicates(root))
+                        worksheet.write(row_index, 2, nfr.scan.number_of_scanned_hosts(root))
+                        worksheet.write(row_index, 3, nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(
+                            root))
+                        worksheet.write(row_index, 4, nfr.scan.number_of_not_scanned_hosts(root))
+
+                        scan_start_time = nfr.scan.scan_time_start(root)
+                        if scan_start_time is not None:
+                            worksheet.write_datetime(row_index, 5, scan_start_time, date_format)
+                        else:
+                            worksheet.write_blank(row_index, 5, None)
+
+                        scan_end_time = nfr.scan.scan_time_end(root)
+                        if scan_end_time is not None:
+                            worksheet.write_datetime(row_index, 6, scan_end_time, date_format)
+                        else:
+                            worksheet.write_blank(row_index, 6, None)
+
+                        worksheet.write(row_index, 7, nfr.scan.scan_time_elapsed(root))
+                        worksheet.write(row_index, 8, login_used)
+                        worksheet.write(row_index, 9, nfr.scan.policy_db_sid(root))
+                        worksheet.write(row_index, 10, nfr.scan.policy_db_port(root))
+                        worksheet.write(row_index, 11, number_of_plugins)
+                        worksheet.write(row_index, 12, number_of_plugins_critical)
+                        worksheet.write(row_index, 13, number_of_plugins_high)
+                        worksheet.write(row_index, 14, number_of_plugins_medium)
+                        worksheet.write(row_index, 15, number_of_plugins_low)
+                        worksheet.write(row_index, 16, number_of_plugins_none)
+                        worksheet.write(row_index, 17, number_of_compliance_plugins)
+                        worksheet.write(row_index, 18, number_of_compliance_plugins_passed)
+                        worksheet.write(row_index, 19, number_of_compliance_plugins_failed)
+                        worksheet.write(row_index, 20, number_of_compliance_plugins_warning)
                     else:
-                        worksheet.write_blank(row_index, 5, None)
+                        worksheet.write(row_index, 0, nfr.scan.report_name(root))
+                        worksheet.write(row_index, 1, file_to_pars_full_name)
+                        worksheet.write(row_index, 2, source_file_size)
+                        worksheet.write(row_index, 3, nfr.scan.number_of_target_hosts(root))
+                        worksheet.write(row_index, 4, nfr.scan.number_of_target_hosts_without_duplicates(root))
+                        worksheet.write(row_index, 5, nfr.scan.number_of_scanned_hosts(root))
+                        worksheet.write(row_index, 6, nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(
+                            root))
+                        worksheet.write(row_index, 7, nfr.scan.number_of_not_scanned_hosts(root))
 
-                    scan_end_time = nfr.scan.scan_time_end(root)
-                    if scan_end_time is not None:
-                        worksheet.write_datetime(row_index, 6, scan_end_time, date_format)
-                    else:
-                        worksheet.write_blank(row_index, 6, None)
+                        scan_start_time = nfr.scan.scan_time_start(root)
+                        if scan_start_time is not None:
+                            worksheet.write_datetime(row_index, 8, scan_start_time, date_format)
+                        else:
+                            worksheet.write_blank(row_index, 8, None)
 
-                    worksheet.write(row_index, 7, nfr.scan.scan_time_elapsed(root))
-                    worksheet.write(row_index, 8, login_used)
-                    worksheet.write(row_index, 9, nfr.scan.policy_db_sid(root))
-                    worksheet.write(row_index, 10, nfr.scan.policy_db_port(root))
-                    worksheet.write(row_index, 11, number_of_plugins)
-                    worksheet.write(row_index, 12, number_of_plugins_critical)
-                    worksheet.write(row_index, 13, number_of_plugins_high)
-                    worksheet.write(row_index, 14, number_of_plugins_medium)
-                    worksheet.write(row_index, 15, number_of_plugins_low)
-                    worksheet.write(row_index, 16, number_of_plugins_none)
-                    worksheet.write(row_index, 17, number_of_compliance_plugins)
-                    worksheet.write(row_index, 18, number_of_compliance_plugins_passed)
-                    worksheet.write(row_index, 19, number_of_compliance_plugins_failed)
-                    worksheet.write(row_index, 20, number_of_compliance_plugins_warning)
-                else:
-                    worksheet.write(row_index, 0, nfr.scan.report_name(root))
-                    worksheet.write(row_index, 1, nfr.file.nessus_scan_file_name_with_path(nessus_scan_file))
-                    worksheet.write(row_index, 2, nfr.file.nessus_scan_file_size_human(nessus_scan_file))
-                    worksheet.write(row_index, 3, nfr.scan.number_of_target_hosts(root))
-                    worksheet.write(row_index, 4, nfr.scan.number_of_target_hosts_without_duplicates(root))
-                    worksheet.write(row_index, 5, nfr.scan.number_of_scanned_hosts(root))
-                    worksheet.write(row_index, 6, nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root))
-                    worksheet.write(row_index, 7, nfr.scan.number_of_not_scanned_hosts(root))
+                        scan_end_time = nfr.scan.scan_time_end(root)
+                        if scan_end_time is not None:
+                            worksheet.write_datetime(row_index, 9, scan_end_time, date_format)
+                        else:
+                            worksheet.write_blank(row_index, 9, None)
 
-                    scan_start_time = nfr.scan.scan_time_start(root)
-                    if scan_start_time is not None:
-                        worksheet.write_datetime(row_index, 8, scan_start_time, date_format)
-                    else:
-                        worksheet.write_blank(row_index, 8, None)
+                        worksheet.write(row_index, 10, nfr.scan.scan_time_elapsed(root))
+                        worksheet.write(row_index, 11, nfr.scan.policy_name(root))
+                        worksheet.write(row_index, 12, login_used)
+                        worksheet.write(row_index, 13, nfr.scan.policy_db_sid(root))
+                        worksheet.write(row_index, 14, nfr.scan.policy_db_port(root))
+                        worksheet.write(row_index, 15, nfr.scan.reverse_lookup(root))
+                        worksheet.write(row_index, 16, policy_max_hosts)
+                        worksheet.write(row_index, 17, policy_max_checks)
+                        worksheet.write(row_index, 18, policy_checks_read_timeout)
+                        worksheet.write(row_index, 19, len(nfr.scan.plugin_set(root)))
+                        worksheet.write(row_index, 20, number_of_plugins)
+                        worksheet.write(row_index, 21, number_of_plugins_critical)
+                        worksheet.write(row_index, 22, number_of_plugins_high)
+                        worksheet.write(row_index, 23, number_of_plugins_medium)
+                        worksheet.write(row_index, 24, number_of_plugins_low)
+                        worksheet.write(row_index, 25, number_of_plugins_none)
+                        worksheet.write(row_index, 26, number_of_compliance_plugins)
+                        worksheet.write(row_index, 27, number_of_compliance_plugins_passed)
+                        worksheet.write(row_index, 28, number_of_compliance_plugins_failed)
+                        worksheet.write(row_index, 29, number_of_compliance_plugins_warning)
 
-                    scan_end_time = nfr.scan.scan_time_end(root)
-                    if scan_end_time is not None:
-                        worksheet.write_datetime(row_index, 9, scan_end_time, date_format)
-                    else:
-                        worksheet.write_blank(row_index, 9, None)
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
 
-                    worksheet.write(row_index, 10, nfr.scan.scan_time_elapsed(root))
-                    worksheet.write(row_index, 11, nfr.scan.policy_name(root))
-                    worksheet.write(row_index, 12, login_used)
-                    worksheet.write(row_index, 13, nfr.scan.policy_db_sid(root))
-                    worksheet.write(row_index, 14, nfr.scan.policy_db_port(root))
-                    worksheet.write(row_index, 15, nfr.scan.reverse_lookup(root))
-                    worksheet.write(row_index, 16, policy_max_hosts)
-                    worksheet.write(row_index, 17, policy_max_checks)
-                    worksheet.write(row_index, 18, policy_checks_read_timeout)
-                    worksheet.write(row_index, 19, len(nfr.scan.plugin_set(root)))
-                    worksheet.write(row_index, 20, number_of_plugins)
-                    worksheet.write(row_index, 21, number_of_plugins_critical)
-                    worksheet.write(row_index, 22, number_of_plugins_high)
-                    worksheet.write(row_index, 23, number_of_plugins_medium)
-                    worksheet.write(row_index, 24, number_of_plugins_low)
-                    worksheet.write(row_index, 25, number_of_plugins_none)
-                    worksheet.write(row_index, 26, number_of_compliance_plugins)
-                    worksheet.write(row_index, 27, number_of_compliance_plugins_passed)
-                    worksheet.write(row_index, 28, number_of_compliance_plugins_failed)
-                    worksheet.write(row_index, 29, number_of_compliance_plugins_warning)
+                    self.log_emitter('info ', file_to_pars_full_name, f'[elapsed_time={elapsed_time_parsed}]')
+                    self.log_emitter('end  ', file_to_pars_full_name)
 
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
-
-                self.log_emitter('info ', nessus_scan_file, '[elapsed_time={0}]'.format(elapsed_time_parsed))
-                self.log_emitter('end  ', nessus_scan_file)
-
-            except Exception as e:
-                number_of_files_with_errors += 1
-                traceback.print_exc()
-                self.log_emitter('info',
-                                 "ERROR Parsing [" + str(nessus_scan_file_number) + "/" +
-                                 str(len(list_of_source_files)) + "] nessus files")
-                self.log_emitter('info', e)
+                except Exception as e:
+                    number_of_files_with_errors += 1
+                    traceback.print_exc()
+                    self.log_emitter('info',
+                                     "ERROR Parsing [" + str(nessus_scan_file_number) + "/" +
+                                     str(len(list_of_source_files)) + "] nessus files")
+                    self.log_emitter('info', e)
 
         if number_of_rows > 0:
             worksheet.autofilter(0, 0, number_of_rows, number_of_columns - 1)
@@ -1475,6 +1537,8 @@ class ParsingThread(QThread):
                 'Target',
                 'Hostname',
                 'FQDN',
+                # 'NetBIOS Computer name',
+                # 'NetBIOS Domain name',
                 'IP',
                 'Scanned',
                 'Credentialed checks',
@@ -1530,6 +1594,8 @@ class ParsingThread(QThread):
                 'Target',
                 'Hostname',
                 'FQDN',
+                'NetBIOS Computer name',
+                'NetBIOS Domain name',
                 'IP',
                 'Scanned',
                 'Credentialed checks',
@@ -1583,8 +1649,8 @@ class ParsingThread(QThread):
 
         worksheet.set_column(0, number_of_columns - 1, 18)
 
-        debug_columns_list = [0, 1, 2, 13, 17, 18, 19, 20, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46,
-                              47, 48, 49, 50, 51, 52]
+        debug_columns_list = [0, 1, 2, 6, 7, 13, 17, 18, 19, 20, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44,
+                              45, 46, 47, 48, 49, 50, 51, 52]
 
         for column_index, header in enumerate(headers):
             if self.report_host_debug_data_enabled and column_index in debug_columns_list:
@@ -1603,442 +1669,477 @@ class ParsingThread(QThread):
         number_of_rows = 0
         row_index = 0
         row_index_per_file = 0
-        for nessus_scan_file in list_of_source_files:
-            row_index_per_file += 1
-            nessus_scan_file_number = nessus_scan_file_number + 1
-            info_file = ', File: ' + str(row_index_per_file) + '/' + str(len(list_of_source_files))
+        for scan_file in list_of_source_files:
+            source_file_type = ''
+            files_to_pars = []
+            if fnmatch.fnmatch(scan_file, '*.nessus'):
+                files_to_pars.append(scan_file)
+                source_file_type = 'nessus'
+            elif fnmatch.fnmatch(scan_file, '*.zip'):
+                source_file_type = 'zip'
+                zip_source = zipfile.ZipFile(scan_file)
+                zip_files_list = zip_source.namelist()
+                for zip_file in zip_files_list:
+                    if fnmatch.fnmatch(zip_file, '*.nessus'):
+                        files_to_pars.append(zip_file)
 
-            try:
-                root = nfr.file.nessus_scan_file_root_element(nessus_scan_file)
+            for file_to_pars in files_to_pars:
+                row_index_per_file += 1
+                nessus_scan_file_number += 1
+                info_file = ', File: ' + str(row_index_per_file) + '/' + str(len(list_of_source_files))
 
-                nessus_scan_file = nfr.file.nessus_scan_file_name_with_path(nessus_scan_file)
-                start_time = time.time()
-                self.log_emitter('start', nessus_scan_file)
-                self.file_analysis_started.emit(1)
+                try:
+                    file_to_pars_full_name = ''
+                    source_file_size = 0
+                    if source_file_type == 'nessus':
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        file_to_pars_full_name = nfr.file.nessus_scan_file_name_with_path(file_to_pars)
+                        source_file_size = nfa.utilities.size_of_file_human(file_to_pars_full_name)
+                    elif source_file_type == 'zip':
+                        source_file_size = nfa.utilities.size_of_file_inside_zip_human(zip_source, file_to_pars)
+                        file_to_pars_full_name = f'{nfr.file.nessus_scan_file_name_with_path(scan_file)} ' \
+                            f'[{zip_source.getinfo(file_to_pars).filename}]'
+                        file_to_pars = zip_source.open(file_to_pars)
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
 
-                source_file_size = nfa.utilities.size_of_file_human(nessus_scan_file)
-                self.log_emitter('info ', nessus_scan_file, '[source_file_size={0}]'.format(source_file_size))
-                self.log_emitter('info ', nessus_scan_file, '[report_type={0}]'.format(report_name))
-                self.log_emitter('info ', nessus_scan_file,
-                                 '[number_of_target_hosts={0}]'.format(nfr.scan.number_of_target_hosts(root)))
-                self.log_emitter('info ', nessus_scan_file,
-                                 '[number_of_scanned_hosts={0}]'.format(nfr.scan.number_of_scanned_hosts(root)))
-                self.log_emitter('info ', nessus_scan_file, '[number_of_scanned_hosts_with_credentials={0}]'.format(
-                    nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root)))
+                    start_time = time.time()
+                    self.log_emitter('start', file_to_pars_full_name)
+                    self.file_analysis_started.emit(1)
 
-                date_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
-                policy_max_hosts = int(nfr.scan.policy_max_hosts(root))
-                policy_max_checks = int(nfr.scan.policy_max_checks(root))
-                policy_checks_read_timeout = int(nfr.scan.policy_checks_read_timeout(root))
-                scan_report_name = nfr.scan.report_name(root)
-                nessus_scan_file_name_with_path = nfr.file.nessus_scan_file_name_with_path(nessus_scan_file)
-                scan_time_elapsed = nfr.scan.scan_time_elapsed(root)
-                scan_policy_name = nfr.scan.policy_name(root)
-                scan_policy_db_sid = nfr.scan.policy_db_sid(root)
-                scan_policy_db_port = nfr.scan.policy_db_port(root)
-                scan_reverse_lookup = nfr.scan.reverse_lookup(root)
-                scan_policy_login_specified = nfr.scan.policy_login_specified(root)
+                    self.log_emitter('info ', file_to_pars_full_name, f'[source_file_size={source_file_size}]')
+                    self.log_emitter('info ', file_to_pars_full_name, f'[report_type={report_name}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_target_hosts={nfr.scan.number_of_target_hosts(root)}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_scanned_hosts={nfr.scan.number_of_scanned_hosts(root)}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_scanned_hosts_with_credentials='
+                                     f'{nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root)}]')
 
-                report_host_counter = 0
-                number_of_report_hosts = nfr.scan.number_of_scanned_hosts(root)
+                    date_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
+                    policy_max_hosts = int(nfr.scan.policy_max_hosts(root))
+                    policy_max_checks = int(nfr.scan.policy_max_checks(root))
+                    policy_checks_read_timeout = int(nfr.scan.policy_checks_read_timeout(root))
+                    scan_report_name = nfr.scan.report_name(root)
+                    nessus_scan_file_name_with_path = nfr.file.nessus_scan_file_name_with_path(file_to_pars_full_name)
+                    scan_time_elapsed = nfr.scan.scan_time_elapsed(root)
+                    scan_policy_name = nfr.scan.policy_name(root)
+                    scan_policy_db_sid = nfr.scan.policy_db_sid(root)
+                    scan_policy_db_port = nfr.scan.policy_db_port(root)
+                    scan_reverse_lookup = nfr.scan.reverse_lookup(root)
+                    scan_policy_login_specified = nfr.scan.policy_login_specified(root)
 
-                info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
-                info_final = info_report + info_file + info_host
-                self.print_status_bar_info.emit(info_final)
-
-                for report_host in nfr.scan.report_hosts(root):
-                    row_index += 1
-                    number_of_rows += 1
-
-                    report_host_counter += 1
-                    self.progress.emit(report_host_counter, number_of_report_hosts)
+                    report_host_counter = 0
+                    number_of_report_hosts = nfr.scan.number_of_scanned_hosts(root)
 
                     info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
                     info_final = info_report + info_file + info_host
                     self.print_status_bar_info.emit(info_final)
 
-                    login_used = nfr.host.login_used(report_host)
-                    if login_used is None:
-                        login_used = scan_policy_login_specified
+                    for report_host in nfr.scan.report_hosts(root):
+                        # print(row_index, number_of_rows, nessus_scan_file_number)
+                        row_index += 1
+                        number_of_rows += 1
 
-                    number_of_plugins = nfr.host.number_of_plugins(report_host)
-                    number_of_plugins_critical = nfr.host.number_of_plugins_per_risk_factor(report_host, 'Critical')
-                    number_of_plugins_high = nfr.host.number_of_plugins_per_risk_factor(report_host, 'High')
-                    number_of_plugins_medium = nfr.host.number_of_plugins_per_risk_factor(report_host, 'Medium')
-                    number_of_plugins_low = nfr.host.number_of_plugins_per_risk_factor(report_host, 'Low')
-                    number_of_plugins_none = nfr.host.number_of_plugins_per_risk_factor(report_host, 'None')
-                    number_of_compliance_plugins = nfr.host.number_of_compliance_plugins(report_host)
-                    number_of_compliance_plugins_passed = \
-                        nfr.host.number_of_compliance_plugins_per_result(report_host, 'PASSED')
-                    number_of_compliance_plugins_failed = \
-                        nfr.host.number_of_compliance_plugins_per_result(report_host, 'FAILED')
-                    number_of_compliance_plugins_warning = \
-                        nfr.host.number_of_compliance_plugins_per_result(report_host, 'WARNING')
-                    if not self.report_host_debug_data_enabled:
-                        worksheet.write(row_index, 0, nfr.host.report_host_name(report_host))
-                        worksheet.write(row_index, 1, nfr.host.resolved_hostname(report_host))
-                        worksheet.write(row_index, 2, nfr.host.resolved_fqdn(report_host))
-                        worksheet.write(row_index, 3, nfr.host.resolved_ip(report_host))
-                        worksheet.write(row_index, 4, 'yes')
-                        worksheet.write(row_index, 5, nfr.host.credentialed_checks(root, report_host))
+                        report_host_counter += 1
+                        self.progress.emit(report_host_counter, number_of_report_hosts)
 
-                        host_start_time = nfr.host.host_time_start(report_host)
-                        if host_start_time is not None:
-                            worksheet.write_datetime(row_index, 6, host_start_time, date_format)
-                        else:
-                            worksheet.write_blank(row_index, 6, None)
+                        info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
+                        info_final = info_report + info_file + info_host
+                        self.print_status_bar_info.emit(info_final)
 
-                        host_end_time = nfr.host.host_time_end(report_host)
-                        if host_end_time is not None:
-                            worksheet.write_datetime(row_index, 7, host_end_time, date_format)
-                        else:
-                            worksheet.write_blank(row_index, 7, None)
+                        login_used = nfr.host.login_used(report_host)
+                        if login_used is None:
+                            login_used = scan_policy_login_specified
 
-                        worksheet.write(row_index, 8, nfr.host.host_time_elapsed(report_host))
-                        worksheet.write(row_index, 9, scan_time_elapsed)
-                        worksheet.write(row_index, 10, login_used)
-                        worksheet.write(row_index, 11, scan_policy_db_sid)
-                        worksheet.write(row_index, 12, scan_policy_db_port)
-                        worksheet.write(row_index, 13, nfr.host.detected_os(report_host))
-                        worksheet.write(row_index, 14, number_of_plugins)
-                        worksheet.write(row_index, 15, number_of_plugins_critical)
-                        worksheet.write(row_index, 16, number_of_plugins_high)
-                        worksheet.write(row_index, 17, number_of_plugins_medium)
-                        worksheet.write(row_index, 18, number_of_plugins_low)
-                        worksheet.write(row_index, 19, number_of_plugins_none)
-                        worksheet.write(row_index, 20, number_of_compliance_plugins)
-                        worksheet.write(row_index, 21, number_of_compliance_plugins_passed)
-                        worksheet.write(row_index, 22, number_of_compliance_plugins_failed)
-                        worksheet.write(row_index, 23, number_of_compliance_plugins_warning)
+                        number_of_plugins = nfr.host.number_of_plugins(report_host)
+                        number_of_plugins_critical = nfr.host.number_of_plugins_per_risk_factor(report_host, 'Critical')
+                        number_of_plugins_high = nfr.host.number_of_plugins_per_risk_factor(report_host, 'High')
+                        number_of_plugins_medium = nfr.host.number_of_plugins_per_risk_factor(report_host, 'Medium')
+                        number_of_plugins_low = nfr.host.number_of_plugins_per_risk_factor(report_host, 'Low')
+                        number_of_plugins_none = nfr.host.number_of_plugins_per_risk_factor(report_host, 'None')
+                        number_of_compliance_plugins = nfr.host.number_of_compliance_plugins(report_host)
+                        number_of_compliance_plugins_passed = \
+                            nfr.host.number_of_compliance_plugins_per_result(report_host, 'PASSED')
+                        number_of_compliance_plugins_failed = \
+                            nfr.host.number_of_compliance_plugins_per_result(report_host, 'FAILED')
+                        number_of_compliance_plugins_warning = \
+                            nfr.host.number_of_compliance_plugins_per_result(report_host, 'WARNING')
+                        if not self.report_host_debug_data_enabled:
+                            worksheet.write(row_index, 0, nfr.host.report_host_name(report_host))
+                            worksheet.write(row_index, 1, nfr.host.resolved_hostname(report_host))
+                            worksheet.write(row_index, 2, nfr.host.resolved_fqdn(report_host))
+                            worksheet.write(row_index, 3, nfr.host.resolved_ip(report_host))
+                            worksheet.write(row_index, 4, 'yes')
+                            worksheet.write(row_index, 5, nfr.host.credentialed_checks(root, report_host))
 
-                    else:
-                        worksheet.write(row_index, 0, nfr.host.scanner_ip(root, report_host))
-                        worksheet.write(row_index, 1, scan_report_name)
-                        worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
-                        worksheet.write(row_index, 3, nfr.host.report_host_name(report_host))
-                        worksheet.write(row_index, 4, nfr.host.resolved_hostname(report_host))
-                        worksheet.write(row_index, 5, nfr.host.resolved_fqdn(report_host))
-                        worksheet.write(row_index, 6, nfr.host.resolved_ip(report_host))
-                        worksheet.write(row_index, 7, 'yes')
-                        worksheet.write(row_index, 8, nfr.host.credentialed_checks(root, report_host))
-
-                        host_start_time = nfr.host.host_time_start(report_host)
-                        if host_start_time is not None:
-                            worksheet.write_datetime(row_index, 9, host_start_time, date_format)
-                        else:
-                            worksheet.write_blank(row_index, 9, None)
-
-                        host_end_time = nfr.host.host_time_end(report_host)
-                        if host_end_time is not None:
-                            worksheet.write_datetime(row_index, 10, host_end_time, date_format)
-                        else:
-                            worksheet.write_blank(row_index, 10, None)
-
-                        worksheet.write(row_index, 11, nfr.host.host_time_elapsed(report_host))
-                        worksheet.write(row_index, 12, scan_time_elapsed)
-                        worksheet.write(row_index, 13, scan_policy_name)
-                        worksheet.write(row_index, 14, login_used)
-                        worksheet.write(row_index, 15, scan_policy_db_sid)
-                        worksheet.write(row_index, 16, scan_policy_db_port)
-                        worksheet.write(row_index, 17, scan_reverse_lookup)
-                        worksheet.write(row_index, 18, policy_max_hosts)
-                        worksheet.write(row_index, 19, policy_max_checks)
-                        worksheet.write(row_index, 20, policy_checks_read_timeout)
-                        worksheet.write(row_index, 21, nfr.host.detected_os(report_host))
-                        worksheet.write(row_index, 22, number_of_plugins)
-                        worksheet.write(row_index, 23, number_of_plugins_critical)
-                        worksheet.write(row_index, 24, number_of_plugins_high)
-                        worksheet.write(row_index, 25, number_of_plugins_medium)
-                        worksheet.write(row_index, 26, number_of_plugins_low)
-                        worksheet.write(row_index, 27, number_of_plugins_none)
-                        worksheet.write(row_index, 28, number_of_compliance_plugins)
-                        worksheet.write(row_index, 29, number_of_compliance_plugins_passed)
-                        worksheet.write(row_index, 30, number_of_compliance_plugins_failed)
-                        worksheet.write(row_index, 31, number_of_compliance_plugins_warning)
-                        # '10180: Ping to remote host'
-                        worksheet.write(row_index, 32, nfr.plugin.plugin_output(root, report_host, '10180'))
-                        # '10287: Traceroute Information'
-                        worksheet.write(row_index, 33, nfr.plugin.plugin_output(root, report_host, '10287'))
-                        # '11936: OS Identification'
-                        worksheet.write(row_index, 34, nfr.plugin.plugin_output(root, report_host, '11936'))
-                        # '45590: Common Platform Enumeration (CPE)'
-                        worksheet.write(row_index, 35, nfr.plugin.plugin_output(root, report_host, '45590'))
-                        # '54615: Device Type'
-                        worksheet.write(row_index, 36, nfr.plugin.plugin_output(root, report_host, '54615'))
-                        # '21745: Authentication Failure - Local Checks Not Run'
-                        worksheet.write(row_index, 37, nfr.plugin.plugin_output(root, report_host, '21745'))
-                        # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
-                        worksheet.write(row_index, 38, nfr.plugin.plugin_output(root, report_host, '12634'))
-                        # '110385: Authentication Success Insufficient Access'
-                        worksheet.write(row_index, 39, nfr.plugin.plugin_output(root, report_host, '110385'))
-                        # '102094: SSH Commands Require Privilege Escalation'
-                        worksheet.write(row_index, 40, nfr.plugin.plugin_output(root, report_host, '102094'))
-                        # '10394: Microsoft Windows SMB Log In Possible'
-                        worksheet.write(row_index, 41, nfr.plugin.plugin_output(root, report_host, '10394'))
-                        # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
-                        worksheet.write(row_index, 42, nfr.plugin.plugin_output(root, report_host, '24786'))
-                        # '24269: Windows Management Instrumentation (WMI) Available'
-                        worksheet.write(row_index, 43, nfr.plugin.plugin_output(root, report_host, '24269'))
-                        # '11011: Microsoft Windows SMB Service Detection'
-                        worksheet.write(row_index, 44, nfr.plugin.plugin_outputs(root, report_host, '11011'))
-                        # '10400: Microsoft Windows SMB Registry Remotely Accessible'
-                        worksheet.write(row_index, 45, nfr.plugin.plugin_output(root, report_host, '10400'))
-                        # '26917: Microsoft Windows SMB Registry : Nessus Cannot Access the Windows Registry'
-                        worksheet.write(row_index, 46, nfr.plugin.plugin_output(root, report_host, '26917'))
-                        # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
-                        worksheet.write(row_index, 47, nfr.plugin.plugin_output(root, report_host, '42897'))
-                        # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
-                        worksheet.write(row_index, 48, nfr.plugin.plugin_output(root, report_host, '20811'))
-                        # '91825: Oracle DB Login Possible'
-                        worksheet.write(row_index, 49, nfr.plugin.plugin_output(root, report_host, '91825'))
-                        # '91827: Microsoft SQL Server Login Possible'
-                        worksheet.write(row_index, 50, nfr.plugin.plugin_output(root, report_host, '91827'))
-                        # '47864: Cisco IOS Version'
-                        worksheet.write(row_index, 51, nfr.plugin.plugin_output(root, report_host, '47864'))
-                        # '67217: Cisco IOS XE Version'
-                        worksheet.write(row_index, 52, nfr.plugin.plugin_output(root, report_host, '67217'))
-
-                number_of_not_scanned_hosts = nfr.scan.number_of_not_scanned_hosts(root)
-                if number_of_not_scanned_hosts > 0:
-                    not_scanned_hosts = nfr.scan.list_of_not_scanned_hosts(root)
-                    not_scanned_host_counter = 0
-
-                    file_source = nfr.scan.source_of_file(root)
-                    if file_source == 'Tenable.sc':
-                        targets_sc = nfr.scan.list_of_target_hosts_sc_fqdn_ip(root)
-
-                        for target in not_scanned_hosts:
-                            row_index += 1
-                            not_scanned_host_counter += 1
-                            self.progress.emit(not_scanned_host_counter, number_of_not_scanned_hosts)
-
-                            target_fqdn = ''
-                            target_hostname = ''
-                            target_ip = ''
-                            for target_sc in targets_sc:
-                                if target == target_sc['target_fqdn']:
-                                    target_fqdn = target_sc['target_fqdn']
-                                    target_hostname = target_fqdn.split('.')[0]
-                                    target_ip = target_sc['target_ip']
-
-                            if not self.report_host_debug_data_enabled:
-                                worksheet.write(row_index, 0, target)
-                                worksheet.write(row_index, 1, target_hostname)
-                                worksheet.write(row_index, 2, target_fqdn)
-                                worksheet.write(row_index, 3, target_ip)
-                                worksheet.write(row_index, 4, 'no')
-                                worksheet.write(row_index, 5, 'no')
-                                worksheet.write_blank(row_index, 6, None)
-                                worksheet.write_blank(row_index, 7, None)
-                                worksheet.write(row_index, 8, '0:00:00')
-                                worksheet.write(row_index, 9, scan_time_elapsed)
-                                worksheet.write(row_index, 10, scan_policy_login_specified)
-                                worksheet.write(row_index, 11, scan_policy_db_sid)
-                                worksheet.write(row_index, 12, scan_policy_db_port)
-                                worksheet.write_blank(row_index, 13, None)
-                                worksheet.write_blank(row_index, 14, None)
-                                worksheet.write_blank(row_index, 15, None)
-                                worksheet.write_blank(row_index, 16, None)
-                                worksheet.write_blank(row_index, 17, None)
-                                worksheet.write_blank(row_index, 18, None)
-                                worksheet.write_blank(row_index, 19, None)
-                                worksheet.write_blank(row_index, 20, None)
-                                worksheet.write_blank(row_index, 21, None)
-                                worksheet.write_blank(row_index, 22, None)
+                            host_start_time = nfr.host.host_time_start(report_host)
+                            if host_start_time is not None:
+                                worksheet.write_datetime(row_index, 6, host_start_time, date_format)
                             else:
-                                # worksheet.write_blank(row_index, 0, None)
-                                worksheet.write(row_index, 1, scan_report_name)
-                                worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
-                                worksheet.write(row_index, 3, target)
-                                worksheet.write(row_index, 4, target_hostname)
-                                worksheet.write(row_index, 5, target_fqdn)
-                                worksheet.write(row_index, 6, target_ip)
-                                worksheet.write(row_index, 7, 'no')
-                                worksheet.write(row_index, 8, 'no')
-                                # worksheet.write_blank(row_index, 9, None)
-                                # worksheet.write_blank(row_index, 10, None)
-                                worksheet.write(row_index, 11, '0:00:00')
-                                worksheet.write(row_index, 12, scan_time_elapsed)
-                                worksheet.write(row_index, 13, scan_policy_name)
-                                worksheet.write(row_index, 14, scan_policy_login_specified)
-                                worksheet.write(row_index, 15, scan_policy_db_sid)
-                                worksheet.write(row_index, 16, scan_policy_db_port)
-                                worksheet.write(row_index, 17, scan_reverse_lookup)
-                                worksheet.write(row_index, 18, policy_max_hosts)
-                                worksheet.write(row_index, 19, policy_max_checks)
-                                # worksheet.write_blank(row_index, 20, None)
-                                # worksheet.write_blank(row_index, 21, None)
-                                # worksheet.write_blank(row_index, 22, None)
-                                # worksheet.write_blank(row_index, 23, None)
-                                # worksheet.write_blank(row_index, 24, None)
-                                # worksheet.write_blank(row_index, 25, None)
-                                # worksheet.write_blank(row_index, 26, None)
-                                # worksheet.write_blank(row_index, 27, None)
-                                # worksheet.write_blank(row_index, 28, None)
-                                # worksheet.write_blank(row_index, 29, None)
-                                # worksheet.write_blank(row_index, 30, None)
-                                # # '10180: Ping to remote host'
-                                # worksheet.write_blank(row_index, 31, None)
-                                # # '10287: Traceroute Information'
-                                # worksheet.write_blank(row_index, 32, None)
-                                # # '11936: OS Identification'
-                                # worksheet.write_blank(row_index, 33, None)
-                                # # '45590: Common Platform Enumeration (CPE)'
-                                # worksheet.write_blank(row_index, 34, None)
-                                # # '54615: Device Type'
-                                # worksheet.write_blank(row_index, 35, None)
-                                # # '21745: Authentication Failure - Local Checks Not Run'
-                                # worksheet.write_blank(row_index, 36, None)
-                                # # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
-                                # worksheet.write_blank(row_index, 37, None)
-                                # # '110385: Authentication Success Insufficient Access'
-                                # worksheet.write_blank(row_index, 38, None)
-                                # # '102094: SSH Commands Require Privilege Escalation'
-                                # worksheet.write_blank(row_index, 39, None)
-                                # # '10394: Microsoft Windows SMB Log In Possible'
-                                # worksheet.write_blank(row_index, 40, None)
-                                # # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
-                                # worksheet.write_blank(row_index, 41, None)
-                                # # '24269: Windows Management Instrumentation (WMI) Available'
-                                # worksheet.write_blank(row_index, 42, None)
-                                # # '11011: Microsoft Windows SMB Service Detection'
-                                # worksheet.write_blank(row_index, 43, None)
-                                # # '10400: Microsoft Windows SMB Registry Remotely Accessible'
-                                # worksheet.write_blank(row_index, 44, None)
-                                # # '26917: Microsoft Windows SMB Registry : Nessus Cannot Access the Windows Registry'
-                                # worksheet.write_blank(row_index, 45, None)
-                                # # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
-                                # worksheet.write_blank(row_index, 46, None)
-                                # # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
-                                # worksheet.write_blank(row_index, 47, None)
-                                # # '91825: Oracle DB Login Possible'
-                                # worksheet.write_blank(row_index, 48, None)
-                                # # '91827: Microsoft SQL Server Login Possible'
-                                # worksheet.write_blank(row_index, 49, None)
-                                # # '47864: Cisco IOS Version'
-                                # worksheet.write_blank(row_index, 50, None)
-                                # # '67217: Cisco IOS XE Version'
-                                # worksheet.write_blank(row_index, 51, None)
-
-                    else:
-                        for target in not_scanned_hosts:
-                            row_index += 1
-                            not_scanned_host_counter += 1
-                            self.progress.emit(not_scanned_host_counter, number_of_not_scanned_hosts)
-
-                            if not self.report_host_debug_data_enabled:
-                                worksheet.write(row_index, 0, target)
-                                worksheet.write_blank(row_index, 1, None)
-                                worksheet.write_blank(row_index, 2, None)
-                                worksheet.write_blank(row_index, 3, None)
-                                worksheet.write(row_index, 4, 'no')
-                                worksheet.write(row_index, 5, 'no')
                                 worksheet.write_blank(row_index, 6, None)
-                                worksheet.write_blank(row_index, 7, None)
-                                worksheet.write(row_index, 8, '0:00:00')
-                                worksheet.write(row_index, 9, scan_time_elapsed)
-                                worksheet.write(row_index, 10, scan_policy_login_specified)
-                                worksheet.write(row_index, 11, scan_policy_db_sid)
-                                worksheet.write(row_index, 12, scan_policy_db_port)
-                                worksheet.write_blank(row_index, 13, None)
-                                worksheet.write_blank(row_index, 14, None)
-                                worksheet.write_blank(row_index, 15, None)
-                                worksheet.write_blank(row_index, 16, None)
-                                worksheet.write_blank(row_index, 17, None)
-                                worksheet.write_blank(row_index, 18, None)
-                                worksheet.write_blank(row_index, 19, None)
-                                worksheet.write_blank(row_index, 20, None)
-                                worksheet.write_blank(row_index, 21, None)
-                                worksheet.write_blank(row_index, 22, None)
+
+                            host_end_time = nfr.host.host_time_end(report_host)
+                            if host_end_time is not None:
+                                worksheet.write_datetime(row_index, 7, host_end_time, date_format)
                             else:
-                                # worksheet.write_blank(row_index, 0, None)
-                                worksheet.write(row_index, 1, scan_report_name)
-                                worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
-                                worksheet.write(row_index, 3, target)
-                                # worksheet.write_blank(row_index, 4, None)
-                                # worksheet.write_blank(row_index, 5, None)
-                                # worksheet.write_blank(row_index, 6, None)
-                                worksheet.write(row_index, 7, 'no')
-                                worksheet.write(row_index, 8, 'no')
-                                # worksheet.write_blank(row_index, 9, None)
-                                # worksheet.write_blank(row_index, 10, None)
-                                worksheet.write(row_index, 11, '0:00:00')
-                                worksheet.write(row_index, 12, scan_time_elapsed)
-                                worksheet.write(row_index, 13, scan_policy_name)
-                                worksheet.write(row_index, 14, scan_policy_login_specified)
-                                worksheet.write(row_index, 15, scan_policy_db_sid)
-                                worksheet.write(row_index, 16, scan_policy_db_port)
-                                worksheet.write(row_index, 17, scan_reverse_lookup)
-                                worksheet.write(row_index, 18, policy_max_hosts)
-                                worksheet.write(row_index, 19, policy_max_checks)
-                                # worksheet.write_blank(row_index, 20, None)
-                                # worksheet.write_blank(row_index, 21, None)
-                                # worksheet.write_blank(row_index, 22, None)
-                                # worksheet.write_blank(row_index, 23, None)
-                                # worksheet.write_blank(row_index, 24, None)
-                                # worksheet.write_blank(row_index, 25, None)
-                                # worksheet.write_blank(row_index, 26, None)
-                                # worksheet.write_blank(row_index, 27, None)
-                                # worksheet.write_blank(row_index, 28, None)
-                                # worksheet.write_blank(row_index, 29, None)
-                                # worksheet.write_blank(row_index, 30, None)
-                                # # '10180: Ping to remote host'
-                                # worksheet.write_blank(row_index, 31, None)
-                                # # '10287: Traceroute Information'
-                                # worksheet.write_blank(row_index, 32, None)
-                                # # '11936: OS Identification'
-                                # worksheet.write_blank(row_index, 33, None)
-                                # # '45590: Common Platform Enumeration (CPE)'
-                                # worksheet.write_blank(row_index, 34, None)
-                                # # '54615: Device Type'
-                                # worksheet.write_blank(row_index, 35, None)
-                                # # '21745: Authentication Failure - Local Checks Not Run'
-                                # worksheet.write_blank(row_index, 36, None)
-                                # # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
-                                # worksheet.write_blank(row_index, 37, None)
-                                # # '110385: Authentication Success Insufficient Access'
-                                # worksheet.write_blank(row_index, 38, None)
-                                # # '102094: SSH Commands Require Privilege Escalation'
-                                # worksheet.write_blank(row_index, 39, None)
-                                # # '10394: Microsoft Windows SMB Log In Possible'
-                                # worksheet.write_blank(row_index, 40, None)
-                                # # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
-                                # worksheet.write_blank(row_index, 41, None)
-                                # # '24269: Windows Management Instrumentation (WMI) Available'
-                                # worksheet.write_blank(row_index, 42, None)
-                                # # '11011: Microsoft Windows SMB Service Detection'
-                                # worksheet.write_blank(row_index, 43, None)
-                                # # '10400: Microsoft Windows SMB Registry Remotely Accessible'
-                                # worksheet.write_blank(row_index, 44, None)
-                                # # '26917: Microsoft Windows SMB Registry : Nessus Cannot Access the Windows Registry'
-                                # worksheet.write_blank(row_index, 45, None)
-                                # # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
-                                # worksheet.write_blank(row_index, 46, None)
-                                # # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
-                                # worksheet.write_blank(row_index, 47, None)
-                                # # '91825: Oracle DB Login Possible'
-                                # worksheet.write_blank(row_index, 48, None)
-                                # # '91827: Microsoft SQL Server Login Possible'
-                                # worksheet.write_blank(row_index, 49, None)
-                                # # '47864: Cisco IOS Version'
-                                # worksheet.write_blank(row_index, 50, None)
-                                # # '67217: Cisco IOS XE Version'
-                                # worksheet.write_blank(row_index, 51, None)
+                                worksheet.write_blank(row_index, 7, None)
 
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
+                            worksheet.write(row_index, 8, nfr.host.host_time_elapsed(report_host))
+                            worksheet.write(row_index, 9, scan_time_elapsed)
+                            worksheet.write(row_index, 10, login_used)
+                            worksheet.write(row_index, 11, scan_policy_db_sid)
+                            worksheet.write(row_index, 12, scan_policy_db_port)
+                            worksheet.write(row_index, 13, nfr.host.detected_os(report_host))
+                            worksheet.write(row_index, 14, number_of_plugins)
+                            worksheet.write(row_index, 15, number_of_plugins_critical)
+                            worksheet.write(row_index, 16, number_of_plugins_high)
+                            worksheet.write(row_index, 17, number_of_plugins_medium)
+                            worksheet.write(row_index, 18, number_of_plugins_low)
+                            worksheet.write(row_index, 19, number_of_plugins_none)
+                            worksheet.write(row_index, 20, number_of_compliance_plugins)
+                            worksheet.write(row_index, 21, number_of_compliance_plugins_passed)
+                            worksheet.write(row_index, 22, number_of_compliance_plugins_failed)
+                            worksheet.write(row_index, 23, number_of_compliance_plugins_warning)
 
-                self.log_emitter('info ', nessus_scan_file, '[elapsed_time={0}]'.format(elapsed_time_parsed))
-                self.log_emitter('end  ', nessus_scan_file)
+                        else:
+                            worksheet.write(row_index, 0, nfr.host.scanner_ip(root, report_host))
+                            worksheet.write(row_index, 1, scan_report_name)
+                            worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
+                            worksheet.write(row_index, 3, nfr.host.report_host_name(report_host))
+                            worksheet.write(row_index, 4, nfr.host.resolved_hostname(report_host))
+                            worksheet.write(row_index, 5, nfr.host.resolved_fqdn(report_host))
+                            worksheet.write(row_index, 6,
+                                            nfr.host.netbios_network_name(root, report_host)['netbios_computer_name'])
+                            worksheet.write(row_index, 7,
+                                            nfr.host.netbios_network_name(root, report_host)['netbios_domain_name'])
+                            worksheet.write(row_index, 8, nfr.host.resolved_ip(report_host))
+                            worksheet.write(row_index, 9, 'yes')
+                            worksheet.write(row_index, 10, nfr.host.credentialed_checks(root, report_host))
 
-            except Exception as e:
-                number_of_files_with_errors += 1
-                traceback.print_exc()
-                self.log_emitter('info',
-                                 "ERROR Parsing [" + str(nessus_scan_file_number) + "/" +
-                                 str(len(list_of_source_files)) + "] nessus files")
-                self.log_emitter('info', e)
+                            host_start_time = nfr.host.host_time_start(report_host)
+                            if host_start_time is not None:
+                                worksheet.write_datetime(row_index, 11, host_start_time, date_format)
+                            else:
+                                worksheet.write_blank(row_index, 11, None)
+
+                            host_end_time = nfr.host.host_time_end(report_host)
+                            if host_end_time is not None:
+                                worksheet.write_datetime(row_index, 12, host_end_time, date_format)
+                            else:
+                                worksheet.write_blank(row_index, 12, None)
+
+                            worksheet.write(row_index, 13, nfr.host.host_time_elapsed(report_host))
+                            worksheet.write(row_index, 14, scan_time_elapsed)
+                            worksheet.write(row_index, 15, scan_policy_name)
+                            worksheet.write(row_index, 16, login_used)
+                            worksheet.write(row_index, 17, scan_policy_db_sid)
+                            worksheet.write(row_index, 18, scan_policy_db_port)
+                            worksheet.write(row_index, 19, scan_reverse_lookup)
+                            worksheet.write(row_index, 20, policy_max_hosts)
+                            worksheet.write(row_index, 21, policy_max_checks)
+                            worksheet.write(row_index, 22, policy_checks_read_timeout)
+                            worksheet.write(row_index, 23, nfr.host.detected_os(report_host))
+                            worksheet.write(row_index, 24, number_of_plugins)
+                            worksheet.write(row_index, 25, number_of_plugins_critical)
+                            worksheet.write(row_index, 26, number_of_plugins_high)
+                            worksheet.write(row_index, 27, number_of_plugins_medium)
+                            worksheet.write(row_index, 28, number_of_plugins_low)
+                            worksheet.write(row_index, 29, number_of_plugins_none)
+                            worksheet.write(row_index, 30, number_of_compliance_plugins)
+                            worksheet.write(row_index, 31, number_of_compliance_plugins_passed)
+                            worksheet.write(row_index, 32, number_of_compliance_plugins_failed)
+                            worksheet.write(row_index, 33, number_of_compliance_plugins_warning)
+                            # '10180: Ping to remote host'
+                            worksheet.write(row_index, 34, nfr.plugin.plugin_output(root, report_host, '10180'))
+                            # '10287: Traceroute Information'
+                            worksheet.write(row_index, 35, nfr.plugin.plugin_output(root, report_host, '10287'))
+                            # '11936: OS Identification'
+                            worksheet.write(row_index, 36, nfr.plugin.plugin_output(root, report_host, '11936'))
+                            # '45590: Common Platform Enumeration (CPE)'
+                            worksheet.write(row_index, 37, nfr.plugin.plugin_output(root, report_host, '45590'))
+                            # '54615: Device Type'
+                            worksheet.write(row_index, 38, nfr.plugin.plugin_output(root, report_host, '54615'))
+                            # '21745: Authentication Failure - Local Checks Not Run'
+                            worksheet.write(row_index, 39, nfr.plugin.plugin_output(root, report_host, '21745'))
+                            # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
+                            worksheet.write(row_index, 40, nfr.plugin.plugin_output(root, report_host, '12634'))
+                            # '110385: Authentication Success Insufficient Access'
+                            worksheet.write(row_index, 41, nfr.plugin.plugin_output(root, report_host, '110385'))
+                            # '102094: SSH Commands Require Privilege Escalation'
+                            worksheet.write(row_index, 42, nfr.plugin.plugin_output(root, report_host, '102094'))
+                            # '10394: Microsoft Windows SMB Log In Possible'
+                            worksheet.write(row_index, 43, nfr.plugin.plugin_output(root, report_host, '10394'))
+                            # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
+                            worksheet.write(row_index, 44, nfr.plugin.plugin_output(root, report_host, '24786'))
+                            # '24269: Windows Management Instrumentation (WMI) Available'
+                            worksheet.write(row_index, 45, nfr.plugin.plugin_output(root, report_host, '24269'))
+                            # '11011: Microsoft Windows SMB Service Detection'
+                            worksheet.write(row_index, 46, nfr.plugin.plugin_outputs(root, report_host, '11011'))
+                            # '10400: Microsoft Windows SMB Registry Remotely Accessible'
+                            worksheet.write(row_index, 47, nfr.plugin.plugin_output(root, report_host, '10400'))
+                            # '26917: Microsoft Windows SMB Registry : Nessus Cannot Access the Windows Registry'
+                            worksheet.write(row_index, 48, nfr.plugin.plugin_output(root, report_host, '26917'))
+                            # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
+                            worksheet.write(row_index, 49, nfr.plugin.plugin_output(root, report_host, '42897'))
+                            # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
+                            worksheet.write(row_index, 50, nfr.plugin.plugin_output(root, report_host, '20811'))
+                            # '91825: Oracle DB Login Possible'
+                            worksheet.write(row_index, 51, nfr.plugin.plugin_output(root, report_host, '91825'))
+                            # '91827: Microsoft SQL Server Login Possible'
+                            worksheet.write(row_index, 52, nfr.plugin.plugin_output(root, report_host, '91827'))
+                            # '47864: Cisco IOS Version'
+                            worksheet.write(row_index, 53, nfr.plugin.plugin_output(root, report_host, '47864'))
+                            # '67217: Cisco IOS XE Version'
+                            worksheet.write(row_index, 54, nfr.plugin.plugin_output(root, report_host, '67217'))
+
+                    number_of_not_scanned_hosts = nfr.scan.number_of_not_scanned_hosts(root)
+                    if number_of_not_scanned_hosts > 0:
+                        not_scanned_hosts = nfr.scan.list_of_not_scanned_hosts(root)
+                        not_scanned_host_counter = 0
+
+                        file_source = nfr.scan.source_of_file(root)
+                        if file_source == 'Tenable.sc':
+                            targets_sc = nfr.scan.list_of_target_hosts_sc_fqdn_ip(root)
+
+                            for target in not_scanned_hosts:
+                                row_index += 1
+                                not_scanned_host_counter += 1
+                                self.progress.emit(not_scanned_host_counter, number_of_not_scanned_hosts)
+
+                                target_fqdn = ''
+                                target_hostname = ''
+                                target_ip = ''
+                                for target_sc in targets_sc:
+                                    if target == target_sc['target_fqdn']:
+                                        target_fqdn = target_sc['target_fqdn']
+                                        target_hostname = target_fqdn.split('.')[0]
+                                        target_ip = target_sc['target_ip']
+
+                                if not self.report_host_debug_data_enabled:
+                                    worksheet.write(row_index, 0, target)
+                                    worksheet.write(row_index, 1, target_hostname)
+                                    worksheet.write(row_index, 2, target_fqdn)
+                                    worksheet.write(row_index, 3, target_ip)
+                                    worksheet.write(row_index, 4, 'no')
+                                    worksheet.write(row_index, 5, 'no')
+                                    worksheet.write_blank(row_index, 6, None)
+                                    worksheet.write_blank(row_index, 7, None)
+                                    worksheet.write(row_index, 8, '0:00:00')
+                                    worksheet.write(row_index, 9, scan_time_elapsed)
+                                    worksheet.write(row_index, 10, scan_policy_login_specified)
+                                    worksheet.write(row_index, 11, scan_policy_db_sid)
+                                    worksheet.write(row_index, 12, scan_policy_db_port)
+                                    worksheet.write_blank(row_index, 13, None)
+                                    worksheet.write_blank(row_index, 14, None)
+                                    worksheet.write_blank(row_index, 15, None)
+                                    worksheet.write_blank(row_index, 16, None)
+                                    worksheet.write_blank(row_index, 17, None)
+                                    worksheet.write_blank(row_index, 18, None)
+                                    worksheet.write_blank(row_index, 19, None)
+                                    worksheet.write_blank(row_index, 20, None)
+                                    worksheet.write_blank(row_index, 21, None)
+                                    worksheet.write_blank(row_index, 22, None)
+                                else:
+                                    # worksheet.write_blank(row_index, 0, None)
+                                    worksheet.write(row_index, 1, scan_report_name)
+                                    worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
+                                    worksheet.write(row_index, 3, target)
+                                    worksheet.write(row_index, 4, target_hostname)
+                                    worksheet.write(row_index, 5, target_fqdn)
+                                    # worksheet.write_blank(row_index, 6, None)
+                                    # worksheet.write_blank(row_index, 7, None)
+                                    worksheet.write(row_index, 8, target_ip)
+                                    worksheet.write(row_index, 9, 'no')
+                                    worksheet.write(row_index, 10, 'no')
+                                    # worksheet.write_blank(row_index, 11, None)
+                                    # worksheet.write_blank(row_index, 12, None)
+                                    worksheet.write(row_index, 13, '0:00:00')
+                                    worksheet.write(row_index, 14, scan_time_elapsed)
+                                    worksheet.write(row_index, 15, scan_policy_name)
+                                    worksheet.write(row_index, 16, scan_policy_login_specified)
+                                    worksheet.write(row_index, 17, scan_policy_db_sid)
+                                    worksheet.write(row_index, 18, scan_policy_db_port)
+                                    worksheet.write(row_index, 19, scan_reverse_lookup)
+                                    worksheet.write(row_index, 20, policy_max_hosts)
+                                    worksheet.write(row_index, 21, policy_max_checks)
+                                    # worksheet.write_blank(row_index, 22, None)
+                                    # worksheet.write_blank(row_index, 23, None)
+                                    # worksheet.write_blank(row_index, 24, None)
+                                    # worksheet.write_blank(row_index, 25, None)
+                                    # worksheet.write_blank(row_index, 26, None)
+                                    # worksheet.write_blank(row_index, 27, None)
+                                    # worksheet.write_blank(row_index, 28, None)
+                                    # worksheet.write_blank(row_index, 29, None)
+                                    # worksheet.write_blank(row_index, 30, None)
+                                    # worksheet.write_blank(row_index, 31, None)
+                                    # worksheet.write_blank(row_index, 32, None)
+                                    # # '10180: Ping to remote host'
+                                    # worksheet.write_blank(row_index, 33, None)
+                                    # # '10287: Traceroute Information'
+                                    # worksheet.write_blank(row_index, 34, None)
+                                    # # '11936: OS Identification'
+                                    # worksheet.write_blank(row_index, 35, None)
+                                    # # '45590: Common Platform Enumeration (CPE)'
+                                    # worksheet.write_blank(row_index, 36, None)
+                                    # # '54615: Device Type'
+                                    # worksheet.write_blank(row_index, 37, None)
+                                    # # '21745: Authentication Failure - Local Checks Not Run'
+                                    # worksheet.write_blank(row_index, 38, None)
+                                    # # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
+                                    # worksheet.write_blank(row_index, 39, None)
+                                    # # '110385: Authentication Success Insufficient Access'
+                                    # worksheet.write_blank(row_index, 40, None)
+                                    # # '102094: SSH Commands Require Privilege Escalation'
+                                    # worksheet.write_blank(row_index, 41, None)
+                                    # # '10394: Microsoft Windows SMB Log In Possible'
+                                    # worksheet.write_blank(row_index, 42, None)
+                                    # # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
+                                    # worksheet.write_blank(row_index, 43, None)
+                                    # # '24269: Windows Management Instrumentation (WMI) Available'
+                                    # worksheet.write_blank(row_index, 44, None)
+                                    # # '11011: Microsoft Windows SMB Service Detection'
+                                    # worksheet.write_blank(row_index, 45, None)
+                                    # # '10400: Microsoft Windows SMB Registry Remotely Accessible'
+                                    # worksheet.write_blank(row_index, 46, None)
+                                    # # '26917: Microsoft Windows SMB Registry :
+                                    # # Nessus Cannot Access the Windows Registry'
+                                    # worksheet.write_blank(row_index, 47, None)
+                                    # # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
+                                    # worksheet.write_blank(row_index, 48, None)
+                                    # # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
+                                    # worksheet.write_blank(row_index, 49, None)
+                                    # # '91825: Oracle DB Login Possible'
+                                    # worksheet.write_blank(row_index, 50, None)
+                                    # # '91827: Microsoft SQL Server Login Possible'
+                                    # worksheet.write_blank(row_index, 51, None)
+                                    # # '47864: Cisco IOS Version'
+                                    # worksheet.write_blank(row_index, 52, None)
+                                    # # '67217: Cisco IOS XE Version'
+                                    # worksheet.write_blank(row_index, 53, None)
+
+                        else:
+                            for target in not_scanned_hosts:
+                                row_index += 1
+                                not_scanned_host_counter += 1
+                                self.progress.emit(not_scanned_host_counter, number_of_not_scanned_hosts)
+
+                                if not self.report_host_debug_data_enabled:
+                                    worksheet.write(row_index, 0, target)
+                                    worksheet.write_blank(row_index, 1, None)
+                                    worksheet.write_blank(row_index, 2, None)
+                                    worksheet.write_blank(row_index, 3, None)
+                                    worksheet.write(row_index, 4, 'no')
+                                    worksheet.write(row_index, 5, 'no')
+                                    worksheet.write_blank(row_index, 6, None)
+                                    worksheet.write_blank(row_index, 7, None)
+                                    worksheet.write(row_index, 8, '0:00:00')
+                                    worksheet.write(row_index, 9, scan_time_elapsed)
+                                    worksheet.write(row_index, 10, scan_policy_login_specified)
+                                    worksheet.write(row_index, 11, scan_policy_db_sid)
+                                    worksheet.write(row_index, 12, scan_policy_db_port)
+                                    worksheet.write_blank(row_index, 13, None)
+                                    worksheet.write_blank(row_index, 14, None)
+                                    worksheet.write_blank(row_index, 15, None)
+                                    worksheet.write_blank(row_index, 16, None)
+                                    worksheet.write_blank(row_index, 17, None)
+                                    worksheet.write_blank(row_index, 18, None)
+                                    worksheet.write_blank(row_index, 19, None)
+                                    worksheet.write_blank(row_index, 20, None)
+                                    worksheet.write_blank(row_index, 21, None)
+                                    worksheet.write_blank(row_index, 22, None)
+                                else:
+                                    # worksheet.write_blank(row_index, 0, None)
+                                    worksheet.write(row_index, 1, scan_report_name)
+                                    worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
+                                    worksheet.write(row_index, 3, target)
+                                    # worksheet.write_blank(row_index, 4, None)
+                                    # worksheet.write_blank(row_index, 5, None)
+                                    # worksheet.write_blank(row_index, 6, None)
+                                    # worksheet.write_blank(row_index, 7, None)
+                                    # worksheet.write_blank(row_index, 8, None)
+                                    worksheet.write(row_index, 9, 'no')
+                                    worksheet.write(row_index, 10, 'no')
+                                    # worksheet.write_blank(row_index, 11, None)
+                                    # worksheet.write_blank(row_index, 12, None)
+                                    worksheet.write(row_index, 13, '0:00:00')
+                                    worksheet.write(row_index, 14, scan_time_elapsed)
+                                    worksheet.write(row_index, 15, scan_policy_name)
+                                    worksheet.write(row_index, 16, scan_policy_login_specified)
+                                    worksheet.write(row_index, 17, scan_policy_db_sid)
+                                    worksheet.write(row_index, 18, scan_policy_db_port)
+                                    worksheet.write(row_index, 19, scan_reverse_lookup)
+                                    worksheet.write(row_index, 20, policy_max_hosts)
+                                    worksheet.write(row_index, 21, policy_max_checks)
+                                    # worksheet.write_blank(row_index, 22, None)
+                                    # worksheet.write_blank(row_index, 23, None)
+                                    # worksheet.write_blank(row_index, 24, None)
+                                    # worksheet.write_blank(row_index, 25, None)
+                                    # worksheet.write_blank(row_index, 26, None)
+                                    # worksheet.write_blank(row_index, 27, None)
+                                    # worksheet.write_blank(row_index, 28, None)
+                                    # worksheet.write_blank(row_index, 29, None)
+                                    # worksheet.write_blank(row_index, 30, None)
+                                    # worksheet.write_blank(row_index, 31, None)
+                                    # worksheet.write_blank(row_index, 32, None)
+                                    # # '10180: Ping to remote host'
+                                    # worksheet.write_blank(row_index, 33, None)
+                                    # # '10287: Traceroute Information'
+                                    # worksheet.write_blank(row_index, 34, None)
+                                    # # '11936: OS Identification'
+                                    # worksheet.write_blank(row_index, 35, None)
+                                    # # '45590: Common Platform Enumeration (CPE)'
+                                    # worksheet.write_blank(row_index, 36, None)
+                                    # # '54615: Device Type'
+                                    # worksheet.write_blank(row_index, 37, None)
+                                    # # '21745: Authentication Failure - Local Checks Not Run'
+                                    # worksheet.write_blank(row_index, 38, None)
+                                    # # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
+                                    # worksheet.write_blank(row_index, 39, None)
+                                    # # '110385: Authentication Success Insufficient Access'
+                                    # worksheet.write_blank(row_index, 40, None)
+                                    # # '102094: SSH Commands Require Privilege Escalation'
+                                    # worksheet.write_blank(row_index, 41, None)
+                                    # # '10394: Microsoft Windows SMB Log In Possible'
+                                    # worksheet.write_blank(row_index, 42, None)
+                                    # # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
+                                    # worksheet.write_blank(row_index, 43, None)
+                                    # # '24269: Windows Management Instrumentation (WMI) Available'
+                                    # worksheet.write_blank(row_index, 44, None)
+                                    # # '11011: Microsoft Windows SMB Service Detection'
+                                    # worksheet.write_blank(row_index, 45, None)
+                                    # # '10400: Microsoft Windows SMB Registry Remotely Accessible'
+                                    # worksheet.write_blank(row_index, 46, None)
+                                    # # '26917: Microsoft Windows SMB Registry :
+                                    # # Nessus Cannot Access the Windows Registry'
+                                    # worksheet.write_blank(row_index, 47, None)
+                                    # # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
+                                    # worksheet.write_blank(row_index, 48, None)
+                                    # # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
+                                    # worksheet.write_blank(row_index, 49, None)
+                                    # # '91825: Oracle DB Login Possible'
+                                    # worksheet.write_blank(row_index, 50, None)
+                                    # # '91827: Microsoft SQL Server Login Possible'
+                                    # worksheet.write_blank(row_index, 51, None)
+                                    # # '47864: Cisco IOS Version'
+                                    # worksheet.write_blank(row_index, 52, None)
+                                    # # '67217: Cisco IOS XE Version'
+                                    # worksheet.write_blank(row_index, 53, None)
+
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
+
+                    self.log_emitter('info ', file_to_pars_full_name, f'[elapsed_time={elapsed_time_parsed}]')
+                    self.log_emitter('end  ', file_to_pars_full_name)
+
+                except Exception as e:
+                    number_of_files_with_errors += 1
+                    traceback.print_exc()
+                    self.log_emitter('info',
+                                     "ERROR Parsing [" + str(nessus_scan_file_number) + "/" +
+                                     str(len(list_of_source_files)) + "] nessus files")
+                    self.log_emitter('info', e)
 
         if number_of_rows > 0:
             worksheet.autofilter(0, 0, number_of_rows, number_of_columns - 1)
@@ -2144,129 +2245,107 @@ class ParsingThread(QThread):
         number_of_rows = 0
         row_index = 0
         row_index_per_file = 0
-        for nessus_scan_file in list_of_source_files:
-            row_index_per_file += 1
-            nessus_scan_file_number = nessus_scan_file_number + 1
-            info_file = ', File: ' + str(row_index_per_file) + '/' + str(len(list_of_source_files))
+        for scan_file in list_of_source_files:
+            source_file_type = ''
+            files_to_pars = []
+            if fnmatch.fnmatch(scan_file, '*.nessus'):
+                files_to_pars.append(scan_file)
+                source_file_type = 'nessus'
+            elif fnmatch.fnmatch(scan_file, '*.zip'):
+                source_file_type = 'zip'
+                zip_source = zipfile.ZipFile(scan_file)
+                zip_files_list = zip_source.namelist()
+                for zip_file in zip_files_list:
+                    if fnmatch.fnmatch(zip_file, '*.nessus'):
+                        files_to_pars.append(zip_file)
 
-            try:
-                root = nfr.file.nessus_scan_file_root_element(nessus_scan_file)
+            for file_to_pars in files_to_pars:
+                row_index_per_file += 1
+                nessus_scan_file_number = nessus_scan_file_number + 1
+                info_file = ', File: ' + str(row_index_per_file) + '/' + str(len(list_of_source_files))
 
-                nessus_scan_file = nfr.file.nessus_scan_file_name_with_path(nessus_scan_file)
+                try:
+                    file_to_pars_full_name = ''
+                    source_file_size = 0
+                    if source_file_type == 'nessus':
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        file_to_pars_full_name = nfr.file.nessus_scan_file_name_with_path(file_to_pars)
+                        source_file_size = nfa.utilities.size_of_file_human(file_to_pars_full_name)
+                    elif source_file_type == 'zip':
+                        source_file_size = nfa.utilities.size_of_file_inside_zip_human(zip_source, file_to_pars)
+                        file_to_pars_full_name = f'{nfr.file.nessus_scan_file_name_with_path(scan_file)} [' \
+                            f'{zip_source.getinfo(file_to_pars).filename}]'
+                        file_to_pars = zip_source.open(file_to_pars)
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
 
-                start_time = time.time()
-                self.log_emitter('start', nessus_scan_file)
-                self.file_analysis_started.emit(1)
+                    start_time = time.time()
+                    self.log_emitter('start', file_to_pars_full_name)
+                    self.file_analysis_started.emit(1)
+                    self.log_emitter('info ', file_to_pars_full_name, f'[source_file_size={source_file_size}]')
+                    self.log_emitter('info ', file_to_pars_full_name, f'[report_type={report_name}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_target_hosts={nfr.scan.number_of_target_hosts(root)}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_scanned_hosts={nfr.scan.number_of_scanned_hosts(root)}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_scanned_hosts_with_credentials='
+                                     f'{nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root)}]')
 
-                source_file_size = nfa.utilities.size_of_file_human(nessus_scan_file)
-                self.log_emitter('info ', nessus_scan_file, '[source_file_size={0}]'.format(source_file_size))
-                self.log_emitter('info ', nessus_scan_file, '[report_type={0}]'.format(report_name))
-                self.log_emitter('info ', nessus_scan_file,
-                                 '[number_of_target_hosts={0}]'.format(nfr.scan.number_of_target_hosts(root)))
-                self.log_emitter('info ', nessus_scan_file,
-                                 '[number_of_scanned_hosts={0}]'.format(nfr.scan.number_of_scanned_hosts(root)))
-                self.log_emitter('info ', nessus_scan_file, '[number_of_scanned_hosts_with_credentials={0}]'.format(
-                    nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root)))
+                    date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
 
-                date_format = workbook.add_format({'num_format': 'yyyy-mm-dd'})
+                    scan_report_name = nfr.scan.report_name(root)
+                    nessus_scan_file_name_with_path = nfr.file.nessus_scan_file_name_with_path(file_to_pars_full_name)
+                    scan_policy_name = nfr.scan.policy_name(root)
 
-                scan_report_name = nfr.scan.report_name(root)
-                nessus_scan_file_name_with_path = nfr.file.nessus_scan_file_name_with_path(nessus_scan_file)
-                scan_policy_name = nfr.scan.policy_name(root)
-
-                report_host_counter = 0
-                number_of_report_hosts = nfr.scan.number_of_scanned_hosts(root)
-
-                info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
-                info_final = info_report + info_file + info_host
-                self.print_status_bar_info.emit(info_final)
-
-                for report_host in nfr.scan.report_hosts(root):
-
-                    report_host_counter += 1
-                    self.progress.emit(report_host_counter, number_of_report_hosts)
+                    report_host_counter = 0
+                    number_of_report_hosts = nfr.scan.number_of_scanned_hosts(root)
 
                     info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
                     info_final = info_report + info_file + info_host
                     self.print_status_bar_info.emit(info_final)
 
-                    report_items_per_host = nfr.host.report_items(report_host)
+                    for report_host in nfr.scan.report_hosts(root):
 
-                    host_scanner_ip = nfr.host.scanner_ip(root, report_host)
-                    host_report_host_name = nfr.host.report_host_name(report_host)
-                    host_resolved_hostname = nfr.host.resolved_hostname(report_host)
-                    host_resolved_fqdn = nfr.host.resolved_fqdn(report_host)
-                    host_resolved_ip = nfr.host.resolved_ip(report_host)
-                    host_credentialed_checks = nfr.host.credentialed_checks(root, report_host)
+                        report_host_counter += 1
+                        self.progress.emit(report_host_counter, number_of_report_hosts)
 
-                    for report_item in report_items_per_host:
-                        number_of_rows += 1
-                        row_index += 1
-                        protocol = nfr.plugin.report_item_value(report_item, 'protocol')
-                        service_name = nfr.plugin.report_item_value(report_item, 'svc_name')
-                        port = int(nfr.plugin.report_item_value(report_item, 'port'))
-                        plugin_id = int(nfr.plugin.report_item_value(report_item, 'pluginID'))
-                        plugin_name = nfr.plugin.report_item_value(report_item, 'pluginName')
-                        plugin_type = nfr.plugin.report_item_value(report_item, 'plugin_type')
-                        risk_factor = nfr.plugin.report_item_value(report_item, 'risk_factor')
-                        plugin_family = nfr.plugin.report_item_value(report_item, 'pluginFamily')
-                        plugin_file_name = nfr.plugin.report_item_value(report_item, 'fname')
-                        plugin_version = nfr.plugin.report_item_value(report_item, 'script_version')
-                        plugin_publication_date = nfr.plugin.report_item_value(report_item, 'plugin_publication_date')
-                        plugin_modification_date = nfr.plugin.report_item_value(report_item, 'plugin_modification_date')
-                        plugin_description = nfr.plugin.report_item_value(report_item, 'description')
-                        solution = nfr.plugin.report_item_value(report_item, 'solution')
-                        plugin_output = nfr.plugin.report_item_value(report_item, 'plugin_output')
-                        plugin_cves = nfr.plugin.report_item_values(report_item, 'cve')
+                        info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
+                        info_final = info_report + info_file + info_host
+                        self.print_status_bar_info.emit(info_final)
 
-                        if not self.report_vulnerabilities_debug_data_enabled and not \
-                                self.report_vulnerabilities_none_skip:
-                            worksheet.write(row_index, 0, host_report_host_name)
-                            worksheet.write(row_index, 1, host_resolved_hostname)
-                            worksheet.write(row_index, 2, host_resolved_fqdn)
-                            worksheet.write(row_index, 3, host_resolved_ip)
-                            worksheet.write(row_index, 4, 'yes')
-                            worksheet.write(row_index, 5, host_credentialed_checks)
-                            worksheet.write(row_index, 6, protocol)
-                            worksheet.write(row_index, 7, service_name)
-                            worksheet.write(row_index, 8, port)
-                            worksheet.write(row_index, 9, plugin_id)
-                            worksheet.write(row_index, 10, plugin_name)
-                            worksheet.write(row_index, 11, plugin_type)
-                            if self.report_vulnerabilities_none_filter_out:
-                                if risk_factor == 'None':
-                                    worksheet.set_row(row_index, options={'hidden': True})
-                            worksheet.write(row_index, 12, risk_factor)
-                            worksheet.write(row_index, 13, plugin_family)
-                            worksheet.write(row_index, 14, plugin_version)
-                            if plugin_publication_date is not None:
-                                worksheet.write_datetime(row_index, 15,
-                                                         nfr.plugin.plugin_date(plugin_publication_date), date_format)
-                            else:
-                                worksheet.write_blank(row_index, 15, None)
-                            if plugin_modification_date is not None:
-                                worksheet.write_datetime(row_index, 16,
-                                                         nfr.plugin.plugin_date(plugin_modification_date), date_format)
-                            else:
-                                worksheet.write_blank(row_index, 16, None)
-                            worksheet.write(row_index, 17, plugin_description)
-                            worksheet.write(row_index, 18, solution)
-                            if plugin_output is not None:
-                                worksheet.write_string(row_index, 19, plugin_output)
-                            else:
-                                worksheet.write_blank(row_index, 19, None)
-                            if plugin_cves:
-                                worksheet.write_number(row_index, 20, len(plugin_cves))
-                                worksheet.write_string(row_index, 21, ','.join(plugin_cves))
-                            else:
-                                worksheet.write_number(row_index, 20, 0)
-                                worksheet.write_blank(row_index, 21, None)
-                        elif not self.report_vulnerabilities_debug_data_enabled and \
-                                self.report_vulnerabilities_none_skip:
-                            if risk_factor == 'None':
-                                number_of_rows -= 1
-                                row_index -= 1
-                            elif risk_factor != 'None':
+                        report_items_per_host = nfr.host.report_items(report_host)
+
+                        host_scanner_ip = nfr.host.scanner_ip(root, report_host)
+                        host_report_host_name = nfr.host.report_host_name(report_host)
+                        host_resolved_hostname = nfr.host.resolved_hostname(report_host)
+                        host_resolved_fqdn = nfr.host.resolved_fqdn(report_host)
+                        host_resolved_ip = nfr.host.resolved_ip(report_host)
+                        host_credentialed_checks = nfr.host.credentialed_checks(root, report_host)
+
+                        for report_item in report_items_per_host:
+                            number_of_rows += 1
+                            row_index += 1
+                            protocol = nfr.plugin.report_item_value(report_item, 'protocol')
+                            service_name = nfr.plugin.report_item_value(report_item, 'svc_name')
+                            port = int(nfr.plugin.report_item_value(report_item, 'port'))
+                            plugin_id = int(nfr.plugin.report_item_value(report_item, 'pluginID'))
+                            plugin_name = nfr.plugin.report_item_value(report_item, 'pluginName')
+                            plugin_type = nfr.plugin.report_item_value(report_item, 'plugin_type')
+                            risk_factor = nfr.plugin.report_item_value(report_item, 'risk_factor')
+                            plugin_family = nfr.plugin.report_item_value(report_item, 'pluginFamily')
+                            plugin_file_name = nfr.plugin.report_item_value(report_item, 'fname')
+                            plugin_version = nfr.plugin.report_item_value(report_item, 'script_version')
+                            plugin_publication_date = nfr.plugin.report_item_value(report_item,
+                                                                                   'plugin_publication_date')
+                            plugin_modification_date = nfr.plugin.report_item_value(report_item,
+                                                                                    'plugin_modification_date')
+                            plugin_description = nfr.plugin.report_item_value(report_item, 'description')
+                            solution = nfr.plugin.report_item_value(report_item, 'solution')
+                            plugin_output = nfr.plugin.report_item_value(report_item, 'plugin_output')
+                            plugin_cves = nfr.plugin.report_item_values(report_item, 'cve')
+
+                            if not self.report_vulnerabilities_debug_data_enabled and not \
+                                    self.report_vulnerabilities_none_skip:
                                 worksheet.write(row_index, 0, host_report_host_name)
                                 worksheet.write(row_index, 1, host_resolved_hostname)
                                 worksheet.write(row_index, 2, host_resolved_fqdn)
@@ -2279,6 +2358,9 @@ class ParsingThread(QThread):
                                 worksheet.write(row_index, 9, plugin_id)
                                 worksheet.write(row_index, 10, plugin_name)
                                 worksheet.write(row_index, 11, plugin_type)
+                                if self.report_vulnerabilities_none_filter_out:
+                                    if risk_factor == 'None':
+                                        worksheet.set_row(row_index, options={'hidden': True})
                                 worksheet.write(row_index, 12, risk_factor)
                                 worksheet.write(row_index, 13, plugin_family)
                                 worksheet.write(row_index, 14, plugin_version)
@@ -2306,59 +2388,53 @@ class ParsingThread(QThread):
                                 else:
                                     worksheet.write_number(row_index, 20, 0)
                                     worksheet.write_blank(row_index, 21, None)
-                        elif self.report_vulnerabilities_debug_data_enabled and not \
-                                self.report_vulnerabilities_none_skip:
-                            worksheet.write(row_index, 0, host_scanner_ip)
-                            worksheet.write(row_index, 1, scan_report_name)
-                            worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
-                            worksheet.write(row_index, 3, host_report_host_name)
-                            worksheet.write(row_index, 4, host_resolved_hostname)
-                            worksheet.write(row_index, 5, host_resolved_fqdn)
-                            worksheet.write(row_index, 6, host_resolved_ip)
-                            worksheet.write(row_index, 7, 'yes')
-                            worksheet.write(row_index, 8, host_credentialed_checks)
-                            worksheet.write(row_index, 9, scan_policy_name)
-                            worksheet.write(row_index, 10, protocol)
-                            worksheet.write(row_index, 11, service_name)
-                            worksheet.write(row_index, 12, port)
-                            worksheet.write(row_index, 13, plugin_id)
-                            worksheet.write(row_index, 14, plugin_name)
-                            worksheet.write(row_index, 15, plugin_type)
-                            if self.report_vulnerabilities_none_filter_out:
+                            elif not self.report_vulnerabilities_debug_data_enabled and \
+                                    self.report_vulnerabilities_none_skip:
                                 if risk_factor == 'None':
-                                    worksheet.set_row(row_index, options={'hidden': True})
-                            worksheet.write(row_index, 16, risk_factor)
-                            worksheet.write(row_index, 17, plugin_family)
-                            worksheet.write(row_index, 18, plugin_file_name)
-                            worksheet.write(row_index, 19, plugin_version)
-                            if plugin_publication_date is not None:
-                                worksheet.write_datetime(row_index, 20,
-                                                         nfr.plugin.plugin_date(plugin_publication_date), date_format)
-                            else:
-                                worksheet.write_blank(row_index, 20, None)
-                            if plugin_modification_date is not None:
-                                worksheet.write_datetime(row_index, 21,
-                                                         nfr.plugin.plugin_date(plugin_modification_date), date_format)
-                            else:
-                                worksheet.write_blank(row_index, 21, None)
-                            worksheet.write(row_index, 22, plugin_description)
-                            worksheet.write(row_index, 23, solution)
-                            if plugin_output is not None:
-                                worksheet.write_string(row_index, 24, plugin_output)
-                            else:
-                                worksheet.write_blank(row_index, 24, None)
-                            if plugin_cves:
-                                worksheet.write_number(row_index, 25, len(plugin_cves))
-                                worksheet.write_string(row_index, 26, ','.join(plugin_cves))
-                            else:
-                                worksheet.write_number(row_index, 25, 0)
-                                worksheet.write_blank(row_index, 26, None)
-                        elif self.report_vulnerabilities_debug_data_enabled and \
-                                self.report_vulnerabilities_none_skip:
-                            if risk_factor == 'None':
-                                number_of_rows -= 1
-                                row_index -= 1
-                            elif risk_factor != 'None':
+                                    number_of_rows -= 1
+                                    row_index -= 1
+                                elif risk_factor != 'None':
+                                    worksheet.write(row_index, 0, host_report_host_name)
+                                    worksheet.write(row_index, 1, host_resolved_hostname)
+                                    worksheet.write(row_index, 2, host_resolved_fqdn)
+                                    worksheet.write(row_index, 3, host_resolved_ip)
+                                    worksheet.write(row_index, 4, 'yes')
+                                    worksheet.write(row_index, 5, host_credentialed_checks)
+                                    worksheet.write(row_index, 6, protocol)
+                                    worksheet.write(row_index, 7, service_name)
+                                    worksheet.write(row_index, 8, port)
+                                    worksheet.write(row_index, 9, plugin_id)
+                                    worksheet.write(row_index, 10, plugin_name)
+                                    worksheet.write(row_index, 11, plugin_type)
+                                    worksheet.write(row_index, 12, risk_factor)
+                                    worksheet.write(row_index, 13, plugin_family)
+                                    worksheet.write(row_index, 14, plugin_version)
+                                    if plugin_publication_date is not None:
+                                        worksheet.write_datetime(row_index, 15,
+                                                                 nfr.plugin.plugin_date(plugin_publication_date),
+                                                                 date_format)
+                                    else:
+                                        worksheet.write_blank(row_index, 15, None)
+                                    if plugin_modification_date is not None:
+                                        worksheet.write_datetime(row_index, 16,
+                                                                 nfr.plugin.plugin_date(plugin_modification_date),
+                                                                 date_format)
+                                    else:
+                                        worksheet.write_blank(row_index, 16, None)
+                                    worksheet.write(row_index, 17, plugin_description)
+                                    worksheet.write(row_index, 18, solution)
+                                    if plugin_output is not None:
+                                        worksheet.write_string(row_index, 19, plugin_output)
+                                    else:
+                                        worksheet.write_blank(row_index, 19, None)
+                                    if plugin_cves:
+                                        worksheet.write_number(row_index, 20, len(plugin_cves))
+                                        worksheet.write_string(row_index, 21, ','.join(plugin_cves))
+                                    else:
+                                        worksheet.write_number(row_index, 20, 0)
+                                        worksheet.write_blank(row_index, 21, None)
+                            elif self.report_vulnerabilities_debug_data_enabled and not \
+                                    self.report_vulnerabilities_none_skip:
                                 worksheet.write(row_index, 0, host_scanner_ip)
                                 worksheet.write(row_index, 1, scan_report_name)
                                 worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
@@ -2375,6 +2451,9 @@ class ParsingThread(QThread):
                                 worksheet.write(row_index, 13, plugin_id)
                                 worksheet.write(row_index, 14, plugin_name)
                                 worksheet.write(row_index, 15, plugin_type)
+                                if self.report_vulnerabilities_none_filter_out:
+                                    if risk_factor == 'None':
+                                        worksheet.set_row(row_index, options={'hidden': True})
                                 worksheet.write(row_index, 16, risk_factor)
                                 worksheet.write(row_index, 17, plugin_family)
                                 worksheet.write(row_index, 18, plugin_file_name)
@@ -2403,21 +2482,71 @@ class ParsingThread(QThread):
                                 else:
                                     worksheet.write_number(row_index, 25, 0)
                                     worksheet.write_blank(row_index, 26, None)
+                            elif self.report_vulnerabilities_debug_data_enabled and \
+                                    self.report_vulnerabilities_none_skip:
+                                if risk_factor == 'None':
+                                    number_of_rows -= 1
+                                    row_index -= 1
+                                elif risk_factor != 'None':
+                                    worksheet.write(row_index, 0, host_scanner_ip)
+                                    worksheet.write(row_index, 1, scan_report_name)
+                                    worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
+                                    worksheet.write(row_index, 3, host_report_host_name)
+                                    worksheet.write(row_index, 4, host_resolved_hostname)
+                                    worksheet.write(row_index, 5, host_resolved_fqdn)
+                                    worksheet.write(row_index, 6, host_resolved_ip)
+                                    worksheet.write(row_index, 7, 'yes')
+                                    worksheet.write(row_index, 8, host_credentialed_checks)
+                                    worksheet.write(row_index, 9, scan_policy_name)
+                                    worksheet.write(row_index, 10, protocol)
+                                    worksheet.write(row_index, 11, service_name)
+                                    worksheet.write(row_index, 12, port)
+                                    worksheet.write(row_index, 13, plugin_id)
+                                    worksheet.write(row_index, 14, plugin_name)
+                                    worksheet.write(row_index, 15, plugin_type)
+                                    worksheet.write(row_index, 16, risk_factor)
+                                    worksheet.write(row_index, 17, plugin_family)
+                                    worksheet.write(row_index, 18, plugin_file_name)
+                                    worksheet.write(row_index, 19, plugin_version)
+                                    if plugin_publication_date is not None:
+                                        worksheet.write_datetime(row_index, 20,
+                                                                 nfr.plugin.plugin_date(plugin_publication_date),
+                                                                 date_format)
+                                    else:
+                                        worksheet.write_blank(row_index, 20, None)
+                                    if plugin_modification_date is not None:
+                                        worksheet.write_datetime(row_index, 21,
+                                                                 nfr.plugin.plugin_date(plugin_modification_date),
+                                                                 date_format)
+                                    else:
+                                        worksheet.write_blank(row_index, 21, None)
+                                    worksheet.write(row_index, 22, plugin_description)
+                                    worksheet.write(row_index, 23, solution)
+                                    if plugin_output is not None:
+                                        worksheet.write_string(row_index, 24, plugin_output)
+                                    else:
+                                        worksheet.write_blank(row_index, 24, None)
+                                    if plugin_cves:
+                                        worksheet.write_number(row_index, 25, len(plugin_cves))
+                                        worksheet.write_string(row_index, 26, ','.join(plugin_cves))
+                                    else:
+                                        worksheet.write_number(row_index, 25, 0)
+                                        worksheet.write_blank(row_index, 26, None)
 
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
 
-                self.log_emitter('info ', nessus_scan_file, '[elapsed_time={0}]'.format(elapsed_time_parsed))
-                self.log_emitter('end  ', nessus_scan_file)
+                    self.log_emitter('info ', file_to_pars_full_name, f'[elapsed_time={elapsed_time_parsed}]')
+                    self.log_emitter('end  ', file_to_pars_full_name)
 
-            except Exception as e:
-                number_of_files_with_errors += 1
-                traceback.print_exc()
-                self.log_emitter('info',
-                                 "ERROR Parsing [" + str(nessus_scan_file_number) + "/" +
-                                 str(len(list_of_source_files)) + "] nessus files")
-                self.log_emitter('info', e)
+                except Exception as e:
+                    number_of_files_with_errors += 1
+                    traceback.print_exc()
+                    self.log_emitter('info',
+                                     "ERROR Parsing [" + str(nessus_scan_file_number) + "/" +
+                                     str(len(list_of_source_files)) + "] nessus files")
+                    self.log_emitter('info', e)
 
         if number_of_rows > 0:
             worksheet.autofilter(0, 0, number_of_rows, number_of_columns - 1)
@@ -2534,167 +2663,191 @@ class ParsingThread(QThread):
         number_of_rows = 0
         row_index = 0
         row_index_per_file = 0
-        for nessus_scan_file in list_of_source_files:
-            row_index_per_file += 1
-            nessus_scan_file_number = nessus_scan_file_number + 1
-            info_file = ', File: ' + str(row_index_per_file) + '/' + str(len(list_of_source_files))
+        for scan_file in list_of_source_files:
+            source_file_type = ''
+            files_to_pars = []
+            if fnmatch.fnmatch(scan_file, '*.nessus'):
+                files_to_pars.append(scan_file)
+                source_file_type = 'nessus'
+            elif fnmatch.fnmatch(scan_file, '*.zip'):
+                source_file_type = 'zip'
+                zip_source = zipfile.ZipFile(scan_file)
+                zip_files_list = zip_source.namelist()
+                for zip_file in zip_files_list:
+                    if fnmatch.fnmatch(zip_file, '*.nessus'):
+                        files_to_pars.append(zip_file)
 
-            try:
-                root = nfr.file.nessus_scan_file_root_element(nessus_scan_file)
+            for file_to_pars in files_to_pars:
+                row_index_per_file += 1
+                nessus_scan_file_number = nessus_scan_file_number + 1
+                info_file = ', File: ' + str(row_index_per_file) + '/' + str(len(list_of_source_files))
 
-                nessus_scan_file = nfr.file.nessus_scan_file_name_with_path(nessus_scan_file)
+                try:
+                    file_to_pars_full_name = ''
+                    source_file_size = 0
+                    if source_file_type == 'nessus':
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        file_to_pars_full_name = nfr.file.nessus_scan_file_name_with_path(file_to_pars)
+                        source_file_size = nfa.utilities.size_of_file_human(file_to_pars_full_name)
+                    elif source_file_type == 'zip':
+                        source_file_size = nfa.utilities.size_of_file_inside_zip_human(zip_source, file_to_pars)
+                        file_to_pars_full_name = f'{nfr.file.nessus_scan_file_name_with_path(scan_file)} [' \
+                            f'{zip_source.getinfo(file_to_pars).filename}]'
+                        file_to_pars = zip_source.open(file_to_pars)
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
 
-                start_time = time.time()
-                self.log_emitter('start', nessus_scan_file)
-                self.file_analysis_started.emit(1)
+                    start_time = time.time()
+                    self.log_emitter('start', file_to_pars_full_name)
+                    self.file_analysis_started.emit(1)
+                    self.log_emitter('info ', file_to_pars_full_name, f'[source_file_size={source_file_size}]')
+                    self.log_emitter('info ', file_to_pars_full_name, f'[report_type={report_name}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_target_hosts={nfr.scan.number_of_target_hosts(root)}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_scanned_hosts={nfr.scan.number_of_scanned_hosts(root)}]')
+                    self.log_emitter('info ', file_to_pars_full_name,
+                                     f'[number_of_scanned_hosts_with_credentials='
+                                     f'{nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root)}]')
 
-                source_file_size = nfa.utilities.size_of_file_human(nessus_scan_file)
-                self.log_emitter('info ', nessus_scan_file, '[source_file_size={0}]'.format(source_file_size))
-                self.log_emitter('info ', nessus_scan_file, '[report_type={0}]'.format(report_name))
-                self.log_emitter('info ', nessus_scan_file,
-                                 '[number_of_target_hosts={0}]'.format(nfr.scan.number_of_target_hosts(root)))
-                self.log_emitter('info ', nessus_scan_file,
-                                 '[number_of_scanned_hosts={0}]'.format(nfr.scan.number_of_scanned_hosts(root)))
-                self.log_emitter('info ', nessus_scan_file, '[number_of_scanned_hosts_with_credentials={0}]'.format(
-                    nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root)))
+                    date_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
 
-                date_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
+                    scan_report_name = nfr.scan.report_name(root)
+                    nessus_scan_file_name_with_path = nfr.file.nessus_scan_file_name_with_path(file_to_pars_full_name)
+                    scan_policy_name = nfr.scan.policy_name(root)
 
-                scan_report_name = nfr.scan.report_name(root)
-                nessus_scan_file_name_with_path = nfr.file.nessus_scan_file_name_with_path(nessus_scan_file)
-                scan_policy_name = nfr.scan.policy_name(root)
-
-                report_host_counter = 0
-                number_of_report_hosts = nfr.scan.number_of_scanned_hosts(root)
-
-                info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
-                info_final = info_report + info_file + info_host
-                self.print_status_bar_info.emit(info_final)
-
-                for report_host in nfr.scan.report_hosts(root):
-                    report_host_counter += 1
-                    self.progress.emit(report_host_counter, number_of_report_hosts)
+                    report_host_counter = 0
+                    number_of_report_hosts = nfr.scan.number_of_scanned_hosts(root)
 
                     info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
                     info_final = info_report + info_file + info_host
                     self.print_status_bar_info.emit(info_final)
 
-                    report_items_per_host = nfr.host.report_items(report_host)
-                    host_scanner_ip = nfr.host.scanner_ip(root, report_host)
-                    host_report_host_name = nfr.host.report_host_name(report_host)
-                    host_resolved_hostname = nfr.host.resolved_hostname(report_host)
-                    host_resolved_fqdn = nfr.host.resolved_fqdn(report_host)
-                    host_resolved_ip = nfr.host.resolved_ip(report_host)
-                    host_credentialed_checks = nfr.host.credentialed_checks(root, report_host)
+                    for report_host in nfr.scan.report_hosts(root):
+                        report_host_counter += 1
+                        self.progress.emit(report_host_counter, number_of_report_hosts)
 
-                    for report_item in report_items_per_host:
-                        if nfr.plugin.compliance_plugin(report_item):
-                            compliance_plugin = 'true'
-                            row_index += 1
-                            number_of_rows += 1
-                            compliance_check_name = \
-                                nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-check-name')
-                            compliance_check_audit_file = \
-                                nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-audit-file')
-                            compliance_check_check_id = \
-                                nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-check-id')
-                            compliance_check_actual_value = \
-                                nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-actual-value')
-                            compliance_check_uname = \
-                                nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-uname')
-                            compliance_check_info = \
-                                nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-info')
-                            compliance_check_result = \
-                                nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-result')
-                            compliance_check_reference = \
-                                nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-reference')
-                            compliance_check_error = \
-                                nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-error')
+                        info_host = ', Host: ' + str(report_host_counter) + '/' + str(number_of_report_hosts)
+                        info_final = info_report + info_file + info_host
+                        self.print_status_bar_info.emit(info_final)
 
-                            plugin_id = int(nfr.plugin.report_item_value(report_item, 'pluginID'))
-                            plugin_name = nfr.plugin.report_item_value(report_item, 'pluginName')
-                            plugin_type = nfr.plugin.report_item_value(report_item, 'plugin_type')
-                            risk_factor = nfr.plugin.report_item_value(report_item, 'risk_factor')
-                            plugin_family = nfr.plugin.report_item_value(report_item, 'pluginFamily')
-                            plugin_file_name = nfr.plugin.report_item_value(report_item, 'fname')
-                            plugin_version = nfr.plugin.report_item_value(report_item, 'script_version')
-                            plugin_publication_date = \
-                                nfr.plugin.report_item_value(report_item, 'plugin_publication_date')
-                            plugin_modification_date = \
-                                nfr.plugin.report_item_value(report_item, 'plugin_modification_date')
+                        report_items_per_host = nfr.host.report_items(report_host)
+                        host_scanner_ip = nfr.host.scanner_ip(root, report_host)
+                        host_report_host_name = nfr.host.report_host_name(report_host)
+                        host_resolved_hostname = nfr.host.resolved_hostname(report_host)
+                        host_resolved_fqdn = nfr.host.resolved_fqdn(report_host)
+                        host_resolved_ip = nfr.host.resolved_ip(report_host)
+                        host_credentialed_checks = nfr.host.credentialed_checks(root, report_host)
 
-                            if not self.report_noncompliance_debug_data_enabled:
-                                worksheet.write(row_index, 0, host_report_host_name)
-                                worksheet.write(row_index, 1, host_resolved_hostname)
-                                worksheet.write(row_index, 2, host_resolved_fqdn)
-                                worksheet.write(row_index, 3, host_resolved_ip)
-                                worksheet.write(row_index, 4, 'yes')
-                                worksheet.write(row_index, 5, host_credentialed_checks)
-                                worksheet.write(row_index, 6, plugin_id)
-                                worksheet.write(row_index, 7, plugin_name)
-                                worksheet.write(row_index, 8, plugin_type)
-                                worksheet.write(row_index, 9, plugin_family)
-                                worksheet.write(row_index, 10, plugin_version)
-                                worksheet.write_datetime(row_index, 11, nfr.plugin.plugin_date(plugin_publication_date),
-                                                         date_format)
-                                worksheet.write_datetime(row_index, 12,
-                                                         nfr.plugin.plugin_date(plugin_modification_date),
-                                                         date_format)
-                                worksheet.write(row_index, 13, compliance_check_name)
-                                worksheet.write(row_index, 14, compliance_check_audit_file)
-                                worksheet.write(row_index, 15, compliance_check_actual_value)
-                                worksheet.write(row_index, 16, compliance_check_info)
-                                worksheet.write(row_index, 17, compliance_check_result)
-                                worksheet.write(row_index, 18, compliance_check_reference)
-                                worksheet.write(row_index, 19, compliance_check_error)
-                            else:
-                                worksheet.write(row_index, 0, host_scanner_ip)
-                                worksheet.write(row_index, 1, scan_report_name)
-                                worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
-                                worksheet.write(row_index, 3, host_report_host_name)
-                                worksheet.write(row_index, 4, host_resolved_hostname)
-                                worksheet.write(row_index, 5, host_resolved_fqdn)
-                                worksheet.write(row_index, 6, host_resolved_ip)
-                                worksheet.write(row_index, 7, 'yes')
-                                worksheet.write(row_index, 8, host_credentialed_checks)
-                                worksheet.write(row_index, 9, scan_policy_name)
-                                worksheet.write(row_index, 10, plugin_id)
-                                worksheet.write(row_index, 11, plugin_name)
-                                worksheet.write(row_index, 12, plugin_type)
-                                worksheet.write(row_index, 13, risk_factor)
-                                worksheet.write(row_index, 14, plugin_family)
-                                worksheet.write(row_index, 15, compliance_plugin)
-                                worksheet.write(row_index, 16, plugin_file_name)
-                                worksheet.write(row_index, 17, plugin_version)
-                                worksheet.write_datetime(row_index, 18, nfr.plugin.plugin_date(plugin_publication_date),
-                                                         date_format)
-                                worksheet.write_datetime(row_index, 19,
-                                                         nfr.plugin.plugin_date(plugin_modification_date),
-                                                         date_format)
-                                worksheet.write(row_index, 20, compliance_check_name)
-                                worksheet.write(row_index, 21, compliance_check_audit_file)
-                                worksheet.write(row_index, 22, compliance_check_check_id)
-                                worksheet.write(row_index, 23, compliance_check_actual_value)
-                                worksheet.write(row_index, 24, compliance_check_uname)
-                                worksheet.write(row_index, 25, compliance_check_info)
-                                worksheet.write(row_index, 26, compliance_check_result)
-                                worksheet.write(row_index, 27, compliance_check_reference)
-                                worksheet.write(row_index, 28, compliance_check_error)
+                        for report_item in report_items_per_host:
+                            if nfr.plugin.compliance_plugin(report_item):
+                                compliance_plugin = 'true'
+                                row_index += 1
+                                number_of_rows += 1
+                                compliance_check_name = \
+                                    nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-check-name')
+                                compliance_check_audit_file = \
+                                    nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-audit-file')
+                                compliance_check_check_id = \
+                                    nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-check-id')
+                                compliance_check_actual_value = \
+                                    nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-actual-value')
+                                compliance_check_uname = \
+                                    nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-uname')
+                                compliance_check_info = \
+                                    nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-info')
+                                compliance_check_result = \
+                                    nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-result')
+                                compliance_check_reference = \
+                                    nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-reference')
+                                compliance_check_error = \
+                                    nfr.plugin.compliance_check_item_value(report_item, 'cm:compliance-error')
 
-                end_time = time.time()
-                elapsed_time = end_time - start_time
-                elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
+                                plugin_id = int(nfr.plugin.report_item_value(report_item, 'pluginID'))
+                                plugin_name = nfr.plugin.report_item_value(report_item, 'pluginName')
+                                plugin_type = nfr.plugin.report_item_value(report_item, 'plugin_type')
+                                risk_factor = nfr.plugin.report_item_value(report_item, 'risk_factor')
+                                plugin_family = nfr.plugin.report_item_value(report_item, 'pluginFamily')
+                                plugin_file_name = nfr.plugin.report_item_value(report_item, 'fname')
+                                plugin_version = nfr.plugin.report_item_value(report_item, 'script_version')
+                                plugin_publication_date = \
+                                    nfr.plugin.report_item_value(report_item, 'plugin_publication_date')
+                                plugin_modification_date = \
+                                    nfr.plugin.report_item_value(report_item, 'plugin_modification_date')
 
-                self.log_emitter('info ', nessus_scan_file, '[elapsed_time={0}]'.format(elapsed_time_parsed))
-                self.log_emitter('end  ', nessus_scan_file)
+                                if not self.report_noncompliance_debug_data_enabled:
+                                    worksheet.write(row_index, 0, host_report_host_name)
+                                    worksheet.write(row_index, 1, host_resolved_hostname)
+                                    worksheet.write(row_index, 2, host_resolved_fqdn)
+                                    worksheet.write(row_index, 3, host_resolved_ip)
+                                    worksheet.write(row_index, 4, 'yes')
+                                    worksheet.write(row_index, 5, host_credentialed_checks)
+                                    worksheet.write(row_index, 6, plugin_id)
+                                    worksheet.write(row_index, 7, plugin_name)
+                                    worksheet.write(row_index, 8, plugin_type)
+                                    worksheet.write(row_index, 9, plugin_family)
+                                    worksheet.write(row_index, 10, plugin_version)
+                                    worksheet.write_datetime(row_index, 11,
+                                                             nfr.plugin.plugin_date(plugin_publication_date),
+                                                             date_format)
+                                    worksheet.write_datetime(row_index, 12,
+                                                             nfr.plugin.plugin_date(plugin_modification_date),
+                                                             date_format)
+                                    worksheet.write(row_index, 13, compliance_check_name)
+                                    worksheet.write(row_index, 14, compliance_check_audit_file)
+                                    worksheet.write(row_index, 15, compliance_check_actual_value)
+                                    worksheet.write(row_index, 16, compliance_check_info)
+                                    worksheet.write(row_index, 17, compliance_check_result)
+                                    worksheet.write(row_index, 18, compliance_check_reference)
+                                    worksheet.write(row_index, 19, compliance_check_error)
+                                else:
+                                    worksheet.write(row_index, 0, host_scanner_ip)
+                                    worksheet.write(row_index, 1, scan_report_name)
+                                    worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
+                                    worksheet.write(row_index, 3, host_report_host_name)
+                                    worksheet.write(row_index, 4, host_resolved_hostname)
+                                    worksheet.write(row_index, 5, host_resolved_fqdn)
+                                    worksheet.write(row_index, 6, host_resolved_ip)
+                                    worksheet.write(row_index, 7, 'yes')
+                                    worksheet.write(row_index, 8, host_credentialed_checks)
+                                    worksheet.write(row_index, 9, scan_policy_name)
+                                    worksheet.write(row_index, 10, plugin_id)
+                                    worksheet.write(row_index, 11, plugin_name)
+                                    worksheet.write(row_index, 12, plugin_type)
+                                    worksheet.write(row_index, 13, risk_factor)
+                                    worksheet.write(row_index, 14, plugin_family)
+                                    worksheet.write(row_index, 15, compliance_plugin)
+                                    worksheet.write(row_index, 16, plugin_file_name)
+                                    worksheet.write(row_index, 17, plugin_version)
+                                    worksheet.write_datetime(row_index, 18,
+                                                             nfr.plugin.plugin_date(plugin_publication_date),
+                                                             date_format)
+                                    worksheet.write_datetime(row_index, 19,
+                                                             nfr.plugin.plugin_date(plugin_modification_date),
+                                                             date_format)
+                                    worksheet.write(row_index, 20, compliance_check_name)
+                                    worksheet.write(row_index, 21, compliance_check_audit_file)
+                                    worksheet.write(row_index, 22, compliance_check_check_id)
+                                    worksheet.write(row_index, 23, compliance_check_actual_value)
+                                    worksheet.write(row_index, 24, compliance_check_uname)
+                                    worksheet.write(row_index, 25, compliance_check_info)
+                                    worksheet.write(row_index, 26, compliance_check_result)
+                                    worksheet.write(row_index, 27, compliance_check_reference)
+                                    worksheet.write(row_index, 28, compliance_check_error)
 
-            except Exception as e:
-                number_of_files_with_errors += 1
-                traceback.print_exc()
-                self.log_emitter('info',
-                                 "ERROR Parsing [" + str(nessus_scan_file_number) + "/" +
-                                 str(len(list_of_source_files)) + "] nessus files")
-                self.log_emitter('info', e)
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
+
+                    self.log_emitter('info ', file_to_pars_full_name, f'[elapsed_time={elapsed_time_parsed}]')
+                    self.log_emitter('end  ', file_to_pars_full_name)
+
+                except Exception as e:
+                    number_of_files_with_errors += 1
+                    traceback.print_exc()
+                    self.log_emitter('info',
+                                     "ERROR Parsing [" + str(nessus_scan_file_number) + "/" +
+                                     str(len(list_of_source_files)) + "] nessus files")
+                    self.log_emitter('info', e)
 
         if number_of_rows > 0:
             worksheet.autofilter(0, 0, number_of_rows, number_of_columns - 1)
@@ -2707,8 +2860,7 @@ class ParsingThread(QThread):
         :param source_file_name: information about related source file
         :param additional_info: add more information if needed
         """
-        notification = '[action={0}] [source_file_name={1}] {2}'.format(action_name, source_file_name,
-                                                                        additional_info)
+        notification = f'[action={action_name}] [source_file_name={source_file_name}] {additional_info}'
         self.signal.emit(notification)
 
 

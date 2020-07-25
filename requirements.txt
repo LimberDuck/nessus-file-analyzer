@@ -1,8 +1,8 @@
 chardet==3.0.4
-imageio==2.5.0
-nessus-file-reader==0.2.0
-numpy==1.16.2
-Pillow==6.2.0
-PyQt5==5.12.1
-PyQt5-sip==4.19.15
-XlsxWriter==1.1.5
+imageio==2.9.0
+nessus-file-reader==0.3.0
+numpy==1.19.1
+Pillow==7.2.0
+PyQt5==5.15.0
+PyQt5-sip==12.8.0
+XlsxWriter==1.2.9
