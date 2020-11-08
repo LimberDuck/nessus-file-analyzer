@@ -1,5 +1,11 @@
-nessus file analyzer by LimberDuck
-##################################
+.. nessus-file-analyzer documentation master file, created by
+   sphinx-quickstart on Sat Jul 25 19:08:38 2020.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+####################################
+nessus-file-analyzer's documentation
+####################################
 
 *nessus file analyzer* by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
 tool which enables you to parse multiple nessus files containing the results
@@ -20,32 +26,43 @@ decrease our workload and focus on data analysis.
 .. image:: https://user-images.githubusercontent.com/9287709/59981677-5fefcf80-9607-11e9-89aa-35e5649e1c7a.png
    :width: 600
 
-.. class:: no-web no-pdf
 
-.. contents::
+Go through the first steps to quickly start using |nfa|.
 
-.. section-numbering::
+.. toctree::
+   :caption: Table of contents
+   :maxdepth: 4
+   :hidden:
 
-Main features
-=============
+.. toctree::
+   :maxdepth: 2
+   :caption: First steps
 
-* select one or more nessus files at once or select directory to get all nessus files from it and from all its subdirectories
-* select one or more of available report types like: scan, host, vulnerabilities, noncompliance
-* change target directory for output file to desired one, leave it default (current working directory) or set to be the same as source files
-* add suffix for output file with "_YYYYMMDD_HHMMSS" and/or custom text
+   nfa-first-steps
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Settings
 
-Documentation
-=============
+   nfa-settings
 
-Visit https://nessus-file-analyzer.readthedocs.io to find out more.
+.. toctree::
+   :maxdepth: 2
+   :caption: Installation
+   
+   nfa-installation
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Target file
+   
+   nfa-target-file/index
 
 Meta
 ====
 
-Change log
-----------
+Changelog
+---------
 
 See `CHANGELOG`_.
 
@@ -54,7 +71,6 @@ Licence
 -------
 
 GNU GPLv3: `LICENSE`_.
-
 
 Authors
 -------
