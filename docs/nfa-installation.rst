@@ -16,25 +16,25 @@ Windows
 2. If you don't have, install latest version of Git, you can download it via https://git-scm.com/downloads
 3. Clone |nfa| repository using below command in Git Bash:
 
-    .. code-block::
+    .. code-block:: bash
 
         git clone https://github.com/LimberDuck/nessus-file-analyzer.git
 
 4. Install requirements using below command
 
-    .. code-block::
+    .. code-block:: bash
 
         pip install -r .\requirements.txt
 
 5. Run |nfa| using below command
 
-    .. code-block::
+    .. code-block:: bash
 
         python nfa.py
 
 6. Upgrade setuptools using below command
 
-    .. code-block::
+    .. code-block:: bash
 
         pip install --upgrade setuptools
 
@@ -46,7 +46,7 @@ Windows
 
 8. Build your own executable file using below command
 
-    .. code-block::
+    .. code-block:: bash
 
         pyinstaller --onefile --windowed --version-file=.\version.rc --icon=.\icons\LimberDuck-nessus-file-analyzer.ico nfa.py
 
