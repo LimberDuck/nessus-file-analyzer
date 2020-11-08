@@ -2,23 +2,23 @@
 Getting started
 ###############
 
-.. mermaid::
-    :caption: Simple nessus file analyzer's end-user path
+.. .. mermaid::
+..     :caption: Simple nessus file analyzer's end-user path
 
-    sequenceDiagram
-        autonumber
-        participant end_user as End User
-        participant nfa as nessus file analyzer
+..     sequenceDiagram
+..         autonumber
+..         participant end_user as End User
+..         participant nfa as nessus file analyzer
 
-        end_user->>nfa: Provide nessus files.
+..         end_user->>nfa: Provide nessus files.
 
-        end_user->>nfa: Select report\-s type.
+..         end_user->>nfa: Select report\-s type.
 
-        end_user-->>nfa: Customize settings.
+..         end_user-->>nfa: Customize settings.
 
-        end_user->>+nfa: Initialize analyze.
+..         end_user->>+nfa: Initialize analyze.
         
-        nfa->>-end_user: Return target file. 
+..         nfa->>-end_user: Return target file. 
 
 
 ************************
