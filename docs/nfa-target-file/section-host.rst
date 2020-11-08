@@ -36,7 +36,7 @@ Nessus scanner IP
 *****************
 
     .. list-table:: Nessus scanner IP - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -67,7 +67,7 @@ Nessus scan name
 ****************
 
     .. list-table:: Nessus scan name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -90,7 +90,7 @@ Nessus file name
 ****************
 
     .. list-table:: Nessus file name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -113,7 +113,7 @@ Target
 ******
 
     .. list-table:: Target - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -139,7 +139,7 @@ Hostname
 ********
 
     .. list-table:: Hostname - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -164,7 +164,7 @@ FQDN
 ****
 
     .. list-table:: FQDN - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -187,7 +187,7 @@ NetBIOS Computer name
 *********************
 
     .. list-table:: NetBIOS Computer name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -219,7 +219,7 @@ NetBIOS Domain name
 *********************
 
     .. list-table:: NetBIOS Domain name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -251,7 +251,7 @@ IP
 **
 
     .. list-table:: IP - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -274,7 +274,7 @@ Scanned
 *******
 
     .. list-table:: Scanned - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -304,7 +304,7 @@ Credentialed checks
 *******************
 
     .. list-table:: Credentialed checks - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -333,7 +333,7 @@ Scan started
 ************
 
     .. list-table:: Scan started - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -356,7 +356,7 @@ Scan ended
 **********
 
     .. list-table:: Scan ended - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -379,7 +379,7 @@ Elapsed time per host
 *********************
 
     .. list-table:: Elapsed time per host - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -402,7 +402,7 @@ Elapsed time per scan
 *********************
 
     .. list-table:: Elapsed time per scan - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -425,7 +425,7 @@ Policy name
 ***********
 
     .. list-table:: Policy name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -448,7 +448,7 @@ Login used
 **********
 
     .. list-table:: Login used - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -485,7 +485,7 @@ DB SID
 ******
 
     .. list-table:: DB SID - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -508,7 +508,7 @@ DB port
 *******
 
     .. list-table:: DB port - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -531,7 +531,7 @@ Reverse lookup
 **************
 
     .. list-table:: Reverse lookup - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -554,7 +554,7 @@ Max hosts
 *********
 
     .. list-table:: Max hosts - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -577,7 +577,7 @@ Max checks
 **********
 
     .. list-table:: Max checks - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -600,7 +600,7 @@ Network timeout
 ***************
 
     .. list-table:: Network timeout - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -623,7 +623,7 @@ Operating System
 ****************
 
     .. list-table:: Operating System - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -646,7 +646,7 @@ ALL plugins
 ***********
 
     .. list-table:: ALL plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -669,7 +669,7 @@ Critical plugins
 ****************
 
     .. list-table:: Critical plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -692,7 +692,7 @@ High plugins
 ************
 
     .. list-table:: High plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -715,7 +715,7 @@ Medium plugins
 **************
 
     .. list-table:: Medium plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -738,7 +738,7 @@ Low plugins
 ***********
 
     .. list-table:: Low plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -761,7 +761,7 @@ None plugins
 ************
 
     .. list-table:: None plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -784,7 +784,7 @@ ALL compliance
 **************
 
     .. list-table:: ALL compliance - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -807,7 +807,7 @@ Passed compliance
 *****************
 
     .. list-table:: Passed compliance - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -830,7 +830,7 @@ Failed compliance
 *****************
 
     .. list-table:: Failed compliance - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -853,7 +853,7 @@ Warning compliance
 ******************
 
     .. list-table:: Warning compliance - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -876,7 +876,7 @@ Warning compliance
 **************************
 
     .. list-table:: 10180: Ping to remote host - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -907,7 +907,7 @@ Warning compliance
 *****************************
 
     .. list-table:: 10287: Traceroute Information - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -938,7 +938,7 @@ Warning compliance
 ************************
 
     .. list-table:: 11936: OS Identification - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -969,7 +969,7 @@ Warning compliance
 ****************************************
 
     .. list-table:: 45590: Common Platform Enumeration (CPE) - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1000,7 +1000,7 @@ Warning compliance
 ******************
 
     .. list-table:: 54615: Device Type - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1031,7 +1031,7 @@ Warning compliance
 ****************************************************
 
     .. list-table:: 21745: Authentication Failure - Local Checks Not Run - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1062,7 +1062,7 @@ Warning compliance
 **********************************************************************
 
     .. list-table:: 12634: Authenticated Check : OS Name and Installed Package Enumeration - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1093,7 +1093,7 @@ Warning compliance
 **************************************************
 
     .. list-table:: 110385: Authentication Success Insufficient Access - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1124,7 +1124,7 @@ Warning compliance
 *************************************************
 
     .. list-table:: 102094: SSH Commands Require Privilege Escalation - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1155,7 +1155,7 @@ Warning compliance
 ********************************************
 
     .. list-table:: 10394: Microsoft Windows SMB Log In Possible - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1186,7 +1186,7 @@ Warning compliance
 **************************************************************
 
     .. list-table:: 24786: Nessus Windows Scan Not Performed with Admin Privileges - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1217,7 +1217,7 @@ Warning compliance
 *********************************************************
 
     .. list-table:: 24269: Windows Management Instrumentation (WMI) Available - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1248,7 +1248,7 @@ Warning compliance
 **********************************************
 
     .. list-table:: 11011: Microsoft Windows SMB Service Detection - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1280,7 +1280,7 @@ Warning compliance
 *********************************************************
 
     .. list-table:: 10400: Microsoft Windows SMB Registry Remotely Accessible - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1311,7 +1311,7 @@ Warning compliance
 *********************************************************************************
 
     .. list-table:: 26917: Microsoft Windows SMB Registry : Nessus Cannot Access the Windows Registry - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1342,7 +1342,7 @@ Warning compliance
 **********************************************************************
 
     .. list-table:: 42897: SMB Registry : Start the Registry Service during the scan (WMI) - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1373,7 +1373,7 @@ Warning compliance
 ****************************************************************************
 
     .. list-table:: 20811: Microsoft Windows Installed Software Enumeration (credentialed check) - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1404,7 +1404,7 @@ Warning compliance
 *******************************
 
     .. list-table:: 91825: Oracle DB Login Possible - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1435,7 +1435,7 @@ Warning compliance
 ******************************************
 
     .. list-table:: 91827: Microsoft SQL Server Login Possible - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1466,7 +1466,7 @@ Warning compliance
 ************************
 
     .. list-table:: 47864: Cisco IOS Version - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -1497,7 +1497,7 @@ Warning compliance
 ***************************
 
     .. list-table:: 67217: Cisco IOS XE Version - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name

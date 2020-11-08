@@ -5,7 +5,7 @@ Noncompliance section
 Here you will find all details about data visible in target file in *Noncompliance* section.
 
     .. list-table:: Column details explanation
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -36,7 +36,7 @@ Nessus scanner IP
 *****************
 
     .. list-table:: Nessus scanner IP - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -67,7 +67,7 @@ Nessus scan name
 ****************
 
     .. list-table:: Nessus scan name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -90,7 +90,7 @@ Nessus file name
 ****************
 
     .. list-table:: Nessus file name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -113,7 +113,7 @@ Target
 ******
 
     .. list-table:: Target - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -136,7 +136,7 @@ Hostname
 ********
 
     .. list-table:: Hostname - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -161,7 +161,7 @@ FQDN
 ****
 
     .. list-table:: FQDN - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -184,7 +184,7 @@ IP
 **
 
     .. list-table:: IP - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -207,7 +207,7 @@ Scanned
 *******
 
     .. list-table:: Scanned - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -237,7 +237,7 @@ Credentialed checks
 *******************
 
     .. list-table:: Credentialed checks - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -266,7 +266,7 @@ Policy name
 ***********
 
     .. list-table:: Policy name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -289,7 +289,7 @@ Plugin ID
 *********
 
     .. list-table:: Plugin ID - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -312,7 +312,7 @@ Plugin name
 ***********
 
     .. list-table:: Plugin name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -335,7 +335,7 @@ Plugin type
 ***********
 
     .. list-table:: Plugin type - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -358,7 +358,7 @@ Risk Factor
 ***********
 
     .. list-table:: Risk Factor - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -381,7 +381,7 @@ Plugin family
 *************
 
     .. list-table:: Plugin family - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -404,7 +404,7 @@ Compliance plugin file
 **********************
 
     .. list-table:: Compliance plugin file - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -427,7 +427,7 @@ Plugin file name
 ****************
 
     .. list-table:: Plugin file name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -450,7 +450,7 @@ Plugin version
 **************
 
     .. list-table:: Plugin version - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -473,7 +473,7 @@ Plugin publication date
 ***********************
 
     .. list-table:: Plugin publication date - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -496,7 +496,7 @@ Plugin modification date
 ************************
 
     .. list-table:: Plugin modification date - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -519,7 +519,7 @@ Check name
 **********
 
     .. list-table:: Check name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -542,7 +542,7 @@ Audit file name
 ***************
 
     .. list-table:: Audit file name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -565,7 +565,7 @@ Check ID
 ********
 
     .. list-table:: Check ID - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -588,7 +588,7 @@ Current value
 *************
 
     .. list-table:: Current value - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -611,7 +611,7 @@ Uname
 *****
 
     .. list-table:: Uname - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -634,7 +634,7 @@ Description
 ***********
 
     .. list-table:: Description - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -657,7 +657,7 @@ Check status
 ************
 
     .. list-table:: Check status - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -680,7 +680,7 @@ Reference
 *********
 
     .. list-table:: Reference - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -703,7 +703,7 @@ Error
 *****
 
     .. list-table:: Error - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name

@@ -5,7 +5,7 @@ Scan section
 Here you will find all details about data visible in target file in *Scan* section.
 
     .. list-table:: Column details explanation
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -36,7 +36,7 @@ Nessus scan name
 ****************
 
     .. list-table:: Nessus scan name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -59,7 +59,7 @@ Nessus file name
 ****************
 
     .. list-table:: Nessus file name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -82,7 +82,7 @@ nessus file size
 ****************
 
     .. list-table:: nessus file size - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -107,7 +107,7 @@ Target hosts
 ************
 
     .. list-table:: Target hosts - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -134,7 +134,7 @@ Target hosts (without duplicates)
 *********************************
 
     .. list-table:: Target hosts (without duplicates) - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -157,7 +157,7 @@ Scanned hosts
 *************
 
     .. list-table:: Scanned hosts - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -180,7 +180,7 @@ Scanned hosts with credentialed checks
 **************************************
 
     .. list-table:: Scanned hosts with credentialed checks - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -206,7 +206,7 @@ Unreachable hosts
 *****************
 
     .. list-table:: Unreachable hosts - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -229,7 +229,7 @@ Scan started
 ************
 
     .. list-table:: Scan started - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -252,7 +252,7 @@ Scan ended
 **********
 
     .. list-table:: Scan ended - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -275,7 +275,7 @@ Elapsed time per scan
 *********************
 
     .. list-table:: Elapsed time per scan - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -298,7 +298,7 @@ Policy name
 ***********
 
     .. list-table:: Policy name - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -321,7 +321,7 @@ Login used
 **********
 
     .. list-table:: Login used - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -346,7 +346,7 @@ DB SID
 ******
 
     .. list-table:: DB SID - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -369,7 +369,7 @@ DB port
 *******
 
     .. list-table:: DB port - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -392,7 +392,7 @@ Reverse lookup
 **************
 
     .. list-table:: Reverse lookup - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -415,7 +415,7 @@ Max hosts
 *********
 
     .. list-table:: Max hosts - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -438,7 +438,7 @@ Max checks
 **********
 
     .. list-table:: Max checks - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -461,7 +461,7 @@ Network timeout
 ***************
 
     .. list-table:: Network timeout - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -484,7 +484,7 @@ Used plugins
 ************
 
     .. list-table:: Used plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -507,7 +507,7 @@ ALL plugins
 ***********
 
     .. list-table:: ALL plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -530,7 +530,7 @@ Critical plugins
 ****************
 
     .. list-table:: Critical plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -553,7 +553,7 @@ High plugins
 ************
 
     .. list-table:: High plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -576,7 +576,7 @@ Medium plugins
 **************
 
     .. list-table:: Medium plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -599,7 +599,7 @@ Low plugins
 ***********
 
     .. list-table:: Low plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -622,7 +622,7 @@ None plugins
 ************
 
     .. list-table:: None plugins - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -645,7 +645,7 @@ ALL compliance
 **************
 
     .. list-table:: ALL compliance - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -668,7 +668,7 @@ Passed compliance
 *****************
 
     .. list-table:: Passed compliance - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -691,7 +691,7 @@ Failed compliance
 *****************
 
     .. list-table:: Failed compliance - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
@@ -714,7 +714,7 @@ Warning compliance
 ******************
 
     .. list-table:: Warning compliance - column details
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name
