@@ -21,7 +21,7 @@ vulnerabilities and/or noncompliance.
 It's free and open source tool, which has been created to automate our work,
 decrease our workload and focus on data analysis.
 
-|license| |repo_size| |code_size| |supported_platform|
+|license| |repo_size| |code_size| |supported_platform| |docs_status|
 
 .. image:: https://user-images.githubusercontent.com/9287709/59981677-5fefcf80-9607-11e9-89aa-35e5649e1c7a.png
    :width: 600
@@ -88,9 +88,16 @@ Authors
 
 .. |repo_size| image:: https://img.shields.io/github/repo-size/LimberDuck/nessus-file-analyzer.svg
     :target: https://github.com/LimberDuck/nessus-file-analyzer
+    :alt: Repo size
 
 .. |code_size| image:: https://img.shields.io/github/languages/code-size/LimberDuck/nessus-file-analyzer.svg
     :target: https://github.com/LimberDuck/nessus-file-analyzer
+    :alt: Code size
 
 .. |supported_platform| image:: https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey.svg
     :target: https://github.com/LimberDuck/nessus-file-analyzer
+    :alt: Supported platform
+
+.. |docs_status| image:: https://readthedocs.org/projects/nessus-file-analyzer/badge/?version=latest
+    :target: https://nessus-file-analyzer.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
