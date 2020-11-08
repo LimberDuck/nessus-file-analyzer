@@ -5,7 +5,7 @@ Host section
 Here you will find all details about data visible in target file in *Host* section.
 
     .. list-table:: Column details explanation
-        :widths: 10 90
+        :widths: 20 80
         :stub-columns: 1
 
         * - Header name

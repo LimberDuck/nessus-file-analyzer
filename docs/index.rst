@@ -30,6 +30,11 @@ decrease our workload and focus on data analysis.
 Go through the first steps to quickly start using |nfa|.
 
 .. toctree::
+   :caption: Table of contents
+   :maxdepth: 4
+   :hidden:
+
+.. toctree::
    :maxdepth: 2
    :caption: First steps
 
