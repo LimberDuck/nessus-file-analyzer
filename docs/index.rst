@@ -58,6 +58,13 @@ Go through the first steps to quickly start using |nfa|.
    
    nfa-target-file/index
 
+.. toctree::
+   :caption: Links
+   :hidden:
+
+   LimberDuck.org <https://limberduck.org>
+   LimberDuck on GitHub <https://github.com/limberduck>
+
 Meta
 ====
 
