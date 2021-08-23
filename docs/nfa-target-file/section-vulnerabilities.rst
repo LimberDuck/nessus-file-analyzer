@@ -674,3 +674,96 @@ CVE number
 
         * - Column type
           - ``debug``, ``default``
+
+*****************
+Exploit available
+*****************
+
+    .. list-table:: Exploit available - column details
+        :widths: 20 80
+        :stub-columns: 1
+
+        * - Header name
+          - Exploit available
+
+        * - Description
+          - Information if Exploit is available.
+
+        * - Source
+          - nessus file > ``ReportHost/ReportItem/exploit_available``
+
+        * - Post-processing
+          - *none*
+
+        * - Column type
+          - ``debug``, ``default``
+
+*********************
+Exploit code maturity
+*********************
+
+    .. list-table:: Exploit code maturity - column details
+        :widths: 20 80
+        :stub-columns: 1
+
+        * - Header name
+          - Exploit code maturity
+
+        * - Description
+          - Information about Exploit code maturity.
+
+        * - Source
+          - nessus file > ``ReportHost/ReportItem/exploit_code_maturity``
+
+        * - Post-processing
+          - *none*
+
+        * - Column type
+          - ``debug``, ``default``
+
+****************************
+Exploit framework metasploit
+****************************
+
+    .. list-table:: Exploit framework metasploit - column details
+        :widths: 20 80
+        :stub-columns: 1
+
+        * - Header name
+          - Exploit framework metasploit
+
+        * - Description
+          - Information about Exploit framework metasploit.
+
+        * - Source
+          - nessus file > ``ReportHost/ReportItem/exploit_framework_metasploit``
+
+        * - Post-processing
+          - *none*
+
+        * - Column type
+          - ``debug``, ``default``
+
+
+*******************
+Exploitability ease
+*******************
+
+    .. list-table:: Exploitability ease - column details
+        :widths: 20 80
+        :stub-columns: 1
+
+        * - Header name
+          - Exploitability ease
+
+        * - Description
+          - Information if Exploitability is ease.
+
+        * - Source
+          - nessus file > ``ReportHost/ReportItem/exploitability_ease``
+
+        * - Post-processing
+          - *none*
+
+        * - Column type
+          - ``debug``, ``default``

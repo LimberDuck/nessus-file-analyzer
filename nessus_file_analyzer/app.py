@@ -2190,6 +2190,10 @@ class ParsingThread(QThread):
                 'Plugin output',
                 'CVE counter',
                 'CVE number'
+                'Exploit available',
+                'Exploit code maturity',
+                'Exploit framework metasploit',
+                'Exploitability ease',
             ]
         else:
             headers = [
@@ -2219,8 +2223,13 @@ class ParsingThread(QThread):
                 'Solution',
                 'Plugin output',
                 'CVE counter',
-                'CVE number'
+                'CVE number',
+                'Exploit available',
+                'Exploit code maturity',
+                'Exploit framework metasploit',
+                'Exploitability ease',
             ]
+
         number_of_columns = len(headers)
         # print('Number of columns: ' + str(number_of_columns))
 
@@ -2343,6 +2352,10 @@ class ParsingThread(QThread):
                             solution = nfr.plugin.report_item_value(report_item, 'solution')
                             plugin_output = nfr.plugin.report_item_value(report_item, 'plugin_output')
                             plugin_cves = nfr.plugin.report_item_values(report_item, 'cve')
+                            exploit_available = nfr.plugin.report_item_value(report_item, 'exploit_available')
+                            exploit_code_maturity = nfr.plugin.report_item_value(report_item, 'exploit_code_maturity')
+                            exploit_framework_metasploit = nfr.plugin.report_item_value(report_item, 'exploit_framework_metasploit')
+                            exploitability_ease = nfr.plugin.report_item_value(report_item, 'exploitability_ease')
 
                             if not self.report_vulnerabilities_debug_data_enabled and not \
                                     self.report_vulnerabilities_none_skip:
@@ -2388,6 +2401,22 @@ class ParsingThread(QThread):
                                 else:
                                     worksheet.write_number(row_index, 20, 0)
                                     worksheet.write_blank(row_index, 21, None)
+                                if exploit_available is not None:
+                                    worksheet.write_string(row_index, 22, exploit_available)
+                                else:
+                                    worksheet.write_blank(row_index, 22, None)
+                                if exploit_code_maturity is not None:
+                                    worksheet.write_string(row_index, 23, exploit_code_maturity)
+                                else:
+                                    worksheet.write_blank(row_index, 23, None)
+                                if exploit_framework_metasploit is not None:
+                                    worksheet.write_string(row_index, 24, exploit_framework_metasploit)
+                                else:
+                                    worksheet.write_blank(row_index, 24, None)
+                                if exploitability_ease is not None:
+                                    worksheet.write_string(row_index, 25, exploitability_ease)
+                                else:
+                                    worksheet.write_blank(row_index, 25, None)
                             elif not self.report_vulnerabilities_debug_data_enabled and \
                                     self.report_vulnerabilities_none_skip:
                                 if risk_factor == 'None':
@@ -2433,6 +2462,22 @@ class ParsingThread(QThread):
                                     else:
                                         worksheet.write_number(row_index, 20, 0)
                                         worksheet.write_blank(row_index, 21, None)
+                                    if exploit_available is not None:
+                                        worksheet.write_string(row_index, 22, exploit_available)
+                                    else:
+                                        worksheet.write_blank(row_index, 22, None)
+                                    if exploit_code_maturity is not None:
+                                        worksheet.write_string(row_index, 23, exploit_code_maturity)
+                                    else:
+                                        worksheet.write_blank(row_index, 23, None)
+                                    if exploit_framework_metasploit is not None:
+                                        worksheet.write_string(row_index, 24, exploit_framework_metasploit)
+                                    else:
+                                        worksheet.write_blank(row_index, 24, None)
+                                    if exploitability_ease is not None:
+                                        worksheet.write_string(row_index, 25, exploitability_ease)
+                                    else:
+                                        worksheet.write_blank(row_index, 25, None)
                             elif self.report_vulnerabilities_debug_data_enabled and not \
                                     self.report_vulnerabilities_none_skip:
                                 worksheet.write(row_index, 0, host_scanner_ip)
@@ -2482,6 +2527,22 @@ class ParsingThread(QThread):
                                 else:
                                     worksheet.write_number(row_index, 25, 0)
                                     worksheet.write_blank(row_index, 26, None)
+                                if exploit_available is not None:
+                                    worksheet.write_string(row_index, 27, exploit_available)
+                                else:
+                                    worksheet.write_blank(row_index, 27, None)
+                                if exploit_code_maturity is not None:
+                                    worksheet.write_string(row_index, 28, exploit_code_maturity)
+                                else:
+                                    worksheet.write_blank(row_index, 28, None)
+                                if exploit_framework_metasploit is not None:
+                                    worksheet.write_string(row_index, 29, exploit_framework_metasploit)
+                                else:
+                                    worksheet.write_blank(row_index, 29, None)
+                                if exploitability_ease is not None:
+                                    worksheet.write_string(row_index, 30, exploitability_ease)
+                                else:
+                                    worksheet.write_blank(row_index, 30, None)
                             elif self.report_vulnerabilities_debug_data_enabled and \
                                     self.report_vulnerabilities_none_skip:
                                 if risk_factor == 'None':
@@ -2532,6 +2593,22 @@ class ParsingThread(QThread):
                                     else:
                                         worksheet.write_number(row_index, 25, 0)
                                         worksheet.write_blank(row_index, 26, None)
+                                    if exploit_available is not None:
+                                        worksheet.write_string(row_index, 27, exploit_available)
+                                    else:
+                                        worksheet.write_blank(row_index, 27, None)
+                                    if exploit_code_maturity is not None:
+                                        worksheet.write_string(row_index, 28, exploit_code_maturity)
+                                    else:
+                                        worksheet.write_blank(row_index, 28, None)
+                                    if exploit_framework_metasploit is not None:
+                                        worksheet.write_string(row_index, 29, exploit_framework_metasploit)
+                                    else:
+                                        worksheet.write_blank(row_index, 29, None)
+                                    if exploitability_ease is not None:
+                                        worksheet.write_string(row_index, 30, exploitability_ease)
+                                    else:
+                                        worksheet.write_blank(row_index, 30, None)
 
                     end_time = time.time()
                     elapsed_time = end_time - start_time
