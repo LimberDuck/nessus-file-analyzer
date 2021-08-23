@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 ####################################
-nessus-file-analyzer's documentation
+nessus file analyzer's documentation
 ####################################
 
 *nessus file analyzer* by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI

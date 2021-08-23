@@ -17,12 +17,12 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'nessus-file-analyzer'
+project = 'nessus file analyzer'
 copyright = '2018-2021, Damian Krawczyk'
 author = 'Damian Krawczyk'
 
 # The full version, including alpha/beta/rc tags
-release = '0.5.0'
+release = '0.6.0'
 
 
 # -- General configuration ---------------------------------------------------
