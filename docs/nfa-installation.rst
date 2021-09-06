@@ -8,150 +8,226 @@ Installation instructions
     
     Read about `virtualenvwrapper in The Hitchhiker’s Guide to Python! <https://docs.python-guide.org/dev/virtualenvs/#virtualenvwrapper>`_: `virtualenvwrapper <https://virtualenvwrapper.readthedocs.io>`_ provides a set of commands which makes working with virtual environments much more pleasant.
 
-*******
+************
+Installation
+************
+
+1. Install **nessus file analyzer**
+    
+   ``pip install nessus-file-analyzer``
+
+   .. note::
+       
+       To upgrade to newer version run:
+
+       ``pip install -U nessus-file-analyzer``
+
+2. Run **nessus file analyzer**
+
+   ``nessus-file-analyzer``
+   
+   .. tip::
+        
+        Optionally for Linux and macOS:
+        
+        ``nessus-file-analyzer&``
+        
+        Run with ``&`` at the end to start the process in the background.
+
+3. Make a shortcut for **nessus file analyzer**
+
+   **Windows:**
+   
+   - Run in cmd ``where nessus-file-analyzer.exe``
+   - Copy returned path.
+   - Go to e.g. to Desktop.
+   - Right click on Desktop and choose ``New > Shortcut``.
+   - Paste returned path.
+   - Click ``Next``, ``Finish``.
+   
+   **Linux (Ubuntu) / macOS**
+
+   - Run in Terminal ``which nessus-file-analyzer``
+   - Run in Terminal ``ln -s path_returned_in_previous_command ~/Desktop/``
+
+   **macOS**
+
+   - Run in Terminal ``which nessus-file-analyzer``
+   - Open ``bin`` folder where ``nessus-file-analyzer`` is located.
+   - Right click on ``nessus-file-analyzer`` and choose ``Make alias``.
+   - Move your alias e.g. to Desktop.
+
+
+Additional steps
+****************
+
+Linux (Ubuntu)
+==============
+
+If you installed without python virtual environment, and you see below error:
+
+.. code-block:: shell
+
+    ~$ nessus-file-analyzer
+    nessus-file-analyzer: command not found
+
+
+Add below to ``~/.bashrc``
+
+.. code-block:: shell
+
+    # set PATH so it includes user's private ~/.local/bin if it exists
+    if [ -d "$HOME/.local/bin" ] ; then
+        PATH="$HOME/.local/bin:$PATH"
+    fi
+
+If you see below error:
+
+.. code-block:: shell
+
+    ~$ nessus-file-analyzer
+    qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+    This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+
+    Available platform plugins are: eglfs, linuxfb, minimal, minimalegl, offscreen, vnc, wayland-egl, wayland, wayland-xcomposite-egl, wayland-xcomposite-glx, webgl, xcb.
+
+    Aborted (core dumped)
+
+
+Run below to fix the error:
+
+.. code-block:: shell
+
+    sudo apt-get install --reinstall libxcb-xinerama0
+
+
+
+
+*********************
+Build executable file
+*********************
+
 Windows
 *******
 
-1. If you don't have, install Python 3.6.0 or higher, you can download it via https://www.python.org/downloads
-2. If you don't have, install latest version of Git, you can download it via https://git-scm.com/downloads
-3. Clone |nfa| repository using below command in Git Bash:
+1. Clone **nessus file analyzer** repository using below command in Git Bash:
 
     .. code-block:: none
 
         git clone https://github.com/LimberDuck/nessus-file-analyzer.git
 
-4. Install requirements using below command
+2. Install requirements using below command
 
     .. code-block:: none
 
         pip install -r .\requirements.txt
 
-5. Run |nfa| using below command
+3. Run **nessus file analyzer** using below command
 
     .. code-block:: none
 
-        python nfa.py
+        python -m nessus_file_analyzer
 
-6. Upgrade setuptools using below command
+4. Upgrade setuptools using below command
 
     .. code-block:: none
 
         pip install --upgrade setuptools
 
-7. Install PyInstaller
+5. Install PyInstaller
 
     .. code-block:: none
 
         pip install PyInstaller
 
-8. Build your own executable file using below command
+6. Build your own executable file using below command
 
     .. code-block:: none
 
-        pyinstaller --onefile --windowed --version-file=.\version.rc --icon=.\icons\LimberDuck-nessus-file-analyzer.ico nfa.py
+        pyinstaller --onefile --windowed --version-file=.\version.rc --icon=.\icons\LimberDuck-nessus-file-analyzer.ico  --name nessus-file-analyzer nessus_file_analyzer\__main__.py
 
-9. Go to dist catalog to find executable file *nfa.exe*
+7. Go to ``dist`` catalog to find executable file ``nessus-file-analyzer.exe``
 
-**************
+
 Linux (Ubuntu)
 **************
 
-1. Python 3.6.7 should be already installed in Ubuntu 18.04.1 LTS, you can ensure with below command
-
-    .. code-block:: bash
-
-        python3 --version
-
-2. If you don't have, install git using below command
-
-    .. code-block:: bash
-
-        sudo apt install git
-
-3. Clone |nfa| repository using below command
+1. Clone **nessus file analyzer** repository using below command
 
     .. code-block:: bash
 
         git clone https://github.com/LimberDuck/nessus-file-analyzer.git
 
-4. If you don't have, install pip using below command
+2. Install requirements using below command
 
     .. code-block:: bash
 
-        sudo apt install python3-pip
+        pip install -r ./requirements.txt
 
-5. Install requirements using below command
-
-    .. code-block:: bash
-
-        pip3 install -r ./requirements.txt
-
-6. Run |nfa| using below command
+3. Run **nessus file analyzer** using below command
 
     .. code-block:: bash
 
-        python3 nfa.py
+        python -m nessus_file_analyzer
 
-7. Upgrade setuptools using below command
+4. Upgrade setuptools using below command
 
     .. code-block:: bash
 
-        pip3 install --upgrade setuptools
+        pip install --upgrade setuptools
 
-8. Install PyInstaller
+5. Install PyInstaller
 
     .. code-block:: bash
 
         pip install PyInstaller
 
-9. Build your own executable file using below command
+6. Build your own executable file using below command
 
     .. code-block:: bash
 
-        ~/.local/bin/pyinstaller --onefile --windowed --icon=./icons/LimberDuck-nessus-file-analyzer.ico nfa.py
+        ~/.local/bin/pyinstaller --onefile --windowed --icon=./icons/LimberDuck-nessus-file-analyzer.ico --name nessus-file-analyzer nessus_file_analyzer\__main__.py
 
-10. Go to dist catalog to find executable file *nfa*
+7. Go to ``dist`` catalog to find executable file ``nessus-file-analyzer``.
 
+
+macOS
 *****
-MacOS
-*****
 
-1. If you don't have, install Python 3.6.0 or higher, you can download it via https://www.python.org/downloads
-
-2. Clone |nfa| repository using below command
+1. Clone **nessus file analyzer** repository using below command
 
     .. code-block:: bash
 
         git clone https://github.com/LimberDuck/nessus-file-analyzer.git
 
-3. Install requirements using below command
+2. Install requirements using below command
 
     .. code-block:: bash
 
         pip3.6 install -r ./requirements.txt
 
-4. Run |nfa| using below command
+3. Run **nessus file analyzer** using below command
 
     .. code-block:: bash
 
-        python3.6 nfa.py
+        python -m nessus_file_analyzer
 
-5. Upgrade setuptools using below command
+4. Upgrade setuptools using below command
 
     .. code-block:: bash
 
-        pip3.6 install --upgrade setuptools
+        pip install --upgrade setuptools
 
-6. Install PyInstaller
+5. Install PyInstaller
 
     .. code-block:: bash
 
         pip install PyInstaller
 
-7. Build your own executable file using below command
+6. Build your own executable file using below command
 
     .. code-block:: bash
         
-        pyinstaller --onefile --windowed --icon=./icons/LimberDuck-nessus-file-analyzer.ico nfa.py
+        pyinstaller --onefile --windowed --icon=./icons/LimberDuck-nessus-file-analyzer.ico --name nessus-file-analyzer nessus_file_analyzer\__main__.py
 
-8. Go to dist catalog to find executable file *nfa*
+7. Go to ``dist`` catalog to find executable file ``nessus-file-analyzer``.

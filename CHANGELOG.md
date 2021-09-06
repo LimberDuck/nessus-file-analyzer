@@ -5,6 +5,13 @@ This document records all notable changes to [nessus file analyzer by LimberDuck
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2021-09-06
+
+### Added
+
+- `nessus-file-analyzer` as Python package - from now on you can install it with `pip install nessus-file-analyzer`
+- entry point `nessus-file-analyzer` added - from now on, after installation of **nessus file analyzer** you can run it with command `nessus-file-analyzer`, read more in documentation in [Installation instructions](https://nessus-file-analyzer.readthedocs.io/en/latest/nfa-installation.html).
+
 ## [0.6.0] - 2021-08-23
 
 ### Added
@@ -84,14 +91,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
-[0.1.0]: https://github.com/LimberDuck/nessus-file-analyzer/releases/tag/v0.1.0
-[0.1.1]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.1.0...v0.1.1
-[0.2.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.1.1...v0.2.0
-[0.3.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.2.0...v0.3.0
-[0.3.1]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.3.0...v0.3.1
-[0.4.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.3.1...v0.4.0
-[0.5.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.4.0...v0.5.0
-[0.5.1]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.5.0...v0.5.1
+[0.7.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.5.1...v0.6.0
+[0.5.1]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/LimberDuck/nessus-file-analyzer/releases/tag/v0.1.0
 
 [1]: https://github.com/LimberDuck/nessus-file-analyzer
