@@ -28,15 +28,14 @@ __all__ = [
 __title__ = "nessus file analyzer by LimberDuck"
 __package_name__ = "nessus-file-analyzer"
 __icon__ = "LimberDuck-nessus-file-analyzer.ico"
-__summary__ = "nessus file analyzer by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI" \
-              "tool which enables you to parse multiple nessus files containing the results" \
-              "of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed" \
-              "data to a Microsoft Excel Workbook for effortless analysis."
+__summary__ = "nessus file analyzer by LimberDuck is a GUI tool which enables you to parse nessus scan files from " \
+              "Nessus and Tenable.SC by (C) Tenable, Inc. and exports results to a Microsoft Excel Workbook for " \
+              "effortless analysis."
 __uri__ = "https://limberduck.org/en/latest/nessus-file-analyzer"
-__version__ = "0.6.0"
-__release_date__ = "2021.08.23"
+__version__ = "0.7.0"
+__release_date__ = "2021.09.06"
 __author__ = u"Damian Krawczyk"
 __email__ = "damian.krawczyk@limberduck.org"
 __license_name__ = "GNU GPLv3"
 __license_link__ = "https://www.gnu.org/licenses/gpl-3.0.en.html"
-__copyright__ = u"\N{COPYRIGHT SIGN} 2018-2021 by %s" % __author__
+__copyright__ = u"\N{COPYRIGHT SIGN} 2019-2021 by %s" % __author__

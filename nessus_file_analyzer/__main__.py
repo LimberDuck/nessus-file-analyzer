@@ -21,6 +21,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-if __name__ == '__main__':
-    from nessus_file_analyzer import app
+from nessus_file_analyzer import app
+
+
+def main():
+
     app.main()
+
+
+if __name__ == '__main__':
+
+    main()

@@ -2955,7 +2955,7 @@ def main():
 
     app_window_title = name
     form.setWindowTitle(app_window_title)
-    print(app_name, app_version, app_version_release_date)
+    # print(app_name, app_version, app_version_release_date)
 
     # app_icon_file_name_png = 'LimberDuck-nessus-file-analyzer.png'
     # app_icon_file_name_png_to_ico = nfa.utilities.png_to_ico(app_icon_file_name_png)
