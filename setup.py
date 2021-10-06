@@ -13,7 +13,7 @@ with open("nessus_file_analyzer/_version.py") as f:
 setuptools.setup(
     name="nessus_file_analyzer",
     version=about["__version__"],
-    license="LGPLv3",
+    license="GPLv3",
     author="Damian Krawczyk",
     author_email="damian.krawczyk@limberduck.org",
     description="nessus file analyzer by LimberDuck is a GUI tool which enables you to parse nessus scan files from "
