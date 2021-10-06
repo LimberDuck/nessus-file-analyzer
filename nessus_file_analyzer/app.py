@@ -2189,7 +2189,7 @@ class ParsingThread(QThread):
                 'Solution',
                 'Plugin output',
                 'CVE counter',
-                'CVE number'
+                'CVE number',
                 'Exploit available',
                 'Exploit code maturity',
                 'Exploit framework metasploit',
