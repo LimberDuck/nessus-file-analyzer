@@ -1343,6 +1343,7 @@ class ParsingThread(QThread):
                     source_file_size = 0
                     if source_file_type == 'nessus':
                         root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        scan_file_source = nfr.scan.scan_file_source(root)
                         file_to_pars_full_name = nfr.file.nessus_scan_file_name_with_path(file_to_pars)
                         source_file_size = nfa.utilities.size_of_file_human(file_to_pars_full_name)
                     elif source_file_type == 'zip':
@@ -1351,11 +1352,13 @@ class ParsingThread(QThread):
                             f'[{zip_source.getinfo(file_to_pars).filename}]'
                         file_to_pars = zip_source.open(file_to_pars)
                         root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        scan_file_source = nfr.scan.scan_file_source(root)
 
                     start_time = time.time()
                     self.log_emitter('start', file_to_pars_full_name)
                     self.file_analysis_started.emit(1)
 
+                    self.log_emitter('info ', file_to_pars_full_name, f'[scan_file_source={scan_file_source}]')
                     self.log_emitter('info ', file_to_pars_full_name, f'[source_file_size={source_file_size}]')
                     self.log_emitter('info ', file_to_pars_full_name, f'[report_type={report_name}]')
                     self.log_emitter('info ', file_to_pars_full_name,
@@ -1693,6 +1696,7 @@ class ParsingThread(QThread):
                     source_file_size = 0
                     if source_file_type == 'nessus':
                         root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        scan_file_source = nfr.scan.scan_file_source(root)
                         file_to_pars_full_name = nfr.file.nessus_scan_file_name_with_path(file_to_pars)
                         source_file_size = nfa.utilities.size_of_file_human(file_to_pars_full_name)
                     elif source_file_type == 'zip':
@@ -1701,11 +1705,13 @@ class ParsingThread(QThread):
                             f'[{zip_source.getinfo(file_to_pars).filename}]'
                         file_to_pars = zip_source.open(file_to_pars)
                         root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        scan_file_source = nfr.scan.scan_file_source(root)
 
                     start_time = time.time()
                     self.log_emitter('start', file_to_pars_full_name)
                     self.file_analysis_started.emit(1)
 
+                    self.log_emitter('info ', file_to_pars_full_name, f'[scan_file_source={scan_file_source}]')
                     self.log_emitter('info ', file_to_pars_full_name, f'[source_file_size={source_file_size}]')
                     self.log_emitter('info ', file_to_pars_full_name, f'[report_type={report_name}]')
                     self.log_emitter('info ', file_to_pars_full_name,
@@ -2278,6 +2284,7 @@ class ParsingThread(QThread):
                     source_file_size = 0
                     if source_file_type == 'nessus':
                         root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        scan_file_source = nfr.scan.scan_file_source(root)
                         file_to_pars_full_name = nfr.file.nessus_scan_file_name_with_path(file_to_pars)
                         source_file_size = nfa.utilities.size_of_file_human(file_to_pars_full_name)
                     elif source_file_type == 'zip':
@@ -2286,10 +2293,13 @@ class ParsingThread(QThread):
                             f'{zip_source.getinfo(file_to_pars).filename}]'
                         file_to_pars = zip_source.open(file_to_pars)
                         root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        scan_file_source = nfr.scan.scan_file_source(root)
 
                     start_time = time.time()
                     self.log_emitter('start', file_to_pars_full_name)
                     self.file_analysis_started.emit(1)
+
+                    self.log_emitter('info ', file_to_pars_full_name, f'[scan_file_source={scan_file_source}]')
                     self.log_emitter('info ', file_to_pars_full_name, f'[source_file_size={source_file_size}]')
                     self.log_emitter('info ', file_to_pars_full_name, f'[report_type={report_name}]')
                     self.log_emitter('info ', file_to_pars_full_name,
@@ -2764,6 +2774,7 @@ class ParsingThread(QThread):
                     source_file_size = 0
                     if source_file_type == 'nessus':
                         root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        scan_file_source = nfr.scan.scan_file_source(root)
                         file_to_pars_full_name = nfr.file.nessus_scan_file_name_with_path(file_to_pars)
                         source_file_size = nfa.utilities.size_of_file_human(file_to_pars_full_name)
                     elif source_file_type == 'zip':
@@ -2772,10 +2783,12 @@ class ParsingThread(QThread):
                             f'{zip_source.getinfo(file_to_pars).filename}]'
                         file_to_pars = zip_source.open(file_to_pars)
                         root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                        scan_file_source = nfr.scan.scan_file_source(root)
 
                     start_time = time.time()
                     self.log_emitter('start', file_to_pars_full_name)
                     self.file_analysis_started.emit(1)
+                    self.log_emitter('info ', file_to_pars_full_name, f'[scan_file_source={scan_file_source}]')
                     self.log_emitter('info ', file_to_pars_full_name, f'[source_file_size={source_file_size}]')
                     self.log_emitter('info ', file_to_pars_full_name, f'[report_type={report_name}]')
                     self.log_emitter('info ', file_to_pars_full_name,
