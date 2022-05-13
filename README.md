@@ -105,7 +105,7 @@ GNU GPLv3: [LICENSE].
 
 [Damian Krawczyk] created **[nessus file analyzer]** by [LimberDuck].
 
-[nessus file analyzer]: https://limberduck.org/en/latest/nessus-file-analyzer
+[nessus file analyzer]: https://limberduck.org/en/latest/tools/nessus-file-analyzer
 [Damian Krawczyk]: https://damiankrawczyk.com
 [LimberDuck]: https://limberduck.org
 [CHANGELOG]: https://github.com/LimberDuck/nessus-file-analyzer/blob/master/CHANGELOG.md
