@@ -1383,9 +1383,9 @@ class ParsingThread(QThread):
                     number_of_compliance_plugins_failed = 0
                     number_of_compliance_plugins_warning = 0
 
-                    policy_max_hosts = int(nfr.scan.policy_max_hosts(root))
-                    policy_max_checks = int(nfr.scan.policy_max_checks(root))
-                    policy_checks_read_timeout = int(nfr.scan.policy_checks_read_timeout(root))
+                    policy_max_hosts = nfr.scan.policy_max_hosts(root)
+                    policy_max_checks = nfr.scan.policy_max_checks(root)
+                    policy_checks_read_timeout = nfr.scan.policy_checks_read_timeout(root)
 
                     report_host_counter = 0
                     number_of_report_hosts = nfr.scan.number_of_scanned_hosts(root)
@@ -1723,9 +1723,9 @@ class ParsingThread(QThread):
                                      f'{nfr.scan.number_of_scanned_hosts_with_credentialed_checks_yes(root)}]')
 
                     date_format = workbook.add_format({'num_format': 'yyyy-mm-dd hh:mm:ss'})
-                    policy_max_hosts = int(nfr.scan.policy_max_hosts(root))
-                    policy_max_checks = int(nfr.scan.policy_max_checks(root))
-                    policy_checks_read_timeout = int(nfr.scan.policy_checks_read_timeout(root))
+                    policy_max_hosts = nfr.scan.policy_max_hosts(root)
+                    policy_max_checks = nfr.scan.policy_max_checks(root)
+                    policy_checks_read_timeout = nfr.scan.policy_checks_read_timeout(root)
                     scan_report_name = nfr.scan.report_name(root)
                     nessus_scan_file_name_with_path = nfr.file.nessus_scan_file_name_with_path(file_to_pars_full_name)
                     scan_time_elapsed = nfr.scan.scan_time_elapsed(root)
