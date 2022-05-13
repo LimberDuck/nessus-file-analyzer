@@ -1,6 +1,11 @@
 name: Python package
 
-on: [push]
+on:
+  push:
+    branches:
+      - develop
+      - master
+  workflow_dispatch:
 
 env:
   python_package_name: nessus-file-analyzer
