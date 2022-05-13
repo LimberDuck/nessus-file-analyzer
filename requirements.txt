@@ -1,5 +1,5 @@
 chardet>=4.0.0
-imageio>=21.9.1
+imageio>=21.9.0
 nessus-file-reader>=0.4.1
 PyQt5>=5.15.6
 XlsxWriter>=3.0.3
