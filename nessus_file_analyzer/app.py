@@ -1485,7 +1485,7 @@ class ParsingThread(QThread):
                         worksheet.write(row_index, 16, policy_max_hosts)
                         worksheet.write(row_index, 17, policy_max_checks)
                         worksheet.write(row_index, 18, policy_checks_read_timeout)
-                        worksheet.write(row_index, 19, len(nfr.scan.plugin_set(root)))
+                        worksheet.write(row_index, 19, nfr.scan.plugin_set_number(root))
                         worksheet.write(row_index, 20, number_of_plugins)
                         worksheet.write(row_index, 21, number_of_plugins_critical)
                         worksheet.write(row_index, 22, number_of_plugins_high)
