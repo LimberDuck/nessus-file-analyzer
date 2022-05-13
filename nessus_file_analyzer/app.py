@@ -1900,244 +1900,245 @@ class ParsingThread(QThread):
                             worksheet.write(row_index, 54, nfr.plugin.plugin_output(root, report_host, '67217'))
 
                     number_of_not_scanned_hosts = nfr.scan.number_of_not_scanned_hosts(root)
-                    if number_of_not_scanned_hosts > 0:
-                        not_scanned_hosts = nfr.scan.list_of_not_scanned_hosts(root)
-                        not_scanned_host_counter = 0
+                    if number_of_not_scanned_hosts is not None:
+                        if number_of_not_scanned_hosts > 0:
+                            not_scanned_hosts = nfr.scan.list_of_not_scanned_hosts(root)
+                            not_scanned_host_counter = 0
 
-                        file_source = nfr.scan.source_of_file(root)
-                        if file_source == 'Tenable.sc':
-                            targets_sc = nfr.scan.list_of_target_hosts_sc_fqdn_ip(root)
+                            file_source = nfr.scan.scan_file_source(root)
+                            if file_source == 'Tenable.sc':
+                                targets_sc = nfr.scan.list_of_target_hosts_sc_fqdn_ip(root)
 
-                            for target in not_scanned_hosts:
-                                row_index += 1
-                                not_scanned_host_counter += 1
-                                self.progress.emit(not_scanned_host_counter, number_of_not_scanned_hosts)
+                                for target in not_scanned_hosts:
+                                    row_index += 1
+                                    not_scanned_host_counter += 1
+                                    self.progress.emit(not_scanned_host_counter, number_of_not_scanned_hosts)
 
-                                target_fqdn = ''
-                                target_hostname = ''
-                                target_ip = ''
-                                for target_sc in targets_sc:
-                                    if target == target_sc['target_fqdn']:
-                                        target_fqdn = target_sc['target_fqdn']
-                                        target_hostname = target_fqdn.split('.')[0]
-                                        target_ip = target_sc['target_ip']
+                                    target_fqdn = ''
+                                    target_hostname = ''
+                                    target_ip = ''
+                                    for target_sc in targets_sc:
+                                        if target == target_sc['target_fqdn']:
+                                            target_fqdn = target_sc['target_fqdn']
+                                            target_hostname = target_fqdn.split('.')[0]
+                                            target_ip = target_sc['target_ip']
 
-                                if not self.report_host_debug_data_enabled:
-                                    worksheet.write(row_index, 0, target)
-                                    worksheet.write(row_index, 1, target_hostname)
-                                    worksheet.write(row_index, 2, target_fqdn)
-                                    worksheet.write(row_index, 3, target_ip)
-                                    worksheet.write(row_index, 4, 'no')
-                                    worksheet.write(row_index, 5, 'no')
-                                    worksheet.write_blank(row_index, 6, None)
-                                    worksheet.write_blank(row_index, 7, None)
-                                    worksheet.write(row_index, 8, '0:00:00')
-                                    worksheet.write(row_index, 9, scan_time_elapsed)
-                                    worksheet.write(row_index, 10, scan_policy_login_specified)
-                                    worksheet.write(row_index, 11, scan_policy_db_sid)
-                                    worksheet.write(row_index, 12, scan_policy_db_port)
-                                    worksheet.write_blank(row_index, 13, None)
-                                    worksheet.write_blank(row_index, 14, None)
-                                    worksheet.write_blank(row_index, 15, None)
-                                    worksheet.write_blank(row_index, 16, None)
-                                    worksheet.write_blank(row_index, 17, None)
-                                    worksheet.write_blank(row_index, 18, None)
-                                    worksheet.write_blank(row_index, 19, None)
-                                    worksheet.write_blank(row_index, 20, None)
-                                    worksheet.write_blank(row_index, 21, None)
-                                    worksheet.write_blank(row_index, 22, None)
-                                else:
-                                    # worksheet.write_blank(row_index, 0, None)
-                                    worksheet.write(row_index, 1, scan_report_name)
-                                    worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
-                                    worksheet.write(row_index, 3, target)
-                                    worksheet.write(row_index, 4, target_hostname)
-                                    worksheet.write(row_index, 5, target_fqdn)
-                                    # worksheet.write_blank(row_index, 6, None)
-                                    # worksheet.write_blank(row_index, 7, None)
-                                    worksheet.write(row_index, 8, target_ip)
-                                    worksheet.write(row_index, 9, 'no')
-                                    worksheet.write(row_index, 10, 'no')
-                                    # worksheet.write_blank(row_index, 11, None)
-                                    # worksheet.write_blank(row_index, 12, None)
-                                    worksheet.write(row_index, 13, '0:00:00')
-                                    worksheet.write(row_index, 14, scan_time_elapsed)
-                                    worksheet.write(row_index, 15, scan_policy_name)
-                                    worksheet.write(row_index, 16, scan_policy_login_specified)
-                                    worksheet.write(row_index, 17, scan_policy_db_sid)
-                                    worksheet.write(row_index, 18, scan_policy_db_port)
-                                    worksheet.write(row_index, 19, scan_reverse_lookup)
-                                    worksheet.write(row_index, 20, policy_max_hosts)
-                                    worksheet.write(row_index, 21, policy_max_checks)
-                                    # worksheet.write_blank(row_index, 22, None)
-                                    # worksheet.write_blank(row_index, 23, None)
-                                    # worksheet.write_blank(row_index, 24, None)
-                                    # worksheet.write_blank(row_index, 25, None)
-                                    # worksheet.write_blank(row_index, 26, None)
-                                    # worksheet.write_blank(row_index, 27, None)
-                                    # worksheet.write_blank(row_index, 28, None)
-                                    # worksheet.write_blank(row_index, 29, None)
-                                    # worksheet.write_blank(row_index, 30, None)
-                                    # worksheet.write_blank(row_index, 31, None)
-                                    # worksheet.write_blank(row_index, 32, None)
-                                    # # '10180: Ping to remote host'
-                                    # worksheet.write_blank(row_index, 33, None)
-                                    # # '10287: Traceroute Information'
-                                    # worksheet.write_blank(row_index, 34, None)
-                                    # # '11936: OS Identification'
-                                    # worksheet.write_blank(row_index, 35, None)
-                                    # # '45590: Common Platform Enumeration (CPE)'
-                                    # worksheet.write_blank(row_index, 36, None)
-                                    # # '54615: Device Type'
-                                    # worksheet.write_blank(row_index, 37, None)
-                                    # # '21745: Authentication Failure - Local Checks Not Run'
-                                    # worksheet.write_blank(row_index, 38, None)
-                                    # # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
-                                    # worksheet.write_blank(row_index, 39, None)
-                                    # # '110385: Authentication Success Insufficient Access'
-                                    # worksheet.write_blank(row_index, 40, None)
-                                    # # '102094: SSH Commands Require Privilege Escalation'
-                                    # worksheet.write_blank(row_index, 41, None)
-                                    # # '10394: Microsoft Windows SMB Log In Possible'
-                                    # worksheet.write_blank(row_index, 42, None)
-                                    # # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
-                                    # worksheet.write_blank(row_index, 43, None)
-                                    # # '24269: Windows Management Instrumentation (WMI) Available'
-                                    # worksheet.write_blank(row_index, 44, None)
-                                    # # '11011: Microsoft Windows SMB Service Detection'
-                                    # worksheet.write_blank(row_index, 45, None)
-                                    # # '10400: Microsoft Windows SMB Registry Remotely Accessible'
-                                    # worksheet.write_blank(row_index, 46, None)
-                                    # # '26917: Microsoft Windows SMB Registry :
-                                    # # Nessus Cannot Access the Windows Registry'
-                                    # worksheet.write_blank(row_index, 47, None)
-                                    # # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
-                                    # worksheet.write_blank(row_index, 48, None)
-                                    # # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
-                                    # worksheet.write_blank(row_index, 49, None)
-                                    # # '91825: Oracle DB Login Possible'
-                                    # worksheet.write_blank(row_index, 50, None)
-                                    # # '91827: Microsoft SQL Server Login Possible'
-                                    # worksheet.write_blank(row_index, 51, None)
-                                    # # '47864: Cisco IOS Version'
-                                    # worksheet.write_blank(row_index, 52, None)
-                                    # # '67217: Cisco IOS XE Version'
-                                    # worksheet.write_blank(row_index, 53, None)
+                                    if not self.report_host_debug_data_enabled:
+                                        worksheet.write(row_index, 0, target)
+                                        worksheet.write(row_index, 1, target_hostname)
+                                        worksheet.write(row_index, 2, target_fqdn)
+                                        worksheet.write(row_index, 3, target_ip)
+                                        worksheet.write(row_index, 4, 'no')
+                                        worksheet.write(row_index, 5, 'no')
+                                        worksheet.write_blank(row_index, 6, None)
+                                        worksheet.write_blank(row_index, 7, None)
+                                        worksheet.write(row_index, 8, '0:00:00')
+                                        worksheet.write(row_index, 9, scan_time_elapsed)
+                                        worksheet.write(row_index, 10, scan_policy_login_specified)
+                                        worksheet.write(row_index, 11, scan_policy_db_sid)
+                                        worksheet.write(row_index, 12, scan_policy_db_port)
+                                        worksheet.write_blank(row_index, 13, None)
+                                        worksheet.write_blank(row_index, 14, None)
+                                        worksheet.write_blank(row_index, 15, None)
+                                        worksheet.write_blank(row_index, 16, None)
+                                        worksheet.write_blank(row_index, 17, None)
+                                        worksheet.write_blank(row_index, 18, None)
+                                        worksheet.write_blank(row_index, 19, None)
+                                        worksheet.write_blank(row_index, 20, None)
+                                        worksheet.write_blank(row_index, 21, None)
+                                        worksheet.write_blank(row_index, 22, None)
+                                    else:
+                                        # worksheet.write_blank(row_index, 0, None)
+                                        worksheet.write(row_index, 1, scan_report_name)
+                                        worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
+                                        worksheet.write(row_index, 3, target)
+                                        worksheet.write(row_index, 4, target_hostname)
+                                        worksheet.write(row_index, 5, target_fqdn)
+                                        # worksheet.write_blank(row_index, 6, None)
+                                        # worksheet.write_blank(row_index, 7, None)
+                                        worksheet.write(row_index, 8, target_ip)
+                                        worksheet.write(row_index, 9, 'no')
+                                        worksheet.write(row_index, 10, 'no')
+                                        # worksheet.write_blank(row_index, 11, None)
+                                        # worksheet.write_blank(row_index, 12, None)
+                                        worksheet.write(row_index, 13, '0:00:00')
+                                        worksheet.write(row_index, 14, scan_time_elapsed)
+                                        worksheet.write(row_index, 15, scan_policy_name)
+                                        worksheet.write(row_index, 16, scan_policy_login_specified)
+                                        worksheet.write(row_index, 17, scan_policy_db_sid)
+                                        worksheet.write(row_index, 18, scan_policy_db_port)
+                                        worksheet.write(row_index, 19, scan_reverse_lookup)
+                                        worksheet.write(row_index, 20, policy_max_hosts)
+                                        worksheet.write(row_index, 21, policy_max_checks)
+                                        # worksheet.write_blank(row_index, 22, None)
+                                        # worksheet.write_blank(row_index, 23, None)
+                                        # worksheet.write_blank(row_index, 24, None)
+                                        # worksheet.write_blank(row_index, 25, None)
+                                        # worksheet.write_blank(row_index, 26, None)
+                                        # worksheet.write_blank(row_index, 27, None)
+                                        # worksheet.write_blank(row_index, 28, None)
+                                        # worksheet.write_blank(row_index, 29, None)
+                                        # worksheet.write_blank(row_index, 30, None)
+                                        # worksheet.write_blank(row_index, 31, None)
+                                        # worksheet.write_blank(row_index, 32, None)
+                                        # # '10180: Ping to remote host'
+                                        # worksheet.write_blank(row_index, 33, None)
+                                        # # '10287: Traceroute Information'
+                                        # worksheet.write_blank(row_index, 34, None)
+                                        # # '11936: OS Identification'
+                                        # worksheet.write_blank(row_index, 35, None)
+                                        # # '45590: Common Platform Enumeration (CPE)'
+                                        # worksheet.write_blank(row_index, 36, None)
+                                        # # '54615: Device Type'
+                                        # worksheet.write_blank(row_index, 37, None)
+                                        # # '21745: Authentication Failure - Local Checks Not Run'
+                                        # worksheet.write_blank(row_index, 38, None)
+                                        # # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
+                                        # worksheet.write_blank(row_index, 39, None)
+                                        # # '110385: Authentication Success Insufficient Access'
+                                        # worksheet.write_blank(row_index, 40, None)
+                                        # # '102094: SSH Commands Require Privilege Escalation'
+                                        # worksheet.write_blank(row_index, 41, None)
+                                        # # '10394: Microsoft Windows SMB Log In Possible'
+                                        # worksheet.write_blank(row_index, 42, None)
+                                        # # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
+                                        # worksheet.write_blank(row_index, 43, None)
+                                        # # '24269: Windows Management Instrumentation (WMI) Available'
+                                        # worksheet.write_blank(row_index, 44, None)
+                                        # # '11011: Microsoft Windows SMB Service Detection'
+                                        # worksheet.write_blank(row_index, 45, None)
+                                        # # '10400: Microsoft Windows SMB Registry Remotely Accessible'
+                                        # worksheet.write_blank(row_index, 46, None)
+                                        # # '26917: Microsoft Windows SMB Registry :
+                                        # # Nessus Cannot Access the Windows Registry'
+                                        # worksheet.write_blank(row_index, 47, None)
+                                        # # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
+                                        # worksheet.write_blank(row_index, 48, None)
+                                        # # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
+                                        # worksheet.write_blank(row_index, 49, None)
+                                        # # '91825: Oracle DB Login Possible'
+                                        # worksheet.write_blank(row_index, 50, None)
+                                        # # '91827: Microsoft SQL Server Login Possible'
+                                        # worksheet.write_blank(row_index, 51, None)
+                                        # # '47864: Cisco IOS Version'
+                                        # worksheet.write_blank(row_index, 52, None)
+                                        # # '67217: Cisco IOS XE Version'
+                                        # worksheet.write_blank(row_index, 53, None)
 
-                        else:
-                            for target in not_scanned_hosts:
-                                row_index += 1
-                                not_scanned_host_counter += 1
-                                self.progress.emit(not_scanned_host_counter, number_of_not_scanned_hosts)
+                            else:
+                                for target in not_scanned_hosts:
+                                    row_index += 1
+                                    not_scanned_host_counter += 1
+                                    self.progress.emit(not_scanned_host_counter, number_of_not_scanned_hosts)
 
-                                if not self.report_host_debug_data_enabled:
-                                    worksheet.write(row_index, 0, target)
-                                    worksheet.write_blank(row_index, 1, None)
-                                    worksheet.write_blank(row_index, 2, None)
-                                    worksheet.write_blank(row_index, 3, None)
-                                    worksheet.write(row_index, 4, 'no')
-                                    worksheet.write(row_index, 5, 'no')
-                                    worksheet.write_blank(row_index, 6, None)
-                                    worksheet.write_blank(row_index, 7, None)
-                                    worksheet.write(row_index, 8, '0:00:00')
-                                    worksheet.write(row_index, 9, scan_time_elapsed)
-                                    worksheet.write(row_index, 10, scan_policy_login_specified)
-                                    worksheet.write(row_index, 11, scan_policy_db_sid)
-                                    worksheet.write(row_index, 12, scan_policy_db_port)
-                                    worksheet.write_blank(row_index, 13, None)
-                                    worksheet.write_blank(row_index, 14, None)
-                                    worksheet.write_blank(row_index, 15, None)
-                                    worksheet.write_blank(row_index, 16, None)
-                                    worksheet.write_blank(row_index, 17, None)
-                                    worksheet.write_blank(row_index, 18, None)
-                                    worksheet.write_blank(row_index, 19, None)
-                                    worksheet.write_blank(row_index, 20, None)
-                                    worksheet.write_blank(row_index, 21, None)
-                                    worksheet.write_blank(row_index, 22, None)
-                                else:
-                                    # worksheet.write_blank(row_index, 0, None)
-                                    worksheet.write(row_index, 1, scan_report_name)
-                                    worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
-                                    worksheet.write(row_index, 3, target)
-                                    # worksheet.write_blank(row_index, 4, None)
-                                    # worksheet.write_blank(row_index, 5, None)
-                                    # worksheet.write_blank(row_index, 6, None)
-                                    # worksheet.write_blank(row_index, 7, None)
-                                    # worksheet.write_blank(row_index, 8, None)
-                                    worksheet.write(row_index, 9, 'no')
-                                    worksheet.write(row_index, 10, 'no')
-                                    # worksheet.write_blank(row_index, 11, None)
-                                    # worksheet.write_blank(row_index, 12, None)
-                                    worksheet.write(row_index, 13, '0:00:00')
-                                    worksheet.write(row_index, 14, scan_time_elapsed)
-                                    worksheet.write(row_index, 15, scan_policy_name)
-                                    worksheet.write(row_index, 16, scan_policy_login_specified)
-                                    worksheet.write(row_index, 17, scan_policy_db_sid)
-                                    worksheet.write(row_index, 18, scan_policy_db_port)
-                                    worksheet.write(row_index, 19, scan_reverse_lookup)
-                                    worksheet.write(row_index, 20, policy_max_hosts)
-                                    worksheet.write(row_index, 21, policy_max_checks)
-                                    # worksheet.write_blank(row_index, 22, None)
-                                    # worksheet.write_blank(row_index, 23, None)
-                                    # worksheet.write_blank(row_index, 24, None)
-                                    # worksheet.write_blank(row_index, 25, None)
-                                    # worksheet.write_blank(row_index, 26, None)
-                                    # worksheet.write_blank(row_index, 27, None)
-                                    # worksheet.write_blank(row_index, 28, None)
-                                    # worksheet.write_blank(row_index, 29, None)
-                                    # worksheet.write_blank(row_index, 30, None)
-                                    # worksheet.write_blank(row_index, 31, None)
-                                    # worksheet.write_blank(row_index, 32, None)
-                                    # # '10180: Ping to remote host'
-                                    # worksheet.write_blank(row_index, 33, None)
-                                    # # '10287: Traceroute Information'
-                                    # worksheet.write_blank(row_index, 34, None)
-                                    # # '11936: OS Identification'
-                                    # worksheet.write_blank(row_index, 35, None)
-                                    # # '45590: Common Platform Enumeration (CPE)'
-                                    # worksheet.write_blank(row_index, 36, None)
-                                    # # '54615: Device Type'
-                                    # worksheet.write_blank(row_index, 37, None)
-                                    # # '21745: Authentication Failure - Local Checks Not Run'
-                                    # worksheet.write_blank(row_index, 38, None)
-                                    # # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
-                                    # worksheet.write_blank(row_index, 39, None)
-                                    # # '110385: Authentication Success Insufficient Access'
-                                    # worksheet.write_blank(row_index, 40, None)
-                                    # # '102094: SSH Commands Require Privilege Escalation'
-                                    # worksheet.write_blank(row_index, 41, None)
-                                    # # '10394: Microsoft Windows SMB Log In Possible'
-                                    # worksheet.write_blank(row_index, 42, None)
-                                    # # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
-                                    # worksheet.write_blank(row_index, 43, None)
-                                    # # '24269: Windows Management Instrumentation (WMI) Available'
-                                    # worksheet.write_blank(row_index, 44, None)
-                                    # # '11011: Microsoft Windows SMB Service Detection'
-                                    # worksheet.write_blank(row_index, 45, None)
-                                    # # '10400: Microsoft Windows SMB Registry Remotely Accessible'
-                                    # worksheet.write_blank(row_index, 46, None)
-                                    # # '26917: Microsoft Windows SMB Registry :
-                                    # # Nessus Cannot Access the Windows Registry'
-                                    # worksheet.write_blank(row_index, 47, None)
-                                    # # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
-                                    # worksheet.write_blank(row_index, 48, None)
-                                    # # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
-                                    # worksheet.write_blank(row_index, 49, None)
-                                    # # '91825: Oracle DB Login Possible'
-                                    # worksheet.write_blank(row_index, 50, None)
-                                    # # '91827: Microsoft SQL Server Login Possible'
-                                    # worksheet.write_blank(row_index, 51, None)
-                                    # # '47864: Cisco IOS Version'
-                                    # worksheet.write_blank(row_index, 52, None)
-                                    # # '67217: Cisco IOS XE Version'
-                                    # worksheet.write_blank(row_index, 53, None)
+                                    if not self.report_host_debug_data_enabled:
+                                        worksheet.write(row_index, 0, target)
+                                        worksheet.write_blank(row_index, 1, None)
+                                        worksheet.write_blank(row_index, 2, None)
+                                        worksheet.write_blank(row_index, 3, None)
+                                        worksheet.write(row_index, 4, 'no')
+                                        worksheet.write(row_index, 5, 'no')
+                                        worksheet.write_blank(row_index, 6, None)
+                                        worksheet.write_blank(row_index, 7, None)
+                                        worksheet.write(row_index, 8, '0:00:00')
+                                        worksheet.write(row_index, 9, scan_time_elapsed)
+                                        worksheet.write(row_index, 10, scan_policy_login_specified)
+                                        worksheet.write(row_index, 11, scan_policy_db_sid)
+                                        worksheet.write(row_index, 12, scan_policy_db_port)
+                                        worksheet.write_blank(row_index, 13, None)
+                                        worksheet.write_blank(row_index, 14, None)
+                                        worksheet.write_blank(row_index, 15, None)
+                                        worksheet.write_blank(row_index, 16, None)
+                                        worksheet.write_blank(row_index, 17, None)
+                                        worksheet.write_blank(row_index, 18, None)
+                                        worksheet.write_blank(row_index, 19, None)
+                                        worksheet.write_blank(row_index, 20, None)
+                                        worksheet.write_blank(row_index, 21, None)
+                                        worksheet.write_blank(row_index, 22, None)
+                                    else:
+                                        # worksheet.write_blank(row_index, 0, None)
+                                        worksheet.write(row_index, 1, scan_report_name)
+                                        worksheet.write(row_index, 2, nessus_scan_file_name_with_path)
+                                        worksheet.write(row_index, 3, target)
+                                        # worksheet.write_blank(row_index, 4, None)
+                                        # worksheet.write_blank(row_index, 5, None)
+                                        # worksheet.write_blank(row_index, 6, None)
+                                        # worksheet.write_blank(row_index, 7, None)
+                                        # worksheet.write_blank(row_index, 8, None)
+                                        worksheet.write(row_index, 9, 'no')
+                                        worksheet.write(row_index, 10, 'no')
+                                        # worksheet.write_blank(row_index, 11, None)
+                                        # worksheet.write_blank(row_index, 12, None)
+                                        worksheet.write(row_index, 13, '0:00:00')
+                                        worksheet.write(row_index, 14, scan_time_elapsed)
+                                        worksheet.write(row_index, 15, scan_policy_name)
+                                        worksheet.write(row_index, 16, scan_policy_login_specified)
+                                        worksheet.write(row_index, 17, scan_policy_db_sid)
+                                        worksheet.write(row_index, 18, scan_policy_db_port)
+                                        worksheet.write(row_index, 19, scan_reverse_lookup)
+                                        worksheet.write(row_index, 20, policy_max_hosts)
+                                        worksheet.write(row_index, 21, policy_max_checks)
+                                        # worksheet.write_blank(row_index, 22, None)
+                                        # worksheet.write_blank(row_index, 23, None)
+                                        # worksheet.write_blank(row_index, 24, None)
+                                        # worksheet.write_blank(row_index, 25, None)
+                                        # worksheet.write_blank(row_index, 26, None)
+                                        # worksheet.write_blank(row_index, 27, None)
+                                        # worksheet.write_blank(row_index, 28, None)
+                                        # worksheet.write_blank(row_index, 29, None)
+                                        # worksheet.write_blank(row_index, 30, None)
+                                        # worksheet.write_blank(row_index, 31, None)
+                                        # worksheet.write_blank(row_index, 32, None)
+                                        # # '10180: Ping to remote host'
+                                        # worksheet.write_blank(row_index, 33, None)
+                                        # # '10287: Traceroute Information'
+                                        # worksheet.write_blank(row_index, 34, None)
+                                        # # '11936: OS Identification'
+                                        # worksheet.write_blank(row_index, 35, None)
+                                        # # '45590: Common Platform Enumeration (CPE)'
+                                        # worksheet.write_blank(row_index, 36, None)
+                                        # # '54615: Device Type'
+                                        # worksheet.write_blank(row_index, 37, None)
+                                        # # '21745: Authentication Failure - Local Checks Not Run'
+                                        # worksheet.write_blank(row_index, 38, None)
+                                        # # '12634: Authenticated Check : OS Name and Installed Package Enumeration'
+                                        # worksheet.write_blank(row_index, 39, None)
+                                        # # '110385: Authentication Success Insufficient Access'
+                                        # worksheet.write_blank(row_index, 40, None)
+                                        # # '102094: SSH Commands Require Privilege Escalation'
+                                        # worksheet.write_blank(row_index, 41, None)
+                                        # # '10394: Microsoft Windows SMB Log In Possible'
+                                        # worksheet.write_blank(row_index, 42, None)
+                                        # # '24786: Nessus Windows Scan Not Performed with Admin Privileges'
+                                        # worksheet.write_blank(row_index, 43, None)
+                                        # # '24269: Windows Management Instrumentation (WMI) Available'
+                                        # worksheet.write_blank(row_index, 44, None)
+                                        # # '11011: Microsoft Windows SMB Service Detection'
+                                        # worksheet.write_blank(row_index, 45, None)
+                                        # # '10400: Microsoft Windows SMB Registry Remotely Accessible'
+                                        # worksheet.write_blank(row_index, 46, None)
+                                        # # '26917: Microsoft Windows SMB Registry :
+                                        # # Nessus Cannot Access the Windows Registry'
+                                        # worksheet.write_blank(row_index, 47, None)
+                                        # # '42897: SMB Registry : Start the Registry Service during the scan (WMI)'
+                                        # worksheet.write_blank(row_index, 48, None)
+                                        # # '20811: Microsoft Windows Installed Software Enumeration (credentialed check)'
+                                        # worksheet.write_blank(row_index, 49, None)
+                                        # # '91825: Oracle DB Login Possible'
+                                        # worksheet.write_blank(row_index, 50, None)
+                                        # # '91827: Microsoft SQL Server Login Possible'
+                                        # worksheet.write_blank(row_index, 51, None)
+                                        # # '47864: Cisco IOS Version'
+                                        # worksheet.write_blank(row_index, 52, None)
+                                        # # '67217: Cisco IOS XE Version'
+                                        # worksheet.write_blank(row_index, 53, None)
 
-                    end_time = time.time()
-                    elapsed_time = end_time - start_time
-                    elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
+                        end_time = time.time()
+                        elapsed_time = end_time - start_time
+                        elapsed_time_parsed = time.strftime('%H:%M:%S', time.gmtime(elapsed_time))
 
-                    self.log_emitter('info ', file_to_pars_full_name, f'[elapsed_time={elapsed_time_parsed}]')
-                    self.log_emitter('end  ', file_to_pars_full_name)
+                        self.log_emitter('info ', file_to_pars_full_name, f'[elapsed_time={elapsed_time_parsed}]')
+                        self.log_emitter('end  ', file_to_pars_full_name)
 
                 except Exception as e:
                     number_of_files_with_errors += 1
