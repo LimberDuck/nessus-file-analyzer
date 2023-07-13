@@ -2952,7 +2952,7 @@ class ParsingThread(QThread):
         :param additional_info: add more information if needed
         """
         notification = f'[action={action_name}] [source_file_name={source_file_name}] {additional_info}'
-        self.signal.emit(notification)
+        self.signal.emit(str(notification))
 
 
 def main():
