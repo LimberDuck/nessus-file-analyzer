@@ -3,3 +3,4 @@ imageio>=2.19.1
 nessus-file-reader>=0.4.1
 PyQt5>=5.15.6
 XlsxWriter>=3.0.3
+pillow>=10.3.0 # not directly required, pinned by Snyk to avoid a vulnerability
