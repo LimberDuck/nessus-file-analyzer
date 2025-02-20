@@ -28,9 +28,11 @@ setuptools.setup(
         "gui_scripts": ["nessus-file-analyzer = nessus_file_analyzer.__main__:main"]
     },
     classifiers=[
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
         "Development Status :: 4 - Beta",

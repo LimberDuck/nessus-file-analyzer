@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - tests for python
   - added: 3.10, 3.11, 3.12, 3.13
-  - removed: 3.7
+  - removed: 3.7, 3.8
 
 ## [0.7.2] - 2022-05-13
 
