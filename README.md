@@ -39,7 +39,7 @@ decrease our workload and focus on data analysis.
 
 ## Documentation
 
-Visit https://nessus-file-analyzer.readthedocs.io to find out more.
+Visit https://limberduck.org/en/latest/tools/nessus-file-analyzer/ or https://nessus-file-analyzer.readthedocs.io to find out more.
 
 ## Installation
 
