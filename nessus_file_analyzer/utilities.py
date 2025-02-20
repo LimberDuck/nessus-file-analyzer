@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-u"""
+"""
 nessus file analyzer by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
 tool which enables you to parse multiple nessus files containing the results
 of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed
@@ -33,7 +33,7 @@ def file_to_base64(filename):
     :param filename: input file name with path
     :return: base64 string
     """
-    with open(filename, 'rb') as image_file:
+    with open(filename, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read())
         return encoded_string
 
@@ -45,7 +45,7 @@ def png_to_ico(filename):
     :return: ico file name
     """
     filename_without_extension = os.path.splitext(filename)[0]
-    target_file_name = filename_without_extension + '.ico'
+    target_file_name = filename_without_extension + ".ico"
     img = imageio.imread(filename)
     imageio.imwrite(target_file_name, img)
 
@@ -64,9 +64,9 @@ def base64_to_ico(ico_in_base64, filename):
     :return: ico file name
     """
     filename_without_extension = os.path.splitext(filename)[0]
-    target_file_name = filename_without_extension + '.ico'
+    target_file_name = filename_without_extension + ".ico"
     icondata = base64.b64decode(ico_in_base64)
-    iconfile = open(target_file_name, 'wb')
+    iconfile = open(target_file_name, "wb")
     iconfile.write(icondata)
     iconfile.close()
 
@@ -79,14 +79,14 @@ def check_file_encoding(file):
     :param file: input file path
     :return: file encoding eg. 'ascii', 'utf8'
     """
-    raw_data = open(file, 'rb').read()
+    raw_data = open(file, "rb").read()
     result = chardet.detect(raw_data)
-    char_enc = result['encoding']
+    char_enc = result["encoding"]
 
     return char_enc
 
 
-def size_human(size, suffix='B'):
+def size_human(size, suffix="B"):
     """
     Function convert provided size into human readable form
     :param size:  number
@@ -94,14 +94,14 @@ def size_human(size, suffix='B'):
     :return: file size in human readable form
     """
 
-    for unit in [' b', ' Ki', ' Mi', ' Gi', ' Ti', ' Pi', ' Ei', ' Zi']:
+    for unit in [" b", " Ki", " Mi", " Gi", " Ti", " Pi", " Ei", " Zi"]:
         if abs(size) < 1024.0:
-            return '%3.1f%s%s' % (size, unit, suffix)
+            return "%3.1f%s%s" % (size, unit, suffix)
         size /= 1024.0
-    return '%.1f%s%s' % (size, 'Yi', suffix)
+    return "%.1f%s%s" % (size, "Yi", suffix)
 
 
-def size_of_file_human(file, suffix='B'):
+def size_of_file_human(file, suffix="B"):
     """
     Function convert size of provided file into human readable form
     :param file:  source file name with path
@@ -114,7 +114,7 @@ def size_of_file_human(file, suffix='B'):
     return file_real_size_human
 
 
-def size_of_file_inside_zip_human(zip_file, file_inside_zip, suffix='B'):
+def size_of_file_inside_zip_human(zip_file, file_inside_zip, suffix="B"):
     """
     Function convert size of file from inside of provided zip file into human readable form
     :param zip_file: source zip file
@@ -129,7 +129,7 @@ def size_of_file_inside_zip_human(zip_file, file_inside_zip, suffix='B'):
     file_compress_size = zip_file.getinfo(file_inside_zip).compress_size
     file_compress_size_human = size_human(file_compress_size, suffix)
 
-    return f'{file_compress_size_human} [{file_real_size_human}]'
+    return f"{file_compress_size_human} [{file_real_size_human}]"
 
 
 def csv_file_row_counter(file, source_file_delimiter):
@@ -140,9 +140,9 @@ def csv_file_row_counter(file, source_file_delimiter):
     :return: number of rows
     """
     source_file_encoding = check_file_encoding(file)
-    file = open(file, 'r', encoding=source_file_encoding)
-    csv.register_dialect('colons', delimiter=source_file_delimiter)
-    reader = csv.reader(file, dialect='colons')
+    file = open(file, "r", encoding=source_file_encoding)
+    csv.register_dialect("colons", delimiter=source_file_delimiter)
+    reader = csv.reader(file, dialect="colons")
 
     row_count = sum(1 for row in reader)
     return row_count
