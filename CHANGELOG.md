@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.7.3] - 2025-02-20
+
+### Changed
+
+- code formatted with [black](https://black.readthedocs.io)
+- requirements update
+  - from:
+    - chardet>=4.0.0
+    - imageio>=2.9.0
+    - nessus-file-reader>=0.4.1
+    - PyQt5>=5.15.4
+    - XlsxWriter>=3.0.1
+  - to:
+    - chardet>=5.2.0
+    - imageio>=2.37.0
+    - nessus-file-reader>=0.4.3
+    - PyQt5>=5.15.11
+    - XlsxWriter>=3.2.2
+
+- tests for python
+  - added: 3.10, 3.11, 3.12, 3.13
+  - removed: 3.7
+
 ## [0.7.2] - 2022-05-13
 
 ### Added

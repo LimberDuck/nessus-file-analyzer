@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-u"""
+"""
 nessus file analyzer by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
 tool which enables you to parse multiple nessus files containing the results
 of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed
@@ -45,12 +45,21 @@ class About(QMessageBox):
         msg_box.setWindowTitle(self.tr("About " + self.appName))
         msg_box.setTextFormat(Qt.RichText)
         # msg_box.setIconPixmap(QPixmap(ComicTaggerSettings.getGraphic('about.png')))
-        msg_box.setText("<br>"
-                        + self.appName + " v" + self.version + " [" + self.release_date + "] <br>"
-                        + "Copyright " + copyright_info + "<br><br>"
-                        + "<a href='{0}'>{0}</a><br><br>".format(website)
-                        + "<a href='mailto:{0}'>{0}</a><br><br>".format(email)
-                        + "License: <a href='{0}'>{1}</a>".format(license_link, license_name))
+        msg_box.setText(
+            "<br>"
+            + self.appName
+            + " v"
+            + self.version
+            + " ["
+            + self.release_date
+            + "] <br>"
+            + "Copyright "
+            + copyright_info
+            + "<br><br>"
+            + "<a href='{0}'>{0}</a><br><br>".format(website)
+            + "<a href='mailto:{0}'>{0}</a><br><br>".format(email)
+            + "License: <a href='{0}'>{1}</a>".format(license_link, license_name)
+        )
 
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.exec_()

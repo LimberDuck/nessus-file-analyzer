@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-u"""
+"""
 nessus file analyzer by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
 tool which enables you to parse multiple nessus files containing the results
 of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed
@@ -20,22 +20,37 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import datetime
+
 __all__ = [
-    "__title__", "__icon__", "__summary__", "__uri__", "__version__", "__release_date__", "__author__",
-    "__email__", "__license_name__", "__license_link__", "__copyright__"
+    "__title__",
+    "__icon__",
+    "__summary__",
+    "__uri__",
+    "__version__",
+    "__release_date__",
+    "__author__",
+    "__email__",
+    "__license_name__",
+    "__license_link__",
+    "__copyright__",
 ]
 
 __title__ = "nessus file analyzer by LimberDuck"
 __package_name__ = "nessus-file-analyzer"
 __icon__ = "LimberDuck-nessus-file-analyzer.ico"
-__summary__ = "nessus file analyzer by LimberDuck is a GUI tool which enables you to parse nessus scan files from " \
-              "Nessus and Tenable.SC by (C) Tenable, Inc. and exports results to a Microsoft Excel Workbook for " \
-              "effortless analysis."
+__summary__ = (
+    "nessus file analyzer by LimberDuck is a GUI tool which enables you to parse nessus scan files from "
+    "Nessus and Tenable.SC by (C) Tenable, Inc. and exports results to a Microsoft Excel Workbook for "
+    "effortless analysis."
+)
 __uri__ = "https://limberduck.org"
-__version__ = "0.7.2"
-__release_date__ = "2022.05.13"
-__author__ = u"Damian Krawczyk"
+__version__ = "0.7.3"
+__release_date__ = "2025.02.20"
+__author__ = "Damian Krawczyk"
 __email__ = "damian.krawczyk@limberduck.org"
 __license_name__ = "GNU GPLv3"
 __license_link__ = "https://www.gnu.org/licenses/gpl-3.0.en.html"
-__copyright__ = u"\N{COPYRIGHT SIGN} 2019-2022 by %s" % __author__
+__copyright__ = "\N{COPYRIGHT SIGN} 2019-{} by {}".format(
+    datetime.datetime.now().year, __author__
+)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-u"""
+"""
 nessus file analyzer by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
 tool which enables you to parse multiple nessus files containing the results
 of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed
@@ -22,6 +22,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from nessus_file_analyzer import utilities
 
-png_filename = '../icons/LimberDuck-nessus-file-analyzer.png'
+png_filename = "../icons/LimberDuck-nessus-file-analyzer.png"
 
 print(utilities.file_to_base64(utilities.png_to_ico(png_filename)))
