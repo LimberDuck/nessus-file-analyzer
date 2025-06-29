@@ -1167,22 +1167,34 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             color = "red"
             self.print_log(info, color=color)
 
+    def is_dark_mode(self):
+        """
+        Detects if the application is running in dark mode.
+        """
+        app_palette = QApplication.palette()
+        bg_color = app_palette.color(QPalette.ColorRole.Window)
+        # Check if the background color is dark
+        return bg_color.lightness() < 128  # lightness < 128 means dark mode
+
     def print_log(self, log_value, color):
         """
         Function displays actions information in GUI in Progress preview.
         :param log_value: information to display
         :param color: color for given information
         """
-        if color == "black":
-            color_set = QColor(0, 0, 0)
-        elif color == "red":
-            color_set = QColor(230, 30, 30)
-        elif color == "green":
-            color_set = QColor(60, 160, 60)
-        elif color == "blue":
-            color_set = QColor(0, 0, 255)
-        else:
-            color_set = QColor(0, 0, 0)
+        dark_mode = self.is_dark_mode()
+
+        # Define colors for light and dark mode
+        color_map = {
+            "black": QColor(0, 0, 0) if not dark_mode else QColor(255, 255, 255),  # White in dark mode
+            "red": QColor(230, 30, 30) if not dark_mode else QColor(255, 100, 100),
+            "green": QColor(60, 160, 60) if not dark_mode else QColor(100, 255, 100),
+            "blue": QColor(0, 0, 255) if not dark_mode else QColor(100, 180, 255),
+            "default": QColor(0, 0, 0) if not dark_mode else QColor(255, 255, 255)
+        }
+
+        # Get the correct color
+        color_set = color_map.get(color, color_map["default"])
 
         log_output = (
             "["
