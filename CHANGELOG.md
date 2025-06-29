@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - PyQt5>=5.15.17
     - XlsxWriter>=3.2.5
 - build tests for python
-  - removed: 3.9
+  - removed: 3.9, 3.10
 
 
 ## [0.7.3] - 2025-02-20
