@@ -24,7 +24,10 @@ decrease our workload and focus on data analysis.
 [![Supported platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey.svg)](https://github.com/LimberDuck/nessus-file-analyzer)
 [![Documentation Status](https://readthedocs.org/projects/nessus-file-analyzer/badge/?version=latest)](https://nessus-file-analyzer.readthedocs.io/en/latest/?badge=latest)
 
-![](https://user-images.githubusercontent.com/9287709/59981677-5fefcf80-9607-11e9-89aa-35e5649e1c7a.png)
+> [!NOTE]
+> **Visit [LimberDuck.org][LimberDuck] to find out more!**
+
+![](https://limberduck.org/en/latest/_images/nfa.png)
 
 ## Main features
 
@@ -37,13 +40,9 @@ decrease our workload and focus on data analysis.
 * change target directory for output file to desired one, leave it default (current working directory) or set to be the same as source files
 * add suffix for output file with `_YYYYMMDD_HHMMSS` and/or custom text
 
-## Documentation
-
-Visit https://limberduck.org/en/latest/tools/nessus-file-analyzer/ or https://nessus-file-analyzer.readthedocs.io to find out more.
-
 ## Installation
 
-> **Note:**
+> [!NOTE]
 > It's advisable to use python virtual environment for below instructions. Read more about python virtual environment in [The Hitchhiker’s Guide to Python!](https://docs.python-guide.org/dev/virtualenvs/)
 > 
 >Read about [virtualenvwrapper in The Hitchhiker’s Guide to Python!](https://docs.python-guide.org/dev/virtualenvs/#virtualenvwrapper): [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io) provides a set of commands which makes working with virtual environments much more pleasant.
