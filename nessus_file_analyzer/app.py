@@ -1186,11 +1186,13 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
 
         # Define colors for light and dark mode
         color_map = {
-            "black": QColor(0, 0, 0) if not dark_mode else QColor(255, 255, 255),  # White in dark mode
+            "black": (
+                QColor(0, 0, 0) if not dark_mode else QColor(255, 255, 255)
+            ),  # White in dark mode
             "red": QColor(230, 30, 30) if not dark_mode else QColor(255, 100, 100),
             "green": QColor(60, 160, 60) if not dark_mode else QColor(100, 255, 100),
             "blue": QColor(0, 0, 255) if not dark_mode else QColor(100, 180, 255),
-            "default": QColor(0, 0, 0) if not dark_mode else QColor(255, 255, 255)
+            "default": QColor(0, 0, 0) if not dark_mode else QColor(255, 255, 255),
         }
 
         # Get the correct color
@@ -1658,9 +1660,7 @@ class ParsingThread(QThread):
                         f"[source_file_size={source_file_size}]",
                     )
                     self.log_emitter(
-                        "info ", 
-                        file_to_pars_full_name, 
-                        f"[report_type={report_name}]"
+                        "info ", file_to_pars_full_name, f"[report_type={report_name}]"
                     )
                     self.log_emitter(
                         "info ",
@@ -1775,9 +1775,7 @@ class ParsingThread(QThread):
 
                     if not self.report_scan_debug_data_enabled:
                         worksheet.write(
-                            row_index, 
-                            0, 
-                            nfr.scan.number_of_target_hosts(root)
+                            row_index, 0, nfr.scan.number_of_target_hosts(root)
                         )
                         worksheet.write(
                             row_index,
@@ -1785,9 +1783,7 @@ class ParsingThread(QThread):
                             nfr.scan.number_of_target_hosts_without_duplicates(root),
                         )
                         worksheet.write(
-                            row_index, 
-                            2, 
-                            nfr.scan.number_of_scanned_hosts(root)
+                            row_index, 2, nfr.scan.number_of_scanned_hosts(root)
                         )
                         worksheet.write(
                             row_index,
@@ -1797,9 +1793,7 @@ class ParsingThread(QThread):
                             ),
                         )
                         worksheet.write(
-                            row_index, 
-                            4, 
-                            nfr.scan.number_of_not_scanned_hosts(root)
+                            row_index, 4, nfr.scan.number_of_not_scanned_hosts(root)
                         )
 
                         scan_start_time = nfr.scan.scan_time_start(root)
@@ -2195,9 +2189,7 @@ class ParsingThread(QThread):
                         f"[source_file_size={source_file_size}]",
                     )
                     self.log_emitter(
-                        "info ", 
-                        file_to_pars_full_name, 
-                        f"[report_type={report_name}]"
+                        "info ", file_to_pars_full_name, f"[report_type={report_name}]"
                     )
                     self.log_emitter(
                         "info ",
@@ -2314,30 +2306,18 @@ class ParsingThread(QThread):
                         )
                         if not self.report_host_debug_data_enabled:
                             worksheet.write(
-                                row_index, 
-                                0, 
-                                nfr.host.report_host_name(report_host)
+                                row_index, 0, nfr.host.report_host_name(report_host)
                             )
                             worksheet.write(
-                                row_index, 
-                                1, 
-                                nfr.host.resolved_hostname(report_host)
+                                row_index, 1, nfr.host.resolved_hostname(report_host)
                             )
                             worksheet.write(
-                                row_index, 
-                                2, 
-                                nfr.host.resolved_fqdn(report_host)
+                                row_index, 2, nfr.host.resolved_fqdn(report_host)
                             )
                             worksheet.write(
-                                row_index, 
-                                3, 
-                                nfr.host.resolved_ip(report_host)
+                                row_index, 3, nfr.host.resolved_ip(report_host)
                             )
-                            worksheet.write(
-                                row_index, 
-                                4, 
-                                "yes"
-                            )
+                            worksheet.write(row_index, 4, "yes")
                             worksheet.write(
                                 row_index,
                                 5,
@@ -2959,7 +2939,19 @@ class ParsingThread(QThread):
                 "Plugin ID",
                 "Plugin name",
                 "Plugin type",
+                # "Severity Number",
+                "Severity",
                 "Risk Factor",
+                # "CVSSv2 Base Score",
+                "CVSSv2",
+                # "CVSSv3 Base Score",
+                "CVSSv3",
+                # "CVSSv4 Base Score",
+                "CVSSv4",
+                # "VPR Score",
+                "VPR",
+                # "EPSS",
+                "EPSS %",
                 "Plugin family",
                 # "Plugin file name",
                 "Plugin version",
@@ -2993,7 +2985,19 @@ class ParsingThread(QThread):
                 "Plugin ID",
                 "Plugin name",
                 "Plugin type",
+                "Severity Number",
+                "Severity",
                 "Risk Factor",
+                "CVSSv2 Base Score",
+                "CVSSv2",
+                "CVSSv3 Base Score",
+                "CVSSv3",
+                "CVSSv4 Base Score",
+                "CVSSv4",
+                "VPR Score",
+                "VPR",
+                "EPSS",
+                "EPSS %",
                 "Plugin family",
                 "Plugin file name",
                 "Plugin version",
@@ -3015,7 +3019,7 @@ class ParsingThread(QThread):
 
         worksheet.set_column(0, number_of_columns - 1, 18)
 
-        debug_columns_list = [0, 1, 2, 9, 18]
+        debug_columns_list = [0, 1, 2, 9, 16, 19, 21, 23, 25, 27, 30]
 
         for column_index, header in enumerate(headers):
             if (
@@ -3100,9 +3104,7 @@ class ParsingThread(QThread):
                         f"[source_file_size={source_file_size}]",
                     )
                     self.log_emitter(
-                        "info ", 
-                        file_to_pars_full_name, 
-                        f"[report_type={report_name}]"
+                        "info ", file_to_pars_full_name, f"[report_type={report_name}]"
                     )
                     self.log_emitter(
                         "info ",
@@ -3187,8 +3189,44 @@ class ParsingThread(QThread):
                             plugin_type = nfr.plugin.report_item_value(
                                 report_item, "plugin_type"
                             )
+                            severity = nfr.plugin.report_item_value(
+                                report_item, "severity"
+                            )
+                            severity_label = nfr.plugin.severity_number_to_label(
+                                severity
+                            )
                             risk_factor = nfr.plugin.report_item_value(
                                 report_item, "risk_factor"
+                            )
+                            cvssv2_base_score = nfr.plugin.report_item_value(
+                                report_item, "cvss_base_score"
+                            )
+                            cvssv2_base_score_label = (
+                                nfr.plugin.cvssv2_score_to_severity(cvssv2_base_score)
+                            )
+                            cvssv3_base_score = nfr.plugin.report_item_value(
+                                report_item, "cvss3_base_score"
+                            )
+                            cvssv3_base_score_label = (
+                                nfr.plugin.cvssv3_score_to_severity(cvssv3_base_score)
+                            )
+                            cvssv4_base_score = nfr.plugin.report_item_value(
+                                report_item, "cvss4_base_score"
+                            )
+                            cvssv4_base_score_label = (
+                                nfr.plugin.cvssv4_score_to_severity(cvssv4_base_score)
+                            )
+                            vpr_score = nfr.plugin.report_item_value(
+                                report_item, "vpr_score"
+                            )
+                            vpr_score_label = nfr.plugin.vpr_score_to_severity(
+                                vpr_score
+                            )
+                            epss_score = nfr.plugin.report_item_value(
+                                report_item, "epss_score"
+                            )
+                            epss_score_percent = (
+                                nfr.plugin.epss_score_decimal_to_percent(epss_score)
                             )
                             plugin_family = nfr.plugin.report_item_value(
                                 report_item, "pluginFamily"
@@ -3234,6 +3272,13 @@ class ParsingThread(QThread):
                                 not self.report_vulnerabilities_debug_data_enabled
                                 and not self.report_vulnerabilities_none_skip
                             ):
+                                worksheet.set_column("E:G", 10)
+                                worksheet.set_column("I:I", 7)
+                                worksheet.set_column("J:J", 10)
+                                worksheet.set_column("L:L", 12)
+                                worksheet.set_column("M:S", 10)
+                                worksheet.set_column("V:W", 10)
+                                worksheet.set_column("AA:AA", 13)
                                 worksheet.write(row_index, 0, host_report_host_name)
                                 worksheet.write(row_index, 1, host_resolved_hostname)
                                 worksheet.write(row_index, 2, host_resolved_fqdn)
@@ -3251,69 +3296,85 @@ class ParsingThread(QThread):
                                         worksheet.set_row(
                                             row_index, options={"hidden": True}
                                         )
-                                worksheet.write(row_index, 12, risk_factor)
-                                worksheet.write(row_index, 13, plugin_family)
-                                worksheet.write(row_index, 14, plugin_version)
+
+                                worksheet.write(row_index, 12, severity_label)
+                                worksheet.write(row_index, 13, risk_factor)
+                                worksheet.write(row_index, 14, cvssv2_base_score_label)
+                                worksheet.write(row_index, 15, cvssv3_base_score_label)
+                                worksheet.write(row_index, 16, cvssv4_base_score_label)
+                                worksheet.write(row_index, 17, vpr_score_label)
+                                if epss_score is not None:
+                                    percent_format = workbook.add_format(
+                                        {"num_format": "0.0%"}
+                                    )
+                                    worksheet.write_number(
+                                        row_index, 18, float(epss_score), percent_format
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 18, None)
+
+                                worksheet.write(row_index, 19, plugin_family)
+                                worksheet.write(row_index, 20, plugin_version)
                                 if plugin_publication_date is not None:
                                     worksheet.write_datetime(
                                         row_index,
-                                        15,
+                                        21,
                                         nfr.plugin.plugin_date(plugin_publication_date),
                                         date_format,
                                     )
                                 else:
-                                    worksheet.write_blank(row_index, 15, None)
+                                    worksheet.write_blank(row_index, 21, None)
                                 if plugin_modification_date is not None:
                                     worksheet.write_datetime(
                                         row_index,
-                                        16,
+                                        22,
                                         nfr.plugin.plugin_date(
                                             plugin_modification_date
                                         ),
                                         date_format,
                                     )
                                 else:
-                                    worksheet.write_blank(row_index, 16, None)
-                                worksheet.write(row_index, 17, plugin_description)
-                                worksheet.write(row_index, 18, solution)
-                                if plugin_output is not None:
-                                    worksheet.write_string(row_index, 19, plugin_output)
-                                else:
-                                    worksheet.write_blank(row_index, 19, None)
-                                if plugin_cves:
-                                    worksheet.write_number(
-                                        row_index, 20, len(plugin_cves)
-                                    )
-                                    worksheet.write_string(
-                                        row_index, 21, ",".join(plugin_cves)
-                                    )
-                                else:
-                                    worksheet.write_number(row_index, 20, 0)
-                                    worksheet.write_blank(row_index, 21, None)
-                                if exploit_available is not None:
-                                    worksheet.write_string(
-                                        row_index, 22, exploit_available
-                                    )
-                                else:
                                     worksheet.write_blank(row_index, 22, None)
-                                if exploit_code_maturity is not None:
-                                    worksheet.write_string(
-                                        row_index, 23, exploit_code_maturity
-                                    )
-                                else:
-                                    worksheet.write_blank(row_index, 23, None)
-                                if exploit_framework_metasploit is not None:
-                                    worksheet.write_string(
-                                        row_index, 24, exploit_framework_metasploit
-                                    )
-                                else:
-                                    worksheet.write_blank(row_index, 24, None)
-                                if exploitability_ease is not None:
-                                    worksheet.write_string(
-                                        row_index, 25, exploitability_ease
-                                    )
+                                worksheet.write(row_index, 23, plugin_description)
+                                worksheet.write(row_index, 24, solution)
+                                if plugin_output is not None:
+                                    worksheet.write_string(row_index, 25, plugin_output)
                                 else:
                                     worksheet.write_blank(row_index, 25, None)
+                                if plugin_cves:
+                                    worksheet.write_number(
+                                        row_index, 26, len(plugin_cves)
+                                    )
+                                    worksheet.write_string(
+                                        row_index, 27, ",".join(plugin_cves)
+                                    )
+                                else:
+                                    worksheet.write_number(row_index, 26, 0)
+                                    worksheet.write_blank(row_index, 27, None)
+                                if exploit_available is not None:
+                                    worksheet.write_string(
+                                        row_index, 28, exploit_available
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 28, None)
+                                if exploit_code_maturity is not None:
+                                    worksheet.write_string(
+                                        row_index, 29, exploit_code_maturity
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 29, None)
+                                if exploit_framework_metasploit is not None:
+                                    worksheet.write_string(
+                                        row_index, 30, exploit_framework_metasploit
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 30, None)
+                                if exploitability_ease is not None:
+                                    worksheet.write_string(
+                                        row_index, 31, exploitability_ease
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 31, None)
                             elif (
                                 not self.report_vulnerabilities_debug_data_enabled
                                 and self.report_vulnerabilities_none_skip
@@ -3322,6 +3383,13 @@ class ParsingThread(QThread):
                                     number_of_rows -= 1
                                     row_index -= 1
                                 elif risk_factor != "None":
+                                    worksheet.set_column("E:G", 10)
+                                    worksheet.set_column("I:I", 7)
+                                    worksheet.set_column("J:J", 10)
+                                    worksheet.set_column("L:L", 12)
+                                    worksheet.set_column("M:S", 10)
+                                    worksheet.set_column("V:W", 10)
+                                    worksheet.set_column("AA:AA", 13)
                                     worksheet.write(row_index, 0, host_report_host_name)
                                     worksheet.write(
                                         row_index, 1, host_resolved_hostname
@@ -3338,77 +3406,110 @@ class ParsingThread(QThread):
                                     worksheet.write(row_index, 9, plugin_id)
                                     worksheet.write(row_index, 10, plugin_name)
                                     worksheet.write(row_index, 11, plugin_type)
-                                    worksheet.write(row_index, 12, risk_factor)
-                                    worksheet.write(row_index, 13, plugin_family)
-                                    worksheet.write(row_index, 14, plugin_version)
+
+                                    worksheet.write(row_index, 12, severity_label)
+                                    worksheet.write(row_index, 13, risk_factor)
+                                    worksheet.write(
+                                        row_index, 14, cvssv2_base_score_label
+                                    )
+                                    worksheet.write(
+                                        row_index, 15, cvssv3_base_score_label
+                                    )
+                                    worksheet.write(
+                                        row_index, 16, cvssv4_base_score_label
+                                    )
+                                    worksheet.write(row_index, 17, vpr_score_label)
+                                    if epss_score is not None:
+                                        percent_format = workbook.add_format(
+                                            {"num_format": "0.0%"}
+                                        )
+                                        worksheet.write_number(
+                                            row_index,
+                                            18,
+                                            float(epss_score),
+                                            percent_format,
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 18, None)
+
+                                    worksheet.write(row_index, 19, plugin_family)
+                                    worksheet.write(row_index, 20, plugin_version)
                                     if plugin_publication_date is not None:
                                         worksheet.write_datetime(
                                             row_index,
-                                            15,
+                                            21,
                                             nfr.plugin.plugin_date(
                                                 plugin_publication_date
                                             ),
                                             date_format,
                                         )
                                     else:
-                                        worksheet.write_blank(row_index, 15, None)
+                                        worksheet.write_blank(row_index, 21, None)
                                     if plugin_modification_date is not None:
                                         worksheet.write_datetime(
                                             row_index,
-                                            16,
+                                            22,
                                             nfr.plugin.plugin_date(
                                                 plugin_modification_date
                                             ),
                                             date_format,
                                         )
                                     else:
-                                        worksheet.write_blank(row_index, 16, None)
-                                    worksheet.write(row_index, 17, plugin_description)
-                                    worksheet.write(row_index, 18, solution)
+                                        worksheet.write_blank(row_index, 22, None)
+                                    worksheet.write(row_index, 23, plugin_description)
+                                    worksheet.write(row_index, 24, solution)
                                     if plugin_output is not None:
                                         worksheet.write_string(
-                                            row_index, 19, plugin_output
-                                        )
-                                    else:
-                                        worksheet.write_blank(row_index, 19, None)
-                                    if plugin_cves:
-                                        worksheet.write_number(
-                                            row_index, 20, len(plugin_cves)
-                                        )
-                                        worksheet.write_string(
-                                            row_index, 21, ",".join(plugin_cves)
-                                        )
-                                    else:
-                                        worksheet.write_number(row_index, 20, 0)
-                                        worksheet.write_blank(row_index, 21, None)
-                                    if exploit_available is not None:
-                                        worksheet.write_string(
-                                            row_index, 22, exploit_available
-                                        )
-                                    else:
-                                        worksheet.write_blank(row_index, 22, None)
-                                    if exploit_code_maturity is not None:
-                                        worksheet.write_string(
-                                            row_index, 23, exploit_code_maturity
-                                        )
-                                    else:
-                                        worksheet.write_blank(row_index, 23, None)
-                                    if exploit_framework_metasploit is not None:
-                                        worksheet.write_string(
-                                            row_index, 24, exploit_framework_metasploit
-                                        )
-                                    else:
-                                        worksheet.write_blank(row_index, 24, None)
-                                    if exploitability_ease is not None:
-                                        worksheet.write_string(
-                                            row_index, 25, exploitability_ease
+                                            row_index, 25, plugin_output
                                         )
                                     else:
                                         worksheet.write_blank(row_index, 25, None)
+                                    if plugin_cves:
+                                        worksheet.write_number(
+                                            row_index, 26, len(plugin_cves)
+                                        )
+                                        worksheet.write_string(
+                                            row_index, 27, ",".join(plugin_cves)
+                                        )
+                                    else:
+                                        worksheet.write_number(row_index, 26, 0)
+                                        worksheet.write_blank(row_index, 27, None)
+                                    if exploit_available is not None:
+                                        worksheet.write_string(
+                                            row_index, 28, exploit_available
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 28, None)
+                                    if exploit_code_maturity is not None:
+                                        worksheet.write_string(
+                                            row_index, 29, exploit_code_maturity
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 29, None)
+                                    if exploit_framework_metasploit is not None:
+                                        worksheet.write_string(
+                                            row_index, 30, exploit_framework_metasploit
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 30, None)
+                                    if exploitability_ease is not None:
+                                        worksheet.write_string(
+                                            row_index, 31, exploitability_ease
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 31, None)
                             elif (
                                 self.report_vulnerabilities_debug_data_enabled
                                 and not self.report_vulnerabilities_none_skip
                             ):
+                                worksheet.set_column("H:I", 10)
+                                worksheet.set_column("K:K", 10)
+                                worksheet.set_column("M:M", 7)
+                                worksheet.set_column("N:N", 10)
+                                worksheet.set_column("P:P", 12)
+                                worksheet.set_column("Q:AC", 10)
+                                worksheet.set_column("AG:AH", 10)
+                                worksheet.set_column("AL:AL", 13)
                                 worksheet.write(row_index, 0, host_scanner_ip)
                                 worksheet.write(row_index, 1, scan_report_name)
                                 worksheet.write(
@@ -3432,70 +3533,119 @@ class ParsingThread(QThread):
                                         worksheet.set_row(
                                             row_index, options={"hidden": True}
                                         )
-                                worksheet.write(row_index, 16, risk_factor)
-                                worksheet.write(row_index, 17, plugin_family)
-                                worksheet.write(row_index, 18, plugin_file_name)
-                                worksheet.write(row_index, 19, plugin_version)
+                                worksheet.write_number(row_index, 16, int(severity))
+                                worksheet.write(row_index, 17, severity_label)
+                                worksheet.write(row_index, 18, risk_factor)
+                                if cvssv2_base_score is not None:
+                                    worksheet.write_number(
+                                        row_index, 19, float(cvssv2_base_score)
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 19, None)
+                                worksheet.write(row_index, 20, cvssv2_base_score_label)
+                                if cvssv3_base_score is not None:
+                                    worksheet.write_number(
+                                        row_index, 21, float(cvssv3_base_score)
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 21, None)
+                                worksheet.write(row_index, 22, cvssv3_base_score_label)
+                                if cvssv4_base_score is not None:
+                                    worksheet.write_number(
+                                        row_index, 23, float(cvssv4_base_score)
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 23, None)
+                                worksheet.write(row_index, 24, cvssv4_base_score_label)
+                                if vpr_score is not None:
+                                    worksheet.write_number(
+                                        row_index, 25, float(vpr_score)
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 25, None)
+                                worksheet.write(row_index, 26, vpr_score_label)
+                                if epss_score is not None:
+                                    worksheet.write_number(
+                                        row_index, 27, float(epss_score)
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 27, None)
+                                if epss_score is not None:
+                                    worksheet.write_number(
+                                        row_index, 27, float(epss_score)
+                                    )
+                                    percent_format = workbook.add_format(
+                                        {"num_format": "0.0%"}
+                                    )
+                                    worksheet.write_number(
+                                        row_index, 28, float(epss_score), percent_format
+                                    )
+                                else:
+                                    worksheet.write_blank(row_index, 27, None)
+                                    worksheet.write_blank(row_index, 28, None)
+                                worksheet.write(row_index, 29, plugin_family)
+                                worksheet.write(row_index, 30, plugin_file_name)
+                                worksheet.write(row_index, 31, plugin_version)
                                 if plugin_publication_date is not None:
                                     worksheet.write_datetime(
                                         row_index,
-                                        20,
+                                        32,
                                         nfr.plugin.plugin_date(plugin_publication_date),
                                         date_format,
                                     )
                                 else:
-                                    worksheet.write_blank(row_index, 20, None)
+                                    worksheet.write_blank(row_index, 32, None)
                                 if plugin_modification_date is not None:
                                     worksheet.write_datetime(
                                         row_index,
-                                        21,
+                                        33,
                                         nfr.plugin.plugin_date(
                                             plugin_modification_date
                                         ),
                                         date_format,
                                     )
                                 else:
-                                    worksheet.write_blank(row_index, 21, None)
-                                worksheet.write(row_index, 22, plugin_description)
-                                worksheet.write(row_index, 23, solution)
+                                    worksheet.write_blank(row_index, 33, None)
+                                worksheet.write(row_index, 34, plugin_description)
+                                worksheet.write(row_index, 35, solution)
                                 if plugin_output is not None:
-                                    worksheet.write_string(row_index, 24, plugin_output)
+                                    worksheet.write_string(row_index, 36, plugin_output)
                                 else:
-                                    worksheet.write_blank(row_index, 24, None)
+                                    worksheet.write_blank(row_index, 36, None)
                                 if plugin_cves:
                                     worksheet.write_number(
-                                        row_index, 25, len(plugin_cves)
+                                        row_index, 37, len(plugin_cves)
                                     )
                                     worksheet.write_string(
-                                        row_index, 26, ",".join(plugin_cves)
+                                        row_index, 38, ",".join(plugin_cves)
                                     )
                                 else:
-                                    worksheet.write_number(row_index, 25, 0)
-                                    worksheet.write_blank(row_index, 26, None)
+                                    worksheet.write_number(row_index, 37, 0)
+                                    worksheet.write_blank(row_index, 38, None)
                                 if exploit_available is not None:
                                     worksheet.write_string(
-                                        row_index, 27, exploit_available
+                                        row_index, 39, exploit_available
                                     )
                                 else:
-                                    worksheet.write_blank(row_index, 27, None)
+                                    worksheet.write_blank(row_index, 39, None)
                                 if exploit_code_maturity is not None:
                                     worksheet.write_string(
-                                        row_index, 28, exploit_code_maturity
+                                        row_index, 40, exploit_code_maturity
                                     )
                                 else:
-                                    worksheet.write_blank(row_index, 28, None)
+                                    worksheet.write_blank(row_index, 40, None)
                                 if exploit_framework_metasploit is not None:
                                     worksheet.write_string(
-                                        row_index, 29, exploit_framework_metasploit
+                                        row_index, 41, exploit_framework_metasploit
                                     )
                                 else:
-                                    worksheet.write_blank(row_index, 29, None)
+                                    worksheet.write_blank(row_index, 41, None)
                                 if exploitability_ease is not None:
                                     worksheet.write_string(
-                                        row_index, 30, exploitability_ease
+                                        row_index, 42, exploitability_ease
                                     )
                                 else:
-                                    worksheet.write_blank(row_index, 30, None)
+                                    worksheet.write_blank(row_index, 42, None)
                             elif (
                                 self.report_vulnerabilities_debug_data_enabled
                                 and self.report_vulnerabilities_none_skip
@@ -3504,6 +3654,14 @@ class ParsingThread(QThread):
                                     number_of_rows -= 1
                                     row_index -= 1
                                 elif risk_factor != "None":
+                                    worksheet.set_column("H:I", 10)
+                                    worksheet.set_column("K:K", 10)
+                                    worksheet.set_column("M:M", 7)
+                                    worksheet.set_column("N:N", 10)
+                                    worksheet.set_column("P:P", 12)
+                                    worksheet.set_column("Q:AC", 10)
+                                    worksheet.set_column("AG:AH", 10)
+                                    worksheet.set_column("AL:AL", 13)
                                     worksheet.write(row_index, 0, host_scanner_ip)
                                     worksheet.write(row_index, 1, scan_report_name)
                                     worksheet.write(
@@ -3526,74 +3684,126 @@ class ParsingThread(QThread):
                                     worksheet.write(row_index, 13, plugin_id)
                                     worksheet.write(row_index, 14, plugin_name)
                                     worksheet.write(row_index, 15, plugin_type)
-                                    worksheet.write(row_index, 16, risk_factor)
-                                    worksheet.write(row_index, 17, plugin_family)
-                                    worksheet.write(row_index, 18, plugin_file_name)
-                                    worksheet.write(row_index, 19, plugin_version)
+                                    worksheet.write_number(row_index, 16, int(severity))
+                                    worksheet.write(row_index, 17, severity_label)
+                                    worksheet.write(row_index, 18, risk_factor)
+                                    if cvssv2_base_score is not None:
+                                        worksheet.write_number(
+                                            row_index, 19, float(cvssv2_base_score)
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 19, None)
+                                    worksheet.write(
+                                        row_index, 20, cvssv2_base_score_label
+                                    )
+                                    if cvssv3_base_score is not None:
+                                        worksheet.write_number(
+                                            row_index, 21, float(cvssv3_base_score)
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 21, None)
+                                    worksheet.write(
+                                        row_index, 22, cvssv3_base_score_label
+                                    )
+                                    if cvssv4_base_score is not None:
+                                        worksheet.write_number(
+                                            row_index, 23, float(cvssv4_base_score)
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 23, None)
+                                    worksheet.write(
+                                        row_index, 24, cvssv4_base_score_label
+                                    )
+                                    if vpr_score is not None:
+                                        worksheet.write_number(
+                                            row_index, 25, float(vpr_score)
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 25, None)
+                                    worksheet.write(row_index, 26, vpr_score_label)
+                                    if epss_score is not None:
+                                        worksheet.write_number(
+                                            row_index, 27, float(epss_score)
+                                        )
+                                        percent_format = workbook.add_format(
+                                            {"num_format": "0.0%"}
+                                        )
+                                        worksheet.write_number(
+                                            row_index,
+                                            28,
+                                            float(epss_score),
+                                            percent_format,
+                                        )
+                                    else:
+                                        worksheet.write_blank(row_index, 27, None)
+                                        worksheet.write_blank(row_index, 28, None)
+                                    worksheet.write(row_index, 29, plugin_family)
+                                    worksheet.write(row_index, 30, plugin_file_name)
+                                    worksheet.write(row_index, 31, plugin_version)
                                     if plugin_publication_date is not None:
                                         worksheet.write_datetime(
                                             row_index,
-                                            20,
+                                            32,
                                             nfr.plugin.plugin_date(
                                                 plugin_publication_date
                                             ),
                                             date_format,
                                         )
                                     else:
-                                        worksheet.write_blank(row_index, 20, None)
+                                        worksheet.write_blank(row_index, 32, None)
                                     if plugin_modification_date is not None:
                                         worksheet.write_datetime(
                                             row_index,
-                                            21,
+                                            33,
                                             nfr.plugin.plugin_date(
                                                 plugin_modification_date
                                             ),
                                             date_format,
                                         )
                                     else:
-                                        worksheet.write_blank(row_index, 21, None)
-                                    worksheet.write(row_index, 22, plugin_description)
-                                    worksheet.write(row_index, 23, solution)
+                                        worksheet.write_blank(row_index, 33, None)
+                                    worksheet.write(row_index, 34, plugin_description)
+                                    worksheet.write(row_index, 35, solution)
                                     if plugin_output is not None:
                                         worksheet.write_string(
-                                            row_index, 24, plugin_output
+                                            row_index, 36, plugin_output
                                         )
                                     else:
-                                        worksheet.write_blank(row_index, 24, None)
+                                        worksheet.write_blank(row_index, 36, None)
                                     if plugin_cves:
                                         worksheet.write_number(
-                                            row_index, 25, len(plugin_cves)
+                                            row_index, 37, len(plugin_cves)
                                         )
                                         worksheet.write_string(
-                                            row_index, 26, ",".join(plugin_cves)
+                                            row_index, 38, ",".join(plugin_cves)
                                         )
                                     else:
-                                        worksheet.write_number(row_index, 25, 0)
-                                        worksheet.write_blank(row_index, 26, None)
+                                        worksheet.write_number(row_index, 37, 0)
+                                        worksheet.write_blank(row_index, 38, None)
                                     if exploit_available is not None:
                                         worksheet.write_string(
-                                            row_index, 27, exploit_available
+                                            row_index, 39, exploit_available
                                         )
                                     else:
-                                        worksheet.write_blank(row_index, 27, None)
+                                        worksheet.write_blank(row_index, 39, None)
                                     if exploit_code_maturity is not None:
                                         worksheet.write_string(
-                                            row_index, 28, exploit_code_maturity
+                                            row_index, 40, exploit_code_maturity
                                         )
                                     else:
-                                        worksheet.write_blank(row_index, 28, None)
+                                        worksheet.write_blank(row_index, 40, None)
                                     if exploit_framework_metasploit is not None:
                                         worksheet.write_string(
-                                            row_index, 29, exploit_framework_metasploit
+                                            row_index, 41, exploit_framework_metasploit
                                         )
                                     else:
-                                        worksheet.write_blank(row_index, 29, None)
+                                        worksheet.write_blank(row_index, 41, None)
                                     if exploitability_ease is not None:
                                         worksheet.write_string(
-                                            row_index, 30, exploitability_ease
+                                            row_index, 42, exploitability_ease
                                         )
                                     else:
-                                        worksheet.write_blank(row_index, 30, None)
+                                        worksheet.write_blank(row_index, 42, None)
 
                     end_time = time.time()
                     elapsed_time = end_time - start_time
@@ -3806,9 +4016,7 @@ class ParsingThread(QThread):
                         f"[source_file_size={source_file_size}]",
                     )
                     self.log_emitter(
-                        "info ", 
-                        file_to_pars_full_name, 
-                        f"[report_type={report_name}]"
+                        "info ", file_to_pars_full_name, f"[report_type={report_name}]"
                     )
                     self.log_emitter(
                         "info ",

@@ -45,8 +45,8 @@ __summary__ = (
     "effortless analysis."
 )
 __uri__ = "https://limberduck.org"
-__version__ = "0.7.3"
-__release_date__ = "2025.02.20"
+__version__ = "0.8.0"
+__release_date__ = "2025.06.29"
 __author__ = "Damian Krawczyk"
 __email__ = "damian.krawczyk@limberduck.org"
 __license_name__ = "GNU GPLv3"
