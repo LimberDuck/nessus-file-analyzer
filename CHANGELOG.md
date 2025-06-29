@@ -32,14 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - requirements update
   - from:
     - nessus-file-reader>=0.4.3
-    - PyQt5>=5.15.11
     - XlsxWriter>=3.2.2
   - to:
     - nessus-file-reader>=0.6.0
-    - PyQt5>=5.15.17
     - XlsxWriter>=3.2.5
 - build tests for python
-  - removed: 3.9, 3.10, 3.11
+  - removed: 3.9
 
 
 ## [0.7.3] - 2025-02-20
