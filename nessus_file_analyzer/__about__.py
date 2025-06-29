@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-nessus file analyzer by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
+nessus file analyzer (NFA) by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
 tool which enables you to parse multiple nessus files containing the results
 of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed
 data to a Microsoft Excel Workbook for effortless analysis.
@@ -36,11 +36,11 @@ __all__ = [
     "__copyright__",
 ]
 
-__title__ = "nessus file analyzer by LimberDuck"
+__title__ = "nessus file analyzer (NFA) by LimberDuck"
 __package_name__ = "nessus-file-analyzer"
 __icon__ = "LimberDuck-nessus-file-analyzer.ico"
 __summary__ = (
-    "nessus file analyzer by LimberDuck is a GUI tool which enables you to parse nessus scan files from "
+    "nessus file analyzer (NFA) by LimberDuck is a GUI tool which enables you to parse nessus scan files from "
     "Nessus and Tenable.SC by (C) Tenable, Inc. and exports results to a Microsoft Excel Workbook for "
     "effortless analysis."
 )

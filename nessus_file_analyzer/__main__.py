@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-nessus file analyzer by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
+nessus file analyzer (NFA) by LimberDuck (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
 tool which enables you to parse multiple nessus files containing the results
 of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed
 data to a Microsoft Excel Workbook for effortless analysis.

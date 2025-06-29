@@ -1,6 +1,6 @@
 # Change Log
 
-This document records all notable changes to [nessus file analyzer by LimberDuck][1].
+This document records all notable changes to [nessus file analyzer (NFA) by LimberDuck][1].
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `nessus-file-analyzer` as Python package - from now on you can install it with `pip install nessus-file-analyzer`
-- entry point `nessus-file-analyzer` added - from now on, after installation of **nessus file analyzer** you can run it with command `nessus-file-analyzer`, read more in documentation in [Installation instructions](https://nessus-file-analyzer.readthedocs.io/en/latest/nfa-installation.html).
+- entry point `nessus-file-analyzer` added - from now on, after installation of **nessus file analyzer (NFA)** you can run it with command `nessus-file-analyzer`, read more in documentation in [Installation instructions](https://nessus-file-analyzer.readthedocs.io/en/latest/nfa-installation.html).
 
 ## [0.6.0] - 2021-08-23
 
@@ -76,7 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **ZIP Archive support** - now you will have possibility to analyze nessus files just from inside of zip archive files:
     - Go to File > Open file\-s and select "ZIP Archive (*.zip)" extension to see zip archive files and select them.
     - Go to File > Open directory and select directory nessus files and zip archive files containing nessus files will be automatically taken from selected directory and its subdirectories.
-    - Simple drag and drop zip archive file or directories on *nessus file analyzer by LimberDuck* window to open zip archive files containing nessus files from dropped directory and its subdirectories.
+    - Simple drag and drop zip archive file or directories on *nessus file analyzer (NFA) by LimberDuck* window to open zip archive files containing nessus files from dropped directory and its subdirectories.
 - **NetBIOS information in host report** - if you turn on debug option for host report type you will have two additional columns with information about:
     - NetBIOS Computer name - if available in Plugin ID 10150 output.
     - NetBIOS Domain name - if available in Plugin ID 10150 output.
@@ -101,7 +101,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Drag & drop** - now you can drag and drop selected files or directories on *nessus file analyzer by LimberDuck* window to open nessus files.
+- **Drag & drop** - now you can drag and drop selected files or directories on *nessus file analyzer (NFA) by LimberDuck* window to open nessus files.
 
 ### Changed
 

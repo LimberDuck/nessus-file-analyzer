@@ -16,7 +16,7 @@ setuptools.setup(
     license="GPLv3",
     author="Damian Krawczyk",
     author_email="damian.krawczyk@limberduck.org",
-    description="nessus file analyzer by LimberDuck is a GUI tool which enables you to parse nessus scan files from "
+    description="nessus file analyzer (NFA) by LimberDuck is a GUI tool which enables you to parse nessus scan files from "
     "Nessus and Tenable.SC by (C) Tenable, Inc. and exports results to a Microsoft Excel Workbook for "
     "effortless analysis.",
     long_description=long_description,
