@@ -1,0 +1,60 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Black Check",
+        "type": "shell",
+        "command": "${config:virtualenvPath}/black . --check"
+      },
+      {
+        "label": "Black Fix",
+        "type": "shell",
+        "command": "${config:virtualenvPath}/black ."
+      },
+      {
+        "label": "Install Dependencies",
+        "type": "shell",
+        "command": "${config:virtualenvPath}/pip install -r requirements.txt"
+      },
+      {
+        "label": "Start Application",
+        "type": "shell",
+        "options": {
+          "env": {
+              "MODULE_NAME": "nessus_file_analyzer"
+          }
+        },
+        "command": "${config:virtualenvPath}/python -m $MODULE_NAME"
+      },
+      {
+        "label": "Build Application",
+        "type": "shell",
+        "command": "${config:virtualenvPath}/python setup.py sdist bdist_wheel"
+      },
+      {
+        "label": "Start sphinx-autobuild",
+        "type": "shell",
+        "options": {
+            "env": {
+                "PROJECT_PORT": "8070"
+            }
+        },
+        "command": "${config:virtualenvPath}/sphinx-autobuild ${workspaceFolder}/docs ${workspaceFolder}/docs/_build/html -a --port $PROJECT_PORT"
+      },
+      {
+          "label": "Convert UI to Py",
+          "type": "shell",
+          "options": {
+            "env": {
+                "MODULE_NAME": "nessus_file_analyzer"
+            }
+          },
+          "command": "${config:virtualenvPath}/pyuic5 -x designer/mainwindow.ui -o $MODULE_NAME/ui/mainwindow.py"
+      },
+      {
+        "label": "Upgrade pip",
+        "type": "shell",
+        "command": "${config:virtualenvPath}/pip install --upgrade pip"
+      },
+    ]
+  }

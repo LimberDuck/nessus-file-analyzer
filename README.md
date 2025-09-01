@@ -14,15 +14,15 @@ vulnerabilities and/or noncompliance.
 It's free and open source tool, which has been created to automate our work,
 decrease our workload and focus on data analysis.
 
+[![pepy - Downloads](https://img.shields.io/pepy/dt/nessus-file-analyzer?logo=PyPI)](https://pepy.tech/projects/nessus-file-analyzer) [![PyPI Downloads](https://static.pepy.tech/badge/nessus-file-analyzer/month)](https://pepy.tech/projects/nessus-file-analyzer)
 [![Latest Release version](https://img.shields.io/github/v/release/LimberDuck/nessus-file-analyzer?label=Latest%20release)](https://github.com/LimberDuck/nessus-file-analyzer/releases) 
-[![GitHub Release Date](https://img.shields.io/github/release-date/limberduck/nessus-file-analyzer?label=released&logo=GitHub)](https://github.com/LimberDuck/nessus-file-analyzer/releases) 
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/nessus-file-analyzer?logo=PyPI)](https://pypistats.org/packages/nessus-file-analyzer)
-
+[![GitHub Release Date](https://img.shields.io/github/release-date/limberduck/nessus-file-analyzer?label=released&logo=GitHub)](https://github.com/LimberDuck/nessus-file-analyzer/releases)
 [![License](https://img.shields.io/github/license/LimberDuck/nessus-file-analyzer.svg)](https://github.com/LimberDuck/nessus-file-analyzer/blob/master/LICENSE)
 [![Repo size](https://img.shields.io/github/repo-size/LimberDuck/nessus-file-analyzer.svg)](https://github.com/LimberDuck/nessus-file-analyzer)
 [![Code size](https://img.shields.io/github/languages/code-size/LimberDuck/nessus-file-analyzer.svg)](https://github.com/LimberDuck/nessus-file-analyzer)
 [![Supported platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey.svg)](https://github.com/LimberDuck/nessus-file-analyzer)
-[![Documentation Status](https://readthedocs.org/projects/nessus-file-analyzer/badge/?version=latest)](https://nessus-file-analyzer.readthedocs.io/en/latest/?badge=latest)
+<!-- [![PyPI - Downloads](https://img.shields.io/pypi/dm/nessus-file-analyzer?logo=PyPI)](https://pypistats.org/packages/nessus-file-analyzer) -->
+<!-- [![Documentation Status](https://readthedocs.org/projects/nessus-file-analyzer/badge/?version=latest)](https://nessus-file-analyzer.readthedocs.io/en/latest/?badge=latest) -->
 
 > [!NOTE]
 > **Visit [LimberDuck.org][LimberDuck] to find out more!**

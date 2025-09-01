@@ -7,7 +7,5 @@ build/
 dist
 test_files
 _build
-.vscode
-_build
 *.egg-info
 .DS_Store
