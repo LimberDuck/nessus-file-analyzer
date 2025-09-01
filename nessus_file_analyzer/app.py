@@ -37,6 +37,9 @@ import nessus_file_analyzer as nfa
 import urllib.parse
 import fnmatch
 import zipfile
+from nessus_file_analyzer.dialogs import about
+from nessus_file_analyzer.dialogs import update_check
+from nessus_file_analyzer.dialogs import url_open
 
 
 class MainWindow(QMainWindow, nfa.Ui_MainWindow):
@@ -127,6 +130,10 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         )
         self.actionOpen_target_directory.triggered.connect(self.open_target_directory)
         self.actionAbout.triggered.connect(self.open_dialog_about)
+        self.actionCheck_for_Update.triggered.connect(self.open_dialog_update_check)
+        self.actionDocumentation.triggered.connect(self.open_url_documentation)
+        self.actionGitHub.triggered.connect(self.open_url_github)
+        self.actionReleases.triggered.connect(self.open_url_github_releases)
 
         self.checkBox_report_scan.stateChanged.connect(self.report_scan_changed)
         self.checkBox_debug_data_scan.stateChanged.connect(
@@ -727,12 +734,38 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
                 self.__target_file_name_prefix + suffix + ".xlsx"
             )
 
-    @staticmethod
-    def open_dialog_about():
+    def open_dialog_about(self):
         """
         Function opens About dialog.
         """
-        nfa.About()
+        self.dialog_about = about.About()
+
+    def open_dialog_update_check(self):
+        """
+        Function opens Update check dialog.
+        """
+        self.dialog_update_check = update_check.UpdateCheck()
+
+    def open_url_documentation(self):
+        """
+        Function opens Url with documentation.
+        """
+        PACKAGE_NAME = nfa.__about__.__package_name__
+        url_open.open_website(f"https://limberduck.org/en/latest/tools/{PACKAGE_NAME}/")
+
+    def open_url_github(self):
+        """
+        Function opens Url with GitHub.
+        """
+        PACKAGE_NAME = nfa.__about__.__package_name__
+        url_open.open_website(f"https://github.com/LimberDuck/{PACKAGE_NAME}")
+
+    def open_url_github_releases(self):
+        """
+        Function opens Url with GitHub Releases.
+        """
+        PACKAGE_NAME = nfa.__about__.__package_name__
+        url_open.open_website(f"https://github.com/LimberDuck/{PACKAGE_NAME}/releases")
 
     def parsing_thread_start(self):
         """
