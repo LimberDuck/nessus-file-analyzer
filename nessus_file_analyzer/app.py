@@ -198,8 +198,8 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.actionStart_analysis.setDisabled(True)
         self.progressBar.setHidden(True)
 
-        cwd = os.getcwd()
-        self.set_target_directory(cwd)
+        target_dir = os.path.expanduser('~')
+        self.set_target_directory(target_dir)
         self.get_target_directory_from_file()
 
         files = sys.argv[1:]
