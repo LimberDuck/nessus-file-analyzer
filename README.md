@@ -14,7 +14,9 @@ vulnerabilities and/or noncompliance.
 It's free and open source tool, which has been created to automate our work,
 decrease our workload and focus on data analysis.
 
-[![pepy - Downloads](https://img.shields.io/pepy/dt/nessus-file-analyzer?logo=PyPI)](https://pepy.tech/projects/nessus-file-analyzer) [![PyPI Downloads](https://static.pepy.tech/badge/nessus-file-analyzer/month)](https://pepy.tech/projects/nessus-file-analyzer)
+[![pepy - Downloads](https://img.shields.io/pepy/dt/nessus-file-analyzer?logo=PyPI)](https://pepy.tech/projects/nessus-file-analyzer)
+[![PyPI Downloads](https://static.pepy.tech/badge/nessus-file-analyzer/month)](https://pepy.tech/projects/nessus-file-analyzer)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/LimberDuck/nessus-file-analyzer/total?logo=GitHub)
 [![Latest Release version](https://img.shields.io/github/v/release/LimberDuck/nessus-file-analyzer?label=Latest%20release)](https://github.com/LimberDuck/nessus-file-analyzer/releases) 
 [![GitHub Release Date](https://img.shields.io/github/release-date/limberduck/nessus-file-analyzer?label=released&logo=GitHub)](https://github.com/LimberDuck/nessus-file-analyzer/releases)
 [![License](https://img.shields.io/github/license/LimberDuck/nessus-file-analyzer.svg)](https://github.com/LimberDuck/nessus-file-analyzer/blob/master/LICENSE)
