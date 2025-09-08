@@ -4354,6 +4354,9 @@ class ParsingThread(QThread):
 
 
 def main():
+    if getattr(sys, 'frozen', False):
+        os.chdir(os.path.dirname(sys.executable))
+        
     app = QApplication(sys.argv)
     form = MainWindow()
 
