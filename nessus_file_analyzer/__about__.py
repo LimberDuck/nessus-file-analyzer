@@ -38,7 +38,7 @@ __all__ = [
 
 __title__ = "nessus file analyzer (NFA) by LimberDuck"
 __package_name__ = "nessus-file-analyzer"
-__icon__ = "LimberDuck-nessus-file-analyzer.ico"
+__icon__ = "LimberDuck-NFA.ico"
 __summary__ = (
     "nessus file analyzer (NFA) by LimberDuck is a GUI tool which enables you to parse nessus scan files from "
     "Nessus and Tenable.SC by (C) Tenable, Inc. and exports results to a Microsoft Excel Workbook for "

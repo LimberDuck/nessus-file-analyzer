@@ -4369,11 +4369,11 @@ def main():
     form.setWindowTitle(app_window_title)
     # print(app_name, app_version, app_version_release_date)
 
-    # app_icon_file_name_png = 'LimberDuck-nessus-file-analyzer.png'
+    # app_icon_file_name_png = 'LimberDuck-NFA.png'
     # app_icon_file_name_png_to_ico = nfa.utilities.png_to_ico(app_icon_file_name_png)
     # app_icon_file_name_ico_to_base64 = nfa.utilities.file_to_base64(app_icon_file_name_png_to_ico)
     # app_icon_file_name_ico = nfa.utilities.base64_to_ico(app_icon_file_name_ico_to_base64,app_icon_file_name_png)
-    # app_icon_file_name_ico = 'LimberDuck-nessus-file-analyzer.ico'
+    # app_icon_file_name_ico = 'LimberDuck-NFA.ico'
 
     icon_file_name = nfa.__about__.__icon__
     nfa.utilities.base64_to_ico(nfa.ico, icon_file_name)

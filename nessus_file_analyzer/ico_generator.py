@@ -22,6 +22,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from nessus_file_analyzer import utilities
 
-png_filename = "../icons/LimberDuck-nessus-file-analyzer.png"
+png_filename = "../icons/LimberDuck-NFA.png"
 
 print(utilities.file_to_base64(utilities.png_to_ico(png_filename)))
