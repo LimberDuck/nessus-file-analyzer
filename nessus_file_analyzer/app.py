@@ -981,7 +981,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         title = f"Open {extension[0]} or {extension[1]} containing {extension[0]} files"
         starting_directory = ""
         file_filter = (
-            f"Nessus scan file (*.{extension[0]});;ZIP Archive (*.{extension[1]})"
+            f"Nessus scan file & ZIP Archive (*.nessus *.zip);;Nessus scan file (*.{extension[0]});;ZIP Archive (*.{extension[1]})"
         )
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
