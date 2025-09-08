@@ -1377,6 +1377,8 @@ class ParsingThread(QThread):
         final_path_to_save = target_directory + "/" + target_file_name
         workbook = xlsxwriter.Workbook(final_path_to_save, {"constant_memory": True})
 
+        self.set_worksheet_properties(workbook)
+
         if (
             self.report_scan_enabled
             and not self.report_host_enabled
@@ -1522,6 +1524,19 @@ class ParsingThread(QThread):
             print(info)
 
         workbook.close()
+
+    def set_worksheet_properties(self, workbook):
+
+        workbook.set_properties(
+            {
+                "title": "Security report",
+                "subject": "Vulnerability Assessment results",
+                "category": "Report",
+                "keywords": "Vulnerabilities, VA, VM, Nessus",
+                "comments": "Report generated with nessus file analyzer (NFA) by LimberDuck. "
+                "Check https://limberduck.org for more details.",
+            }
+        )
 
     def create_worksheet_for_scans(self, workbook, list_of_source_files):
         """
