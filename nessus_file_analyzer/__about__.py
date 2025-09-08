@@ -38,15 +38,15 @@ __all__ = [
 
 __title__ = "nessus file analyzer (NFA) by LimberDuck"
 __package_name__ = "nessus-file-analyzer"
-__icon__ = "LimberDuck-nessus-file-analyzer.ico"
+__icon__ = "LimberDuck-NFA.ico"
 __summary__ = (
     "nessus file analyzer (NFA) by LimberDuck is a GUI tool which enables you to parse nessus scan files from "
     "Nessus and Tenable.SC by (C) Tenable, Inc. and exports results to a Microsoft Excel Workbook for "
     "effortless analysis."
 )
 __uri__ = "https://limberduck.org"
-__version__ = "0.9.0"
-__release_date__ = "2025.09.01"
+__version__ = "0.10.0"
+__release_date__ = "2025.09.08"
 __author__ = "Damian Krawczyk"
 __email__ = "damian.krawczyk@limberduck.org"
 __license_name__ = "GNU GPLv3"

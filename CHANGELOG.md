@@ -5,15 +5,36 @@ This document records all notable changes to [nessus file analyzer (NFA) by Limb
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2025-09-08
+
+### Added
+
+- `File > Open file\-s` - default extension filter set to both Nessus scan file & ZIP Archive (`*.nessus` `*.zip`)
+- Generated report has set document properties:
+  - "title": "Security report",
+  - "subject": "Vulnerability Assessment results",
+  - "category": "Report",
+  - "keywords": "Vulnerabilities, VA, VM, Nessus",
+  - "comments": "Report generated with nessus file analyzer (NFA) by LimberDuck. Check https://limberduck.org for more details.",
+- Pipeline with Build and Release for Windows, macOS and Linux.
+
+### Changed
+
+- Icon file renamed from `LimberDuck-nessus-file-analyzer` to `LimberDuck-NFA`.
+- Default target directory changed from *current directory* to *user’s home directory*.
+- Fix for app build on macOS.
+- Update check directing to GitHub Releases as well.
+- `version.rc` file info updated.
+
 ## [0.9.0] - 2025-09-01
 
 ### Added
 
 - New options:
   - `Help > Check for Update` - will return confirmation if you are using the latest version of NFA.
-  - `Help > Documentation` - will open NFR documentation at LimberDuck.org.
-  - `Help > GitHub` - will open NFR GitHub page.
-  - `Help > Releases` - will open NFR GitHub Releases page.
+  - `Help > Documentation` - will open NFA documentation at LimberDuck.org.
+  - `Help > GitHub` - will open NFA GitHub page.
+  - `Help > Releases` - will open NFA GitHub Releases page.
 
 - Requirements update
   - from:

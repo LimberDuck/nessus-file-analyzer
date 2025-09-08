@@ -198,8 +198,8 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.actionStart_analysis.setDisabled(True)
         self.progressBar.setHidden(True)
 
-        cwd = os.getcwd()
-        self.set_target_directory(cwd)
+        target_dir = os.path.expanduser('~')
+        self.set_target_directory(target_dir)
         self.get_target_directory_from_file()
 
         files = sys.argv[1:]
@@ -981,7 +981,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         title = f"Open {extension[0]} or {extension[1]} containing {extension[0]} files"
         starting_directory = ""
         file_filter = (
-            f"Nessus scan file (*.{extension[0]});;ZIP Archive (*.{extension[1]})"
+            f"Nessus scan file & ZIP Archive (*.nessus *.zip);;Nessus scan file (*.{extension[0]});;ZIP Archive (*.{extension[1]})"
         )
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
@@ -1377,6 +1377,8 @@ class ParsingThread(QThread):
         final_path_to_save = target_directory + "/" + target_file_name
         workbook = xlsxwriter.Workbook(final_path_to_save, {"constant_memory": True})
 
+        self.set_worksheet_properties(workbook)
+
         if (
             self.report_scan_enabled
             and not self.report_host_enabled
@@ -1522,6 +1524,19 @@ class ParsingThread(QThread):
             print(info)
 
         workbook.close()
+
+    def set_worksheet_properties(self, workbook):
+
+        workbook.set_properties(
+            {
+                "title": "Security report",
+                "subject": "Vulnerability Assessment results",
+                "category": "Report",
+                "keywords": "Vulnerabilities, VA, VM, Nessus",
+                "comments": "Report generated with nessus file analyzer (NFA) by LimberDuck. "
+                "Check https://limberduck.org for more details.",
+            }
+        )
 
     def create_worksheet_for_scans(self, workbook, list_of_source_files):
         """
@@ -4354,6 +4369,9 @@ class ParsingThread(QThread):
 
 
 def main():
+    if getattr(sys, 'frozen', False):
+        os.chdir(os.path.dirname(sys.executable))
+        
     app = QApplication(sys.argv)
     form = MainWindow()
 
@@ -4369,11 +4387,11 @@ def main():
     form.setWindowTitle(app_window_title)
     # print(app_name, app_version, app_version_release_date)
 
-    # app_icon_file_name_png = 'LimberDuck-nessus-file-analyzer.png'
+    # app_icon_file_name_png = 'LimberDuck-NFA.png'
     # app_icon_file_name_png_to_ico = nfa.utilities.png_to_ico(app_icon_file_name_png)
     # app_icon_file_name_ico_to_base64 = nfa.utilities.file_to_base64(app_icon_file_name_png_to_ico)
     # app_icon_file_name_ico = nfa.utilities.base64_to_ico(app_icon_file_name_ico_to_base64,app_icon_file_name_png)
-    # app_icon_file_name_ico = 'LimberDuck-nessus-file-analyzer.ico'
+    # app_icon_file_name_ico = 'LimberDuck-NFA.ico'
 
     icon_file_name = nfa.__about__.__icon__
     nfa.utilities.base64_to_ico(nfa.ico, icon_file_name)
