@@ -66,7 +66,7 @@ class UpdateCheck(QMessageBox):
                     f"<b> A new version of {self.appName} is available!</b><br><br>"
                     f"Latest: <b>{latest}</b><br>"
                     f"You have: <b>{self.current_version}</b><br><br>"
-                    f"Update with:<br>"
+                    f"Download latest version directly from <a href='https://github.com/LimberDuck/{PACKAGE_NAME}/releases'>GitHub Releases</a> or update with:<br>"
                     f"<code>pip install -U {PACKAGE_NAME}</code><br><br>"
                     f"{read_more}"
                 )
