@@ -3,7 +3,7 @@
 **nessus file analyzer (NFA) by LimberDuck** (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
 tool which enables you to parse multiple nessus files containing the results
 of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed
-data to a Microsoft Excel Workbook for effortless analysis.
+data to a spreadsheet file for effortless analysis.
 
 Operational memory usage will be kept low while parsing even the largest of
 files. You can run it on your favourite operating system, whether it is Windows,
@@ -16,7 +16,8 @@ decrease our workload and focus on data analysis.
 
 [![pepy - Downloads](https://img.shields.io/pepy/dt/nessus-file-analyzer?logo=PyPI)](https://pepy.tech/projects/nessus-file-analyzer)
 [![PyPI Downloads](https://static.pepy.tech/badge/nessus-file-analyzer/month)](https://pepy.tech/projects/nessus-file-analyzer)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/LimberDuck/nessus-file-analyzer/total?logo=GitHub)
+[![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/LimberDuck/nessus-file-analyzer/latest/total?label=latest%20release%20downloads&logo=GitHub)](https://github.com/LimberDuck/nessus-file-analyzer/releases/latest)
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/LimberDuck/nessus-file-analyzer/total?label=all%20releases%20downloads&logo=GitHub)](https://github.com/LimberDuck/nessus-file-analyzer/releases)
 [![Latest Release version](https://img.shields.io/github/v/release/LimberDuck/nessus-file-analyzer?label=Latest%20release)](https://github.com/LimberDuck/nessus-file-analyzer/releases) 
 [![GitHub Release Date](https://img.shields.io/github/release-date/limberduck/nessus-file-analyzer?label=released&logo=GitHub)](https://github.com/LimberDuck/nessus-file-analyzer/releases)
 [![License](https://img.shields.io/github/license/LimberDuck/nessus-file-analyzer.svg)](https://github.com/LimberDuck/nessus-file-analyzer/blob/master/LICENSE)
@@ -43,6 +44,9 @@ decrease our workload and focus on data analysis.
 * add suffix for output file with `_YYYYMMDD_HHMMSS` and/or custom text
 
 ## Installation
+
+> [!TIP]
+> You don’t need to install Python, install **nessus file analyzer (NFA)**, or build it yourself. Just go to [GitHub Releases](https://github.com/LimberDuck/nessus-file-analyzer/releases) and download the latest version of **nessus file analyzer (NFA)**, ready to run on Windows, macOS, and Linux.
 
 > [!NOTE]
 > It's advisable to use python virtual environment for below instructions. Read more about python virtual environment in [The Hitchhiker’s Guide to Python!](https://docs.python-guide.org/dev/virtualenvs/)

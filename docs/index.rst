@@ -8,4 +8,4 @@ nessus file analyzer (NFA)
 ##########################
 
 
-Are looking for documentation? Go to `https://limberduck.org <https://limberduck.org>`_
+Looking for documentation? Visit `https://limberduck.org <https://limberduck.org>`_

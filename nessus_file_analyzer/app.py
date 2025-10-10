@@ -40,7 +40,9 @@ import zipfile
 from nessus_file_analyzer.dialogs import about
 from nessus_file_analyzer.dialogs import update_check
 from nessus_file_analyzer.dialogs import url_open
-
+from nessus_file_analyzer import utilities, __about__
+import requests
+from packaging import version
 
 class MainWindow(QMainWindow, nfa.Ui_MainWindow):
 
@@ -131,6 +133,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.actionOpen_target_directory.triggered.connect(self.open_target_directory)
         self.actionAbout.triggered.connect(self.open_dialog_about)
         self.actionCheck_for_Update.triggered.connect(self.open_dialog_update_check)
+        self.actionCheck_Announcements.triggered.connect(self.check_announcements_button)
         self.actionDocumentation.triggered.connect(self.open_url_documentation)
         self.actionGitHub.triggered.connect(self.open_url_github)
         self.actionReleases.triggered.connect(self.open_url_github_releases)
@@ -217,6 +220,8 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             "Hover mouse pointer here, to see tooltip for progress preview.",
             "red",
         )
+
+        self.check_announcements()
 
         self.setAcceptDrops(True)
 
@@ -746,6 +751,53 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         """
         self.dialog_update_check = update_check.UpdateCheck()
 
+    def check_announcements(self):
+        """
+        Function checks Announcements.
+        """
+        
+        announcements = utilities.get_announcements(__about__.__package_name__,__about__.__version__)
+        for a in announcements:
+            self.print_log(f"[{a['type'].upper()}] {a['title']}: {a['message']}", "orange")
+
+    def check_announcements_button(self):
+        """
+        Function checks Announcements.
+        """
+        
+        announcements = utilities.get_announcements(__about__.__package_name__,__about__.__version__)
+        for a in announcements:
+            self.print_log(f"[{a['type'].upper()}] {a['title']}: {a['message']}", "orange")
+
+        if not announcements:
+            self.print_log("No new announcements.", "green")
+
+    def display_update_window(self):
+        """
+        Function automatically opens Update check dialog if new version is available.
+        """
+
+        PACKAGE_NAME = __about__.__package_name__
+        current_version = __about__.__version__
+
+        try:
+            response = requests.get(
+                f"https://pypi.org/pypi/{PACKAGE_NAME}/json", timeout=1.5
+            )
+            response.raise_for_status()
+            latest = response.json()["info"]["version"]
+            if version.parse(latest) > version.parse(current_version):
+                print("New version available:", latest)
+                self.dialog_update_check = update_check.UpdateCheck()
+
+        except requests.exceptions.ConnectionError as e:
+            return (
+                None,
+                f"Could not check for updates: <br><br><i>Connection error</i><br><br>{e}",
+            )
+        except Exception as e:
+            return None, f"Could not check for updates:<br><br>{e}"
+
     def open_url_documentation(self):
         """
         Function opens Url with documentation.
@@ -1212,6 +1264,7 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
     def print_log(self, log_value, color):
         """
         Function displays actions information in GUI in Progress preview.
+
         :param log_value: information to display
         :param color: color for given information
         """
@@ -1219,17 +1272,15 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
 
         # Define colors for light and dark mode
         color_map = {
-            "black": (
-                QColor(0, 0, 0) if not dark_mode else QColor(255, 255, 255)
-            ),  # White in dark mode
-            "red": QColor(230, 30, 30) if not dark_mode else QColor(255, 100, 100),
-            "green": QColor(60, 160, 60) if not dark_mode else QColor(100, 255, 100),
-            "blue": QColor(0, 0, 255) if not dark_mode else QColor(100, 180, 255),
-            "default": QColor(0, 0, 0) if not dark_mode else QColor(255, 255, 255),
+            "black": (0, 0, 0) if not dark_mode else (255, 255, 255),
+            "red": (230, 30, 30) if not dark_mode else (255, 100, 100),
+            "green": (60, 160, 60) if not dark_mode else (100, 255, 100),
+            "blue": (0, 0, 255) if not dark_mode else (100, 180, 255),
+            "orange": (255, 165, 0) if not dark_mode else (255, 200, 120),
+            "default": (0, 0, 0) if not dark_mode else (255, 255, 255),
         }
 
-        # Get the correct color
-        color_set = color_map.get(color, color_map["default"])
+        r, g, b = color_map.get(color, color_map["default"])
 
         log_output = (
             "["
@@ -1238,10 +1289,23 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             + log_value
         )
 
-        self.textEdit_progress.setTextColor(color_set)
-        self.textEdit_progress.append(log_output)
-        self.textEdit_progress.moveCursor(QTextCursor.End)
-        self.textEdit_progress.repaint()
+        html_output = f'''<div style="color: rgb({r}, {g}, {b});">{log_output}</div>'''
+
+        cursor = self.textBrowser_progress.textCursor()
+        cursor.movePosition(QTextCursor.End)
+
+        if not self.textBrowser_progress.document().isEmpty():
+            cursor.insertBlock()
+
+        block_fmt = cursor.blockFormat()
+        block_fmt.setBottomMargin(4.0)
+        cursor.setBlockFormat(block_fmt)
+
+        frag = QTextDocumentFragment.fromHtml(html_output)
+        cursor.insertFragment(frag)
+
+        self.textBrowser_progress.setTextCursor(cursor)
+        self.textBrowser_progress.repaint()
 
     def exit_application(self):
         """
@@ -1376,6 +1440,8 @@ class ParsingThread(QThread):
         target_file_name = target_file_name_prefix + suffix + ".xlsx"
         final_path_to_save = target_directory + "/" + target_file_name
         workbook = xlsxwriter.Workbook(final_path_to_save, {"constant_memory": True})
+
+        workbook.use_zip64()
 
         self.set_worksheet_properties(workbook)
 
@@ -4401,4 +4467,5 @@ def main():
     os.remove(icon_file_name)
 
     form.show()
+    QTimer.singleShot(5, form.display_update_window)
     sys.exit(app.exec_())

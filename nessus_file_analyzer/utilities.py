@@ -25,6 +25,12 @@ import imageio
 import os
 import chardet
 import csv
+import requests
+from datetime import datetime
+from typing import List, Dict
+import re
+from packaging import version
+from nessus_file_analyzer import __about__
 
 
 def file_to_base64(filename):
@@ -146,3 +152,61 @@ def csv_file_row_counter(file, source_file_delimiter):
 
     row_count = sum(1 for row in reader)
     return row_count
+
+
+def get_announcements(tool: str, current_version: str) -> List[Dict[str, str]]:
+    """
+    Fetches announcements from LimberDuck GitHub Pages and returns a list of
+    dicts with "type", "title", and "message" for entries matching the tool,
+    valid date range, and version condition.
+
+    Args:
+        tool (str): Tool name to filter announcements by (e.g., "nessus-file-analyzer").
+        current_version (str): Current version of the tool (e.g., "0.10.0").
+
+    Returns:
+        List[Dict[str, str]]: List of matching announcements.
+    """
+
+    url = "https://limberduck.github.io/data/announcements.json"
+    today = datetime.now().date()
+    results = []
+
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+    except requests.RequestException:
+        # If no Internet or resource not reachable, return information
+        info = "Could not fetch announcements. Please check your Internet connection."
+        return  [{"type": "info", "title": "Announcements", "message": info}]
+
+    announcements = data.get("announcements", [])
+    for item in announcements:
+        try:
+            valid_from = datetime.strptime(item.get("valid_from", "1900-01-01"), "%Y-%m-%d").date()
+            valid_until = datetime.strptime(item.get("valid_until", "9999-12-31"), "%Y-%m-%d").date()
+
+            if not (valid_from <= today <= valid_until):
+                continue
+
+            for t in item.get("tools", []):
+                if t.get("name") == tool:
+                    max_ver = t.get("max_version", "999.0.0")
+                    if version.parse(current_version) <= version.parse(max_ver):
+
+                        message = item.get("message", "")
+                        url_pattern = r"(https?://[^\s]+)"
+                        html_message = re.sub(url_pattern, r'<a href="\1">\1</a>', message)
+
+                        results.append({
+                            "type": item.get("type", "info"),
+                            "title": item.get("title", ""),
+                            "message": html_message
+                        })
+                    break
+
+        except Exception:
+            continue
+
+    return results
