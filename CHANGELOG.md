@@ -2,8 +2,22 @@
 
 This document records all notable changes to [nessus file analyzer (NFA) by LimberDuck][1].
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.11.0] - 2025-10-10
+
+### Added
+
+- **Announcements** are now displayed in the Progress Preview window - either automatically upon opening or manually via `Help > Check Announcements`.
+
+### Changed
+
+- **Check for Updates** now automatically notifies you of a new version immediately after opening the application.
+
+### Fixed
+
+- Fixed an issue that prevented spreadsheets from saving when parsing files larger than 4 GB.
 
 ## [0.10.0] - 2025-09-08
 
@@ -205,6 +219,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
+[0.11.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.10.0...v0.11.0
+[0.10.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.7.3...v0.8.0
 [0.7.3]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.7.2...v0.7.3
