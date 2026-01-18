@@ -1,10 +1,20 @@
-# Change Log
+# Changelog
 
 This document records all notable changes to [nessus file analyzer (NFA) by LimberDuck][1].
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-01-13
+
+### Added
+
+- **Settings** > **Advanced reports** tab added which allows to enable/disable additional reports provided by NFA plugins.
+- **Software enumeration** v0.1.1 advanced report added, this report provides a list of all software detected on the hosts, along with their versions and installation dates. Red more at https://limberduck.org/en/latest/tools/nessus-file-analyzer/advanced-reports/index.html
+
+### Changed
+
+- **Settings** > **Source files** tab renamed to **Standard reports** tab.
 ## [0.11.0] - 2025-10-10
 
 ### Added
