@@ -69,9 +69,9 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="tab_files_source">
+         <widget class="QWidget" name="tab_standard_reports">
           <attribute name="title">
-           <string>Source files</string>
+           <string>Standard reports</string>
           </attribute>
           <widget class="QLabel" name="label_report_type">
            <property name="geometry">
@@ -298,6 +298,65 @@
             </property>
            </widget>
           </widget>
+         </widget>
+         <widget class="QWidget" name="tab_advanced_reports">
+          <attribute name="title">
+           <string>Advanced reports</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_tab_advanced_reports">
+           <item>
+            <widget class="QLabel" name="label_advanced_reports">
+             <property name="text">
+              <string>Select advanced reports to generate:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QScrollArea" name="scrollArea_advanced_plugins">
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="widgetResizable">
+              <bool>true</bool>
+             </property>
+             <widget class="QWidget" name="scrollAreaWidgetContents">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>680</width>
+                <height>140</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_advanced_plugins">
+               <item>
+                <widget class="QLabel" name="label_no_plugins">
+                 <property name="text">
+                  <string>No advanced reports available.</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_plugins">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+          </layout>
          </widget>
          <widget class="QWidget" name="tab_files_target">
           <attribute name="title">
@@ -626,7 +685,7 @@
           <bool>true</bool>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::TextInteractionFlag::LinksAccessibleByKeyboard|Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::TextBrowserInteraction|Qt::TextInteractionFlag::TextSelectableByKeyboard|Qt::TextInteractionFlag::TextSelectableByMouse</set>
+          <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
          </property>
          <property name="openExternalLinks">
           <bool>true</bool>

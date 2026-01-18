@@ -1,9 +1,22 @@
-# Change Log
+# Changelog
 
 This document records all notable changes to [nessus file analyzer (NFA) by LimberDuck][1].
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.12.0] - 2026-01-18
+
+### Added
+
+- **Settings** > **Advanced reports** tab added which allows to enable/disable additional reports provided by NFA plugins.
+- **Software enumeration** v0.1.1 advanced report added, this report provides a list of all software detected on the hosts, along with their versions and installation dates. Red more at https://limberduck.org/en/latest/tools/nessus-file-analyzer/advanced-reports/index.html
+
+### Changed
+
+- **Settings** > **Source files** tab renamed to **Standard reports** tab.
+- **Settings** > **Standard reports** > **vulnerabilities** report
+  - If large file is processed and number of vulnerabilities exceeds 1 048 576 ([maximum number of rows in Excel worksheet](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3)), a new worksheet named "vulnerabilities_2" is created. Note that working with very large files is not effective, so it is recommended to split scan targets into smaller batches before you even run the scan.
 
 ## [0.11.0] - 2025-10-10
 
@@ -219,6 +232,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
+[0.12.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.8.0...v0.9.0

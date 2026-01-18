@@ -43,6 +43,92 @@ from nessus_file_analyzer.dialogs import url_open
 from nessus_file_analyzer import utilities, __about__
 import requests
 from packaging import version
+from nessus_file_analyzer.plugins import discover_plugins
+
+
+class FlowLayout(QLayout):
+    """
+    A layout that arranges widgets in a flow (wrapping to next line when needed).
+    Based on Qt's Flow Layout example.
+    """
+    def __init__(self, parent=None, margin=0, spacing=-1):
+        super(FlowLayout, self).__init__(parent)
+        self.setContentsMargins(margin, margin, margin, margin)
+        self.setSpacing(spacing)
+        self.itemList = []
+
+    def __del__(self):
+        item = self.takeAt(0)
+        while item:
+            item = self.takeAt(0)
+
+    def addItem(self, item):
+        self.itemList.append(item)
+
+    def count(self):
+        return len(self.itemList)
+
+    def itemAt(self, index):
+        if 0 <= index < len(self.itemList):
+            return self.itemList[index]
+        return None
+
+    def takeAt(self, index):
+        if 0 <= index < len(self.itemList):
+            return self.itemList.pop(index)
+        return None
+
+    def expandingDirections(self):
+        return Qt.Orientations(Qt.Orientation(0))
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, width):
+        height = self.doLayout(QRect(0, 0, width, 0), True)
+        return height
+
+    def setGeometry(self, rect):
+        super(FlowLayout, self).setGeometry(rect)
+        self.doLayout(rect, False)
+
+    def sizeHint(self):
+        return self.minimumSize()
+
+    def minimumSize(self):
+        size = QSize()
+        for item in self.itemList:
+            size = size.expandedTo(item.minimumSize())
+        margin, _, _, _ = self.getContentsMargins()
+        size += QSize(2 * margin, 2 * margin)
+        return size
+
+    def doLayout(self, rect, testOnly):
+        # Get the contents margins and adjust the effective rect
+        left, top, right, bottom = self.getContentsMargins()
+        effectiveRect = rect.adjusted(left, top, -right, -bottom)
+
+        x = effectiveRect.x()
+        y = effectiveRect.y()
+        lineHeight = 0
+        spacing = self.spacing()
+
+        for item in self.itemList:
+            nextX = x + item.sizeHint().width() + spacing
+            if nextX - spacing > effectiveRect.right() and lineHeight > 0:
+                x = effectiveRect.x()
+                y = y + lineHeight + spacing
+                nextX = x + item.sizeHint().width() + spacing
+                lineHeight = 0
+
+            if not testOnly:
+                item.setGeometry(QRect(QPoint(x, y), item.sizeHint()))
+
+            x = nextX
+            lineHeight = max(lineHeight, item.sizeHint().height())
+
+        return y + lineHeight - rect.y() + bottom
+
 
 class MainWindow(QMainWindow, nfa.Ui_MainWindow):
 
@@ -114,6 +200,12 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             "set_source_directory_as_target_directory_enabled",
             self.__report_set_source_directory_as_target_directory_enabled,
         )
+
+        # plugins
+        self.__plugins = {}
+        self.__plugin_checkboxes = {}
+        self.__plugin_instances = {}
+        self.__plugin_setting_labels = {}  # Maps setting_key to human-readable label
 
         self.parsing_thread = ParsingThread(
             files_to_pars=self.__files_to_pars,
@@ -221,9 +313,224 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             "red",
         )
 
+        self.initialize_plugins()
+
         self.check_announcements()
 
         self.setAcceptDrops(True)
+
+    def initialize_plugins(self):
+        """
+        Discover and initialize plugins, creating UI elements in the Advanced tab.
+        """
+        try:
+            # Discover all installed plugins
+            plugin_classes = discover_plugins()
+
+            # Update label text based on number of plugins
+            num_plugins = len(plugin_classes)
+            if num_plugins == 0:
+                self.label_advanced_reports.setText("There are no advanced reports available.")
+                # No plugins installed, show the "no plugins" message
+                self.label_no_plugins.setVisible(True)
+                return
+            elif num_plugins == 1:
+                self.label_advanced_reports.setText("There is 1 advanced report available. Enable report to generate:")
+            else:
+                self.label_advanced_reports.setText(f"There are {num_plugins} advanced reports available. Enable report to generate:")
+
+            # Hide the "no plugins" message
+            self.label_no_plugins.setVisible(False)
+
+            # Get the layout from the scroll area
+            layout = self.verticalLayout_advanced_plugins
+
+            # Remove the "no plugins" label and spacer from layout
+            layout.removeWidget(self.label_no_plugins)
+            # Find and remove the spacer
+            for i in range(layout.count()):
+                item = layout.itemAt(i)
+                if isinstance(item, QSpacerItem):
+                    layout.removeItem(item)
+                    break
+
+            # Create UI elements for each plugin
+            for plugin_class in plugin_classes:
+                try:
+                    plugin_instance = plugin_class()
+                    metadata = plugin_instance.get_metadata()
+
+                    # Store plugin class and instance
+                    self.__plugins[metadata.id] = plugin_class
+                    self.__plugin_instances[metadata.id] = plugin_instance
+
+                    # Create a group box for this plugin
+                    group_box = QGroupBox()
+                    group_box.setTitle(f"{metadata.name} - v{metadata.version}")
+                    # Use FlowLayout with margins matching standard checkboxes (10px) and smaller spacing
+                    group_box_layout = FlowLayout(margin=10, spacing=10)
+
+                    # Create main checkbox to enable/disable the plugin
+                    checkbox = QCheckBox(f"Enable")
+
+                    # Format plugin IDs for tooltip (handle None case for plugins that collect all IDs)
+                    if metadata.plugin_ids is None:
+                        plugin_ids_str = "All plugins"
+                    else:
+                        plugin_ids_str = ', '.join(map(str, metadata.plugin_ids))
+
+                    checkbox.setToolTip(
+                        f"{metadata.description}\n\n"
+                        f"Version: {metadata.version}\n"
+                        f"Author: {metadata.author}\n"
+                        f"Plugin IDs: {plugin_ids_str}"
+                    )
+
+                    # Store checkbox reference
+                    self.__plugin_checkboxes[metadata.id] = checkbox
+
+                    # Initialize parsing settings for this plugin
+                    setting_key = plugin_instance.get_enabled_setting_key()
+                    self.update_parsing_settings(setting_key, False)
+
+                    # Connect checkbox to handler
+                    checkbox.stateChanged.connect(
+                        lambda state, pid=metadata.id: self.plugin_checkbox_changed(pid, state)
+                    )
+
+                    group_box_layout.addWidget(checkbox)
+
+                    # Add any additional settings from the plugin
+                    additional_settings = plugin_instance.get_additional_settings()
+                    for setting in additional_settings:
+                        if setting['type'] == 'checkbox':
+                            setting_checkbox = QCheckBox(setting['label'])
+                            if 'tooltip' in setting:
+                                setting_checkbox.setToolTip(setting['tooltip'])
+                            setting_checkbox.setEnabled(False)  # Disabled until main checkbox is checked
+
+                            # Initialize setting
+                            self.update_parsing_settings(setting['key'], setting['default'])
+
+                            # Store label for logging
+                            self.__plugin_setting_labels[setting['key']] = setting['label']
+
+                            # Connect to handler
+                            setting_checkbox.stateChanged.connect(
+                                lambda state, key=setting['key']: self.plugin_setting_changed(key, state)
+                            )
+
+                            # Store reference for enabling/disabling
+                            if metadata.id not in self.__plugin_checkboxes:
+                                self.__plugin_checkboxes[metadata.id] = {}
+                            if not isinstance(self.__plugin_checkboxes[metadata.id], dict):
+                                main_cb = self.__plugin_checkboxes[metadata.id]
+                                self.__plugin_checkboxes[metadata.id] = {'main': main_cb}
+                            self.__plugin_checkboxes[metadata.id][setting['key']] = setting_checkbox
+
+                            group_box_layout.addWidget(setting_checkbox)
+
+                    group_box.setLayout(group_box_layout)
+                    layout.addWidget(group_box)
+
+                    self.print_log(f"Loaded plugin: {metadata.name} v{metadata.version}", "green")
+
+                except Exception as e:
+                    self.print_log(f"Error loading plugin {plugin_class.__name__}: {str(e)}", "red")
+
+            # Add spacer at the end
+            spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            layout.addItem(spacer)
+
+        except Exception as e:
+            self.print_log(f"Error initializing plugins: {str(e)}", "red")
+            import traceback
+            traceback.print_exc()
+
+    def plugin_checkbox_changed(self, plugin_id, state):
+        """
+        Handle plugin enable/disable checkbox state change.
+
+        Args:
+            plugin_id: The plugin ID
+            state: Qt.CheckState value
+        """
+        try:
+            plugin_instance = self.__plugin_instances[plugin_id]
+            metadata = plugin_instance.get_metadata()
+            setting_key = plugin_instance.get_enabled_setting_key()
+
+            if state == Qt.Checked:
+                info = f"{metadata.name} enabled."
+                color = "green"
+                self.print_log(info, color)
+                self.update_parsing_settings(setting_key, True)
+                # Enable additional setting checkboxes
+                plugin_checkboxes = self.__plugin_checkboxes[plugin_id]
+                if isinstance(plugin_checkboxes, dict):
+                    for key, checkbox in plugin_checkboxes.items():
+                        if key != 'main':
+                            checkbox.setEnabled(True)
+            else:
+                info = f"{metadata.name} disabled."
+                color = "green"
+                self.print_log(info, color)
+                self.update_parsing_settings(setting_key, False)
+                # Disable additional setting checkboxes
+                plugin_checkboxes = self.__plugin_checkboxes[plugin_id]
+                if isinstance(plugin_checkboxes, dict):
+                    for key, checkbox in plugin_checkboxes.items():
+                        if key != 'main':
+                            checkbox.setEnabled(False)
+
+            # Update start button state - enable if any report or plugin is enabled AND files are selected
+            any_report_enabled = (
+                self.__report_scan_enabled
+                or self.__report_host_enabled
+                or self.__report_vulnerabilities_enabled
+                or self.__report_noncompliance_enabled
+            )
+
+            # Check if any plugin is enabled
+            any_plugin_enabled = any(
+                self.__parsing_settings.get(self.__plugin_instances[pid].get_enabled_setting_key(), False)
+                for pid in self.__plugin_instances
+            )
+
+            if (any_report_enabled or any_plugin_enabled) and self.__files_to_pars:
+                self.pushButton_start.setEnabled(True)
+                self.actionStart_analysis.setEnabled(True)
+            elif not any_report_enabled and not any_plugin_enabled:
+                self.pushButton_start.setDisabled(True)
+                self.actionStart_analysis.setDisabled(True)
+
+        except Exception as e:
+            self.print_log(f"Error handling plugin checkbox change: {str(e)}", "red")
+
+    def plugin_setting_changed(self, setting_key, state):
+        """
+        Handle plugin additional setting checkbox state change.
+
+        Args:
+            setting_key: The setting key in parsing_settings
+            state: Qt.CheckState value
+        """
+        try:
+            # Get the label for this setting
+            setting_label = self.__plugin_setting_labels.get(setting_key, setting_key)
+
+            if state == Qt.Checked:
+                info = f"{setting_label} enabled."
+                color = "green"
+                self.print_log(info, color)
+                self.update_parsing_settings(setting_key, True)
+            else:
+                info = f"{setting_label} disabled."
+                color = "green"
+                self.print_log(info, color)
+                self.update_parsing_settings(setting_key, False)
+        except Exception as e:
+            self.print_log(f"Error handling plugin setting change: {str(e)}", "red")
 
     def dragEnterEvent(self, e):
 
@@ -265,21 +572,24 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.update_parsing_settings("report_scan_enabled", self.__report_scan_enabled)
         # self.print_settings()
 
-        if (
+        # Check if any standard report is enabled
+        any_standard_report_enabled = (
             self.__report_scan_enabled
             or self.__report_host_enabled
             or self.__report_vulnerabilities_enabled
             or self.__report_noncompliance_enabled
-        ) and self.__files_to_pars:
+        )
+
+        # Check if any plugin is enabled
+        any_plugin_enabled = any(
+            self.__parsing_settings.get(self.__plugin_instances[pid].get_enabled_setting_key(), False)
+            for pid in self.__plugin_instances
+        )
+
+        if (any_standard_report_enabled or any_plugin_enabled) and self.__files_to_pars:
             self.pushButton_start.setEnabled(True)
             self.actionStart_analysis.setEnabled(True)
-
-        if (
-            not self.__report_scan_enabled
-            and not self.__report_host_enabled
-            and not self.__report_vulnerabilities_enabled
-            and not self.__report_noncompliance_enabled
-        ):
+        elif not any_standard_report_enabled and not any_plugin_enabled:
             self.pushButton_start.setDisabled(True)
             self.actionStart_analysis.setDisabled(True)
 
@@ -319,21 +629,24 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.update_parsing_settings("report_host_enabled", self.__report_host_enabled)
         # self.print_settings()
 
-        if (
+        # Check if any standard report is enabled
+        any_standard_report_enabled = (
             self.__report_scan_enabled
             or self.__report_host_enabled
             or self.__report_vulnerabilities_enabled
             or self.__report_noncompliance_enabled
-        ) and self.__files_to_pars:
+        )
+
+        # Check if any plugin is enabled
+        any_plugin_enabled = any(
+            self.__parsing_settings.get(self.__plugin_instances[pid].get_enabled_setting_key(), False)
+            for pid in self.__plugin_instances
+        )
+
+        if (any_standard_report_enabled or any_plugin_enabled) and self.__files_to_pars:
             self.pushButton_start.setEnabled(True)
             self.actionStart_analysis.setEnabled(True)
-
-        if (
-            not self.__report_scan_enabled
-            and not self.__report_host_enabled
-            and not self.__report_vulnerabilities_enabled
-            and not self.__report_noncompliance_enabled
-        ):
+        elif not any_standard_report_enabled and not any_plugin_enabled:
             self.pushButton_start.setDisabled(True)
             self.actionStart_analysis.setDisabled(True)
 
@@ -375,21 +688,24 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         )
         # self.print_settings()
 
-        if (
+        # Check if any standard report is enabled
+        any_standard_report_enabled = (
             self.__report_scan_enabled
             or self.__report_host_enabled
             or self.__report_vulnerabilities_enabled
             or self.__report_noncompliance_enabled
-        ) and self.__files_to_pars:
+        )
+
+        # Check if any plugin is enabled
+        any_plugin_enabled = any(
+            self.__parsing_settings.get(self.__plugin_instances[pid].get_enabled_setting_key(), False)
+            for pid in self.__plugin_instances
+        )
+
+        if (any_standard_report_enabled or any_plugin_enabled) and self.__files_to_pars:
             self.pushButton_start.setEnabled(True)
             self.actionStart_analysis.setEnabled(True)
-
-        if (
-            not self.__report_scan_enabled
-            and not self.__report_host_enabled
-            and not self.__report_vulnerabilities_enabled
-            and not self.__report_noncompliance_enabled
-        ):
+        elif not any_standard_report_enabled and not any_plugin_enabled:
             self.pushButton_start.setDisabled(True)
             self.actionStart_analysis.setDisabled(True)
 
@@ -473,21 +789,24 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         )
         # self.print_settings()
 
-        if (
+        # Check if any standard report is enabled
+        any_standard_report_enabled = (
             self.__report_scan_enabled
             or self.__report_host_enabled
             or self.__report_vulnerabilities_enabled
             or self.__report_noncompliance_enabled
-        ) and self.__files_to_pars:
+        )
+
+        # Check if any plugin is enabled
+        any_plugin_enabled = any(
+            self.__parsing_settings.get(self.__plugin_instances[pid].get_enabled_setting_key(), False)
+            for pid in self.__plugin_instances
+        )
+
+        if (any_standard_report_enabled or any_plugin_enabled) and self.__files_to_pars:
             self.pushButton_start.setEnabled(True)
             self.actionStart_analysis.setEnabled(True)
-
-        if (
-            not self.__report_scan_enabled
-            and not self.__report_host_enabled
-            and not self.__report_vulnerabilities_enabled
-            and not self.__report_noncompliance_enabled
-        ):
+        elif not any_standard_report_enabled and not any_plugin_enabled:
             self.pushButton_start.setDisabled(True)
             self.actionStart_analysis.setDisabled(True)
 
@@ -1060,12 +1379,20 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.list_of_files_to_pars(files_only)
 
         if len(files_only) > 0:
-            if (
+            # Check if any standard report is enabled
+            any_standard_report_enabled = (
                 self.__report_scan_enabled
                 or self.__report_host_enabled
                 or self.__report_vulnerabilities_enabled
                 or self.__report_noncompliance_enabled
-            ):
+            )
+            # Check if any plugin is enabled
+            any_plugin_enabled = any(
+                self.__parsing_settings.get(self.__plugin_instances[pid].get_enabled_setting_key(), False)
+                for pid in self.__plugin_instances
+            ) if self.__plugin_instances else False
+
+            if any_standard_report_enabled or any_plugin_enabled:
                 self.pushButton_start.setEnabled(True)
                 self.actionStart_analysis.setEnabled(True)
         else:
@@ -1143,12 +1470,20 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
         self.list_of_files_to_pars(files)
 
         if len(files) > 0:
-            if (
+            # Check if any standard report is enabled
+            any_standard_report_enabled = (
                 self.__report_scan_enabled
                 or self.__report_host_enabled
                 or self.__report_vulnerabilities_enabled
                 or self.__report_noncompliance_enabled
-            ):
+            )
+            # Check if any plugin is enabled
+            any_plugin_enabled = any(
+                self.__parsing_settings.get(self.__plugin_instances[pid].get_enabled_setting_key(), False)
+                for pid in self.__plugin_instances
+            ) if self.__plugin_instances else False
+
+            if any_standard_report_enabled or any_plugin_enabled:
                 self.pushButton_start.setEnabled(True)
                 self.actionStart_analysis.setEnabled(True)
         else:
@@ -1219,15 +1554,22 @@ class MainWindow(QMainWindow, nfa.Ui_MainWindow):
             self.list_of_files_to_pars(paths)
 
         if len(paths) > 0:
-            if (
+            # Check if any standard report is enabled
+            any_standard_report_enabled = (
                 self.__report_scan_enabled
                 or self.__report_host_enabled
                 or self.__report_vulnerabilities_enabled
                 or self.__report_noncompliance_enabled
-            ):
+            )
+            # Check if any plugin is enabled
+            any_plugin_enabled = any(
+                self.__parsing_settings.get(self.__plugin_instances[pid].get_enabled_setting_key(), False)
+                for pid in self.__plugin_instances
+            ) if self.__plugin_instances else False
+
+            if any_standard_report_enabled or any_plugin_enabled:
                 self.pushButton_start.setEnabled(True)
                 self.actionStart_analysis.setEnabled(True)
-
         else:
             self.pushButton_start.setDisabled(True)
             self.actionStart_analysis.setDisabled(True)
@@ -1429,6 +1771,349 @@ class ParsingThread(QThread):
         # print(self.report_vulnerabilities_none_filter_out)
         # print(self.report_vulnerabilities_none_skip)
 
+        # plugins
+        self.enabled_plugins = []
+        self.plugin_data = {}
+        self._discover_enabled_plugins()
+
+    def _discover_enabled_plugins(self):
+        """Discover and instantiate enabled plugins."""
+        try:
+            from nessus_file_analyzer.plugins import discover_plugins
+
+            plugin_classes = discover_plugins()
+            for plugin_class in plugin_classes:
+                plugin_instance = plugin_class()
+                setting_key = plugin_instance.get_enabled_setting_key()
+                if self.parsing_settings.get(setting_key, False):
+                    self.enabled_plugins.append(plugin_instance)
+                    metadata = plugin_instance.get_metadata()
+                    self.plugin_data[metadata.id] = []
+        except Exception as e:
+            print(f"Error discovering plugins: {e}")
+
+    def _extract_plugin_data(self, report_item, nfr):
+        """
+        Extract comprehensive plugin data from a report_item.
+
+        Args:
+            report_item: XML report_item element from nessus_file_reader
+            nfr: nessus_file_reader module reference
+
+        Returns:
+            Dictionary with all available plugin data fields
+        """
+        # Helper to safely get report_item values
+        def get_value(name, default=''):
+            value = nfr.plugin.report_item_value(report_item, name)
+            return value if value else default
+
+        # Helper to get list values (like CVEs)
+        def get_values(name):
+            values = nfr.plugin.report_item_values(report_item, name)
+            return values if values else []
+
+        # Get raw values
+        severity = get_value('severity')
+        cvss_base_score = get_value('cvss_base_score')
+        cvss3_base_score = get_value('cvss3_base_score')
+        cvss4_base_score = get_value('cvss4_base_score')
+        vpr_score = get_value('vpr_score')
+        epss_score = get_value('epss_score')
+
+        # Apply translation functions to convert numeric values to text labels
+        severity_label = nfr.plugin.severity_number_to_label(severity)
+        cvss_base_score_label = nfr.plugin.cvssv2_score_to_severity(cvss_base_score)
+        cvss3_base_score_label = nfr.plugin.cvssv3_score_to_severity(cvss3_base_score)
+        cvss4_base_score_label = nfr.plugin.cvssv4_score_to_severity(cvss4_base_score)
+        vpr_score_label = nfr.plugin.vpr_score_to_severity(vpr_score)
+        epss_score_percent = nfr.plugin.epss_score_decimal_to_percent(epss_score)
+
+        return {
+            # Plugin identification
+            'plugin_name': get_value('pluginName'),
+            'plugin_family': get_value('pluginFamily'),
+            'plugin_type': get_value('plugin_type'),
+
+            # Severity and risk
+            'severity': severity,
+            'severity_id': int(get_value('severity', '0')),
+            'severity_label': severity_label,  # Translated label
+            'risk_factor': get_value('risk_factor'),
+
+            # Network details
+            'port': get_value('port'),
+            'protocol': get_value('protocol'),
+            'service': get_value('svc_name'),
+
+            # CVSS v2
+            'cvss_base_score': cvss_base_score,
+            'cvss_base_score_label': cvss_base_score_label,  # Translated label
+            'cvss_vector': get_value('cvss_vector'),
+            'cvss_temporal_score': get_value('cvss_temporal_score'),
+            'cvss_temporal_vector': get_value('cvss_temporal_vector'),
+
+            # CVSS v3
+            'cvss3_base_score': cvss3_base_score,
+            'cvss3_base_score_label': cvss3_base_score_label,  # Translated label
+            'cvss3_vector': get_value('cvss3_vector'),
+            'cvss3_temporal_score': get_value('cvss3_temporal_score'),
+            'cvss3_temporal_vector': get_value('cvss3_temporal_vector'),
+
+            # CVSS v4
+            'cvss4_base_score': cvss4_base_score,
+            'cvss4_base_score_label': cvss4_base_score_label,  # Translated label
+            'cvss4_vector': get_value('cvss4_vector'),
+            'cvss4_temporal_score': get_value('cvss4_temporal_score'),
+            'cvss4_temporal_vector': get_value('cvss4_temporal_vector'),
+
+            # VPR (Vulnerability Priority Rating)
+            'vpr_score': vpr_score,
+            'vpr_score_label': vpr_score_label,  # Translated label
+
+            # EPSS (Exploit Prediction Scoring System)
+            'epss_score': epss_score,
+            'epss_score_percent': epss_score_percent,  # Formatted as percentage
+            'epss_percentile': get_value('epss_percentile'),
+
+            # References
+            'cve': get_values('cve'),
+            'bid': get_value('bid'),
+            'xref': get_value('xref'),
+            'see_also': get_value('see_also'),
+
+            # Content
+            'description': get_value('description'),
+            'synopsis': get_value('synopsis'),
+            'solution': get_value('solution'),
+            'plugin_output': get_value('plugin_output'),
+
+            # Exploit information
+            'exploit_available': get_value('exploit_available'),
+            'exploit_code_maturity': get_value('exploit_code_maturity'),
+            'exploitability_ease': get_value('exploitability_ease'),
+            'exploit_framework_canvas': get_value('exploit_framework_canvas'),
+            'exploit_framework_metasploit': get_value('exploit_framework_metasploit'),
+            'exploit_framework_core': get_value('exploit_framework_core'),
+            'exploited_by_malware': get_value('exploited_by_malware'),
+            'exploited_by_nessus': get_value('exploited_by_nessus'),
+            'in_the_news': get_value('in_the_news'),
+
+            # Dates
+            'plugin_publication_date': get_value('plugin_publication_date'),
+            'plugin_modification_date': get_value('plugin_modification_date'),
+            'vuln_publication_date': get_value('vuln_publication_date'),
+            'patch_publication_date': get_value('patch_publication_date'),
+
+            # Additional metadata
+            'script_version': get_value('script_version'),
+            'plugin_version': get_value('plugin_version'),
+            'asset_inventory': get_value('asset_inventory'),
+            'os_identification': get_value('os_identification'),
+
+            # Compliance
+            'compliance': get_value('cm:compliance-result'),
+            'compliance_check_name': get_value('cm:compliance-check-name'),
+            'compliance_audit_file': get_value('cm:compliance-audit-file'),
+            'compliance_check_id': get_value('cm:compliance-check-id'),
+
+            # STIG
+            'stig_severity': get_value('stig-severity'),
+
+            # Agent information (for agent scans)
+            'fname': get_value('fname'),
+            'agent': get_value('agent'),
+        }
+
+    def _generate_plugin_reports(self, workbook, list_of_source_files):
+        """
+        Generate reports for all enabled plugins.
+
+        Args:
+            workbook: xlsxwriter.Workbook object
+            list_of_source_files: List of .nessus files to process
+        """
+        # Initialize counters for progress tracking
+        file_counter = 0
+        total_files = len(list_of_source_files)
+        total_hosts_processed = 0
+
+        # Process all files and collect data for plugins
+        for scan_file in list_of_source_files:
+            file_counter += 1
+            source_file_type = ""
+            files_to_pars = []
+
+            if fnmatch.fnmatch(scan_file, "*.nessus"):
+                files_to_pars.append(scan_file)
+                source_file_type = "nessus"
+            elif fnmatch.fnmatch(scan_file, "*.zip"):
+                source_file_type = "zip"
+                zip_source = zipfile.ZipFile(scan_file)
+                zip_files_list = zip_source.namelist()
+                for zip_file in zip_files_list:
+                    if fnmatch.fnmatch(zip_file, "*.nessus"):
+                        files_to_pars.append(zip_file)
+
+            for file_to_pars in files_to_pars:
+                try:
+                    # Get root element
+                    if source_file_type == "nessus":
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+                    elif source_file_type == "zip":
+                        file_to_pars = zip_source.open(file_to_pars)
+                        root = nfr.file.nessus_scan_file_root_element(file_to_pars)
+
+                    # Get total hosts for progress tracking
+                    number_of_hosts = nfr.scan.number_of_scanned_hosts(root)
+                    host_counter = 0
+
+                    # Process each host
+                    for report_host in nfr.scan.report_hosts(root):
+                        host_counter += 1
+                        total_hosts_processed += 1
+
+                        # Emit status bar update during data collection
+                        info_report = "Report: 0/" + str(self.number_of_selected_reports)
+                        info_file = ", File: " + str(file_counter) + "/" + str(total_files)
+                        info_host = ", Host: " + str(host_counter) + "/" + str(number_of_hosts)
+                        info_final = info_report + info_file + info_host
+                        self.print_status_bar_info.emit(info_final)
+
+                        # Emit progress bar update during data collection
+                        self.progress.emit(host_counter, number_of_hosts)
+
+                        # Build host_data dictionary for plugins
+                        # Get netbios info (returns dict with computer_name and domain_name)
+                        netbios_info = nfr.host.netbios_network_name(root, report_host) or {}
+                        netbios_name = netbios_info.get('netbios_computer_name', '') or ""
+
+                        host_data = {
+                            'report_host_name': nfr.host.report_host_name(report_host) or "",
+                            'resolved_hostname': nfr.host.resolved_hostname(report_host) or "",
+                            'hostname': nfr.host.resolved_hostname(report_host) or nfr.host.report_host_name(report_host) or "",  # Kept for backward compatibility
+                            'ip': nfr.host.resolved_ip(report_host) or "",
+                            'os': nfr.host.detected_os(report_host) or "",
+                            'mac_address': nfr.host.host_property_value(report_host, 'mac-address') or "",
+                            'netbios_name': netbios_name,
+                            'fqdn': nfr.host.resolved_fqdn(report_host) or "",
+                            'scan_start': nfr.host.host_property_value(report_host, 'HOST_START') or "",
+                            'scan_end': nfr.host.host_property_value(report_host, 'HOST_END') or "",
+                            'scan_start_time': nfr.host.host_time_start(report_host),  # Datetime object
+                            'scan_end_time': nfr.host.host_time_end(report_host),  # Datetime object
+                            'credentialed_checks': nfr.host.credentialed_checks(root, report_host) or "",
+                            'plugins': []  # Changed from dict to list to support multiple occurrences
+                        }
+
+                        # Determine which plugin IDs to collect across all enabled plugins
+                        collect_all_plugins = False
+                        specific_plugin_ids = set()
+
+                        for plugin in self.enabled_plugins:
+                            metadata = plugin.get_metadata()
+                            if metadata.plugin_ids is None:
+                                collect_all_plugins = True
+                                break  # If any plugin needs all, collect all
+                            else:
+                                specific_plugin_ids.update(metadata.plugin_ids)
+
+                        # Collect plugin data once for all enabled plugins
+                        if collect_all_plugins:
+                            # Collect all report_items for this host
+                            for report_item in nfr.host.report_items(report_host):
+                                plugin_id = int(nfr.plugin.report_item_value(report_item, 'pluginID'))
+                                plugin_data = self._extract_plugin_data(report_item, nfr)
+                                plugin_data['plugin_id'] = plugin_id
+                                host_data['plugins'].append(plugin_data)
+                        else:
+                            # Collect only specified plugin_ids (all occurrences)
+                            for report_item in nfr.host.report_items(report_host):
+                                item_plugin_id = int(nfr.plugin.report_item_value(report_item, 'pluginID'))
+                                if item_plugin_id in specific_plugin_ids:
+                                    plugin_data = self._extract_plugin_data(report_item, nfr)
+                                    plugin_data['plugin_id'] = item_plugin_id
+                                    host_data['plugins'].append(plugin_data)
+
+                        # Let each plugin process this host's data
+                        for plugin in self.enabled_plugins:
+                            try:
+                                metadata = plugin.get_metadata()
+                                processed_data = plugin.process_host_data(host_data)
+                                if processed_data:
+                                    self.plugin_data[metadata.id].append(processed_data)
+                            except Exception as e:
+                                error_msg = f"Error processing host {host_data.get('hostname', '')} with plugin {metadata.name}: {e}"
+                                print(error_msg)
+                                self.signal.emit(error_msg)
+
+                except Exception as e:
+                    error_msg = f"Error processing file {file_to_pars}: {e}"
+                    print(error_msg)
+                    self.signal.emit(error_msg)
+
+        # Generate reports for each plugin
+        for plugin in self.enabled_plugins:
+            try:
+                metadata = plugin.get_metadata()
+                processed_data = self.plugin_data[metadata.id]
+
+                # Increment report counter and emit status bar message
+                self.report_counter += 1
+                info_report = (
+                    "Report: "
+                    + str(self.report_counter)
+                    + "/"
+                    + str(self.number_of_selected_reports)
+                )
+                info_file = ", File: " + str(total_files) + "/" + str(total_files)
+                info_host = ", Host: " + str(total_hosts_processed) + "/" + str(total_hosts_processed)
+                info_final = info_report + info_file + info_host
+
+                if processed_data:
+                    info_msg = f"Generating report for {metadata.name} ({len(processed_data)} hosts)"
+                    print(info_msg)
+                    self.signal.emit(info_msg)
+                    self.print_status_bar_info.emit(info_final)
+
+                    # Emit progress bar update during report generation (show final counts)
+                    self.progress.emit(total_hosts_processed, total_hosts_processed)
+
+                    # Debug: Show what data we have
+                    # debug_msg = f"DEBUG: Plugin {metadata.name} has {len(processed_data)} host records"
+                    # print(debug_msg)
+                    # self.signal.emit(debug_msg)
+
+                    # if processed_data:
+                    #     first_host = processed_data[0]
+                    #     debug_msg2 = f"DEBUG: First host keys: {list(first_host.keys())}"
+                    #     print(debug_msg2)
+                    #     self.signal.emit(debug_msg2)
+                    #     if 'software' in first_host:
+                    #         debug_msg3 = f"DEBUG: First host has {len(first_host['software'])} software items"
+                    #         print(debug_msg3)
+                    #         self.signal.emit(debug_msg3)
+
+                    plugin.generate_report(workbook, processed_data, self.parsing_settings)
+
+                    success_msg = f"Plugin report '{metadata.name}' generated successfully"
+                    print(success_msg)
+                    self.signal.emit(success_msg)
+                else:
+                    info_msg = f"No data found for plugin {metadata.name}"
+                    print(info_msg)
+                    self.signal.emit(info_msg)
+                    self.print_status_bar_info.emit(info_final)
+
+                    # Emit progress bar update even when no data found
+                    self.progress.emit(total_hosts_processed, total_hosts_processed)
+
+            except Exception as e:
+                error_msg = f"Error generating report for plugin {metadata.name}: {e}"
+                print(error_msg)
+                self.signal.emit(error_msg)
+                import traceback
+                traceback.print_exc()
+
     def run(self):
         files_to_pars = self.files_to_pars
         target_directory = self.target_directory
@@ -1445,13 +2130,16 @@ class ParsingThread(QThread):
 
         self.set_worksheet_properties(workbook)
 
+        # Count enabled plugins to include in total report count
+        number_of_enabled_plugins = len(self.enabled_plugins)
+
         if (
             self.report_scan_enabled
             and not self.report_host_enabled
             and not self.report_vulnerabilities_enabled
             and not self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 1
+            self.number_of_selected_reports = 1 + number_of_enabled_plugins
             self.create_worksheet_for_scans(workbook, files_to_pars)
         elif (
             not self.report_scan_enabled
@@ -1459,7 +2147,7 @@ class ParsingThread(QThread):
             and not self.report_vulnerabilities_enabled
             and not self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 1
+            self.number_of_selected_reports = 1 + number_of_enabled_plugins
             self.create_worksheet_for_hosts(workbook, files_to_pars)
         elif (
             not self.report_scan_enabled
@@ -1467,7 +2155,7 @@ class ParsingThread(QThread):
             and self.report_vulnerabilities_enabled
             and not self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 1
+            self.number_of_selected_reports = 1 + number_of_enabled_plugins
             self.create_worksheet_for_vulnerabilities(workbook, files_to_pars)
         elif (
             not self.report_scan_enabled
@@ -1475,7 +2163,7 @@ class ParsingThread(QThread):
             and not self.report_vulnerabilities_enabled
             and self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 1
+            self.number_of_selected_reports = 1 + number_of_enabled_plugins
             self.create_worksheet_for_noncompliance(workbook, files_to_pars)
         elif (
             self.report_scan_enabled
@@ -1483,7 +2171,7 @@ class ParsingThread(QThread):
             and not self.report_vulnerabilities_enabled
             and not self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 2
+            self.number_of_selected_reports = 2 + number_of_enabled_plugins
             self.create_worksheet_for_scans(workbook, files_to_pars)
             self.create_worksheet_for_hosts(workbook, files_to_pars)
         elif (
@@ -1492,7 +2180,7 @@ class ParsingThread(QThread):
             and self.report_vulnerabilities_enabled
             and not self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 2
+            self.number_of_selected_reports = 2 + number_of_enabled_plugins
             self.create_worksheet_for_scans(workbook, files_to_pars)
             self.create_worksheet_for_vulnerabilities(workbook, files_to_pars)
         elif (
@@ -1501,7 +2189,7 @@ class ParsingThread(QThread):
             and not self.report_vulnerabilities_enabled
             and self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 2
+            self.number_of_selected_reports = 2 + number_of_enabled_plugins
             self.create_worksheet_for_scans(workbook, files_to_pars)
             self.create_worksheet_for_noncompliance(workbook, files_to_pars)
         elif (
@@ -1510,7 +2198,7 @@ class ParsingThread(QThread):
             and self.report_vulnerabilities_enabled
             and not self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 2
+            self.number_of_selected_reports = 2 + number_of_enabled_plugins
             self.create_worksheet_for_hosts(workbook, files_to_pars)
             self.create_worksheet_for_vulnerabilities(workbook, files_to_pars)
         elif (
@@ -1519,7 +2207,7 @@ class ParsingThread(QThread):
             and not self.report_vulnerabilities_enabled
             and self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 2
+            self.number_of_selected_reports = 2 + number_of_enabled_plugins
             self.create_worksheet_for_hosts(workbook, files_to_pars)
             self.create_worksheet_for_noncompliance(workbook, files_to_pars)
         elif (
@@ -1528,7 +2216,7 @@ class ParsingThread(QThread):
             and self.report_vulnerabilities_enabled
             and self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 2
+            self.number_of_selected_reports = 2 + number_of_enabled_plugins
             self.create_worksheet_for_vulnerabilities(workbook, files_to_pars)
             self.create_worksheet_for_noncompliance(workbook, files_to_pars)
         elif (
@@ -1537,7 +2225,7 @@ class ParsingThread(QThread):
             and self.report_vulnerabilities_enabled
             and not self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 3
+            self.number_of_selected_reports = 3 + number_of_enabled_plugins
             self.create_worksheet_for_scans(workbook, files_to_pars)
             self.create_worksheet_for_hosts(workbook, files_to_pars)
             self.create_worksheet_for_vulnerabilities(workbook, files_to_pars)
@@ -1547,7 +2235,7 @@ class ParsingThread(QThread):
             and not self.report_vulnerabilities_enabled
             and self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 3
+            self.number_of_selected_reports = 3 + number_of_enabled_plugins
             self.create_worksheet_for_scans(workbook, files_to_pars)
             self.create_worksheet_for_hosts(workbook, files_to_pars)
             self.create_worksheet_for_noncompliance(workbook, files_to_pars)
@@ -1557,7 +2245,7 @@ class ParsingThread(QThread):
             and self.report_vulnerabilities_enabled
             and self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 3
+            self.number_of_selected_reports = 3 + number_of_enabled_plugins
             self.create_worksheet_for_scans(workbook, files_to_pars)
             self.create_worksheet_for_vulnerabilities(workbook, files_to_pars)
             self.create_worksheet_for_noncompliance(workbook, files_to_pars)
@@ -1567,7 +2255,7 @@ class ParsingThread(QThread):
             and self.report_vulnerabilities_enabled
             and self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 3
+            self.number_of_selected_reports = 3 + number_of_enabled_plugins
             self.create_worksheet_for_hosts(workbook, files_to_pars)
             self.create_worksheet_for_vulnerabilities(workbook, files_to_pars)
             self.create_worksheet_for_noncompliance(workbook, files_to_pars)
@@ -1577,19 +2265,41 @@ class ParsingThread(QThread):
             and self.report_vulnerabilities_enabled
             and self.report_noncompliance_enabled
         ):
-            self.number_of_selected_reports = 4
+            self.number_of_selected_reports = 4 + number_of_enabled_plugins
             self.create_worksheet_for_scans(workbook, files_to_pars)
             self.create_worksheet_for_hosts(workbook, files_to_pars)
             self.create_worksheet_for_vulnerabilities(workbook, files_to_pars)
             self.create_worksheet_for_noncompliance(workbook, files_to_pars)
 
         else:
-            info = (
-                "You did not choose any report type to generate. Select at least one."
-            )
-            print(info)
+            # Only plugins are enabled (no standard reports)
+            if self.enabled_plugins:
+                self.number_of_selected_reports = number_of_enabled_plugins
+            else:
+                # No reports or plugins enabled
+                info = (
+                    "You did not choose any report type to generate. Select at least one."
+                )
+                print(info)
 
-        workbook.close()
+        # Generate plugin reports
+        if self.enabled_plugins:
+            self._generate_plugin_reports(workbook, files_to_pars)
+
+        try:
+            # info_msg = "DEBUG: Closing workbook..."
+            # print(info_msg)
+            # self.signal.emit(info_msg)
+            workbook.close()
+            # info_msg = "DEBUG: Workbook closed successfully"
+            # print(info_msg)
+            # self.signal.emit(info_msg)
+        except Exception as e:
+            error_msg = f"ERROR: Failed to close workbook: {e}"
+            print(error_msg)
+            self.signal.emit(error_msg)
+            import traceback
+            traceback.print_exc()
 
     def set_worksheet_properties(self, workbook):
 
@@ -3019,6 +3729,14 @@ class ParsingThread(QThread):
         :param workbook: workbook where spreadsheet are created
         :param list_of_source_files: list of selected files
         """
+
+        sheet_index = 1
+        row_index = 0
+        rows_in_current_sheet = 0
+
+        MAX_ROWS = 1_048_576
+        HEADER_ROWS = 1
+
         report_name = "vulnerabilities"
         self.report_counter += 1
         info_report = (
@@ -3028,7 +3746,7 @@ class ParsingThread(QThread):
             + str(self.number_of_selected_reports)
         )
 
-        worksheet = workbook.add_worksheet(report_name)
+        worksheet = workbook.add_worksheet(f"{report_name}")
 
         cell_format_bold = workbook.add_format({"bold": True})
         worksheet.set_row(0, None, cell_format_bold)
@@ -3283,8 +4001,46 @@ class ParsingThread(QThread):
                         )
 
                         for report_item in report_items_per_host:
+                            if row_index >= MAX_ROWS - HEADER_ROWS:
+                                # Apply autofilter to the completed worksheet before creating a new one
+                                if rows_in_current_sheet > 0:
+                                    worksheet.autofilter(0, 0, rows_in_current_sheet, number_of_columns - 1)
+
+                                    if self.report_vulnerabilities_none_filter_out:
+                                        risk_factors = ["Critical", "High", "Medium", "Low"]
+                                        if not self.report_vulnerabilities_debug_data_enabled:
+                                            worksheet.filter_column_list(12, risk_factors)
+                                        else:
+                                            worksheet.filter_column_list(16, risk_factors)
+
+                                sheet_index += 1
+                                worksheet = workbook.add_worksheet(f"{report_name}_{sheet_index}")
+                                row_index = 0  # Reset for the new sheet
+                                rows_in_current_sheet = 0  # Reset row counter for new sheet
+
+                                # Apply header formatting and freeze panes for new sheet
+                                worksheet.set_row(0, None, cell_format_bold)
+                                worksheet.set_column(0, number_of_columns - 1, 18)
+
+                                # Write headers to new sheet
+                                for column_index, header in enumerate(headers):
+                                    if (
+                                        self.report_vulnerabilities_debug_data_enabled
+                                        and column_index in debug_columns_list
+                                    ):
+                                        cell_format_bold_blue = workbook.add_format()
+                                        cell_format_bold_blue.set_bold()
+                                        cell_format_bold_blue.set_font_color("blue")
+                                        worksheet.write(0, column_index, header, cell_format_bold_blue)
+                                    else:
+                                        worksheet.write(0, column_index, header)
+
+                                worksheet.freeze_panes(1, 0)  # Freeze the first row
+
                             number_of_rows += 1
                             row_index += 1
+                            rows_in_current_sheet = row_index
+
                             protocol = nfr.plugin.report_item_value(
                                 report_item, "protocol"
                             )
@@ -3945,8 +4701,9 @@ class ParsingThread(QThread):
                     )
                     self.log_emitter("info", e)
 
-        if number_of_rows > 0:
-            worksheet.autofilter(0, 0, number_of_rows, number_of_columns - 1)
+        # Apply autofilter to the final worksheet
+        if rows_in_current_sheet > 0:
+            worksheet.autofilter(0, 0, rows_in_current_sheet, number_of_columns - 1)
 
             if self.report_vulnerabilities_none_filter_out:
                 risk_factors = ["Critical", "High", "Medium", "Low"]

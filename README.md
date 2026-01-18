@@ -35,11 +35,12 @@ decrease our workload and focus on data analysis.
 ## Main features
 
 * select one or more nessus files at once or select directory to get all nessus files from it and from all its subdirectories
-* select one or more of available report types like: 
+* select one or more of standard report types like:
   * scan, 
   * host, 
   * vulnerabilities,
   * noncompliance
+* check advanced reports like software enumeration
 * change target directory for output file to desired one, leave it default (current working directory) or set to be the same as source files
 * add suffix for output file with `_YYYYMMDD_HHMMSS` and/or custom text
 
