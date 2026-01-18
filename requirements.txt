@@ -1,6 +1,7 @@
 chardet>=5.2.0
 imageio>=2.37.0
 nessus-file-reader>=0.7.0
+nfa-plugin-software-enumeration>=0.1.1
 PyQt5>=5.15.11
 XlsxWriter>=3.2.5
 packaging>=25.0
