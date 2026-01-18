@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Settings** > **Source files** tab renamed to **Standard reports** tab.
+- **Settings** > **Standard reports** > **vulnerabilities** report
+  - If large file is processed and number of vulnerabilities exceeds 1 048 576 ([maximum number of rows in Excel worksheet](https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3)), a new worksheet named "vulnerabilities_2" is created. Note that working with very large files is not effective, so it is recommended to split scan targets into smaller batches before you even run the scan.
+
 ## [0.11.0] - 2025-10-10
 
 ### Added

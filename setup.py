@@ -6,6 +6,11 @@ with open("README.md", "r") as fh:
 with open("requirements.txt") as f:
     required = f.read().splitlines()
 
+# Add importlib_metadata for Python < 3.10 (for plugin discovery)
+import sys
+if sys.version_info < (3, 10):
+    required.append("importlib_metadata>=4.0.0")
+
 about = {}
 with open("nessus_file_analyzer/_version.py") as f:
     exec(f.read(), about)

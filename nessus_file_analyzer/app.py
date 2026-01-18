@@ -3729,6 +3729,14 @@ class ParsingThread(QThread):
         :param workbook: workbook where spreadsheet are created
         :param list_of_source_files: list of selected files
         """
+
+        sheet_index = 1
+        row_index = 0
+        rows_in_current_sheet = 0
+
+        MAX_ROWS = 1_048_576
+        HEADER_ROWS = 1
+
         report_name = "vulnerabilities"
         self.report_counter += 1
         info_report = (
@@ -3738,7 +3746,7 @@ class ParsingThread(QThread):
             + str(self.number_of_selected_reports)
         )
 
-        worksheet = workbook.add_worksheet(report_name)
+        worksheet = workbook.add_worksheet(f"{report_name}")
 
         cell_format_bold = workbook.add_format({"bold": True})
         worksheet.set_row(0, None, cell_format_bold)
@@ -3993,8 +4001,46 @@ class ParsingThread(QThread):
                         )
 
                         for report_item in report_items_per_host:
+                            if row_index >= MAX_ROWS - HEADER_ROWS:
+                                # Apply autofilter to the completed worksheet before creating a new one
+                                if rows_in_current_sheet > 0:
+                                    worksheet.autofilter(0, 0, rows_in_current_sheet, number_of_columns - 1)
+
+                                    if self.report_vulnerabilities_none_filter_out:
+                                        risk_factors = ["Critical", "High", "Medium", "Low"]
+                                        if not self.report_vulnerabilities_debug_data_enabled:
+                                            worksheet.filter_column_list(12, risk_factors)
+                                        else:
+                                            worksheet.filter_column_list(16, risk_factors)
+
+                                sheet_index += 1
+                                worksheet = workbook.add_worksheet(f"{report_name}_{sheet_index}")
+                                row_index = 0  # Reset for the new sheet
+                                rows_in_current_sheet = 0  # Reset row counter for new sheet
+
+                                # Apply header formatting and freeze panes for new sheet
+                                worksheet.set_row(0, None, cell_format_bold)
+                                worksheet.set_column(0, number_of_columns - 1, 18)
+
+                                # Write headers to new sheet
+                                for column_index, header in enumerate(headers):
+                                    if (
+                                        self.report_vulnerabilities_debug_data_enabled
+                                        and column_index in debug_columns_list
+                                    ):
+                                        cell_format_bold_blue = workbook.add_format()
+                                        cell_format_bold_blue.set_bold()
+                                        cell_format_bold_blue.set_font_color("blue")
+                                        worksheet.write(0, column_index, header, cell_format_bold_blue)
+                                    else:
+                                        worksheet.write(0, column_index, header)
+
+                                worksheet.freeze_panes(1, 0)  # Freeze the first row
+
                             number_of_rows += 1
                             row_index += 1
+                            rows_in_current_sheet = row_index
+
                             protocol = nfr.plugin.report_item_value(
                                 report_item, "protocol"
                             )
@@ -4655,8 +4701,9 @@ class ParsingThread(QThread):
                     )
                     self.log_emitter("info", e)
 
-        if number_of_rows > 0:
-            worksheet.autofilter(0, 0, number_of_rows, number_of_columns - 1)
+        # Apply autofilter to the final worksheet
+        if rows_in_current_sheet > 0:
+            worksheet.autofilter(0, 0, rows_in_current_sheet, number_of_columns - 1)
 
             if self.report_vulnerabilities_none_filter_out:
                 risk_factors = ["Critical", "High", "Medium", "Low"]
