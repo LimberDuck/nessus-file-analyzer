@@ -41,7 +41,7 @@ __package_name__ = "nessus-file-analyzer"
 __icon__ = "LimberDuck-NFA.ico"
 __summary__ = (
     "nessus file analyzer (NFA) by LimberDuck is a GUI tool which enables you to parse nessus scan files from "
-    "Nessus and Tenable.SC by (C) Tenable, Inc. and exports results to a Microsoft Excel Workbook for "
+    "Nessus and Tenable.SC by (C) Tenable, Inc. and exports results to a spreadsheet file for "
     "effortless analysis."
 )
 __uri__ = "https://limberduck.org"
