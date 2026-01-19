@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import base64
-import imageio
+# import imageio
 import os
 import chardet
 import csv
@@ -44,22 +44,22 @@ def file_to_base64(filename):
         return encoded_string
 
 
-def png_to_ico(filename):
-    """
-    Function converts given png file into ico.
-    :param filename: png file name
-    :return: ico file name
-    """
-    filename_without_extension = os.path.splitext(filename)[0]
-    target_file_name = filename_without_extension + ".ico"
-    img = imageio.imread(filename)
-    imageio.imwrite(target_file_name, img)
+# def png_to_ico(filename):
+#     """
+#     Function converts given png file into ico.
+#     :param filename: png file name
+#     :return: ico file name
+#     """
+#     filename_without_extension = os.path.splitext(filename)[0]
+#     target_file_name = filename_without_extension + ".ico"
+#     img = imageio.imread(filename)
+#     imageio.imwrite(target_file_name, img)
 
-    # img = Image.open(filename)
-    # icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64)]
-    # img.save(target_file_name, sizes=icon_sizes)
+#     # img = Image.open(filename)
+#     # icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64)]
+#     # img.save(target_file_name, sizes=icon_sizes)
 
-    return target_file_name
+#     return target_file_name
 
 
 def base64_to_ico(ico_in_base64, filename):
