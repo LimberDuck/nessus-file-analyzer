@@ -27,9 +27,21 @@
         "command": "${config:virtualenvPath}/python -m $MODULE_NAME"
       },
       {
-        "label": "Build Application",
+        "label": "Build Package",
         "type": "shell",
         "command": "${config:virtualenvPath}/python setup.py sdist bdist_wheel"
+      },
+      {
+        "label": "Build Application",
+        "type": "shell",
+        "options": {
+          "env": {
+              "MODULE_NAME": "nessus_file_analyzer",
+              "APP_NAME": "NFAlocal",
+              "APP_NAME_DASH": "LimberDuck-NFA"
+          }
+        },
+        "command": "${config:virtualenvPath}/PyInstaller $MODULE_NAME/__main__.py --name $APP_NAME --windowed --icon=./icons/$APP_NAME_DASH.ico --distpath dist --hidden-import=nfa_plugin_software_enumeration.software_enumeration"
       },
       {
         "label": "Start sphinx-autobuild",
