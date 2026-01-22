@@ -20,8 +20,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-from nessus_file_analyzer import utilities
+# from nessus_file_analyzer import utilities
 
-png_filename = "../icons/LimberDuck-NFA.png"
+# png_filename = "../icons/LimberDuck-NFA.png"
 
-print(utilities.file_to_base64(utilities.png_to_ico(png_filename)))
+# print(utilities.file_to_base64(utilities.png_to_ico(png_filename)))
