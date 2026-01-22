@@ -45,7 +45,7 @@ __summary__ = (
     "effortless analysis."
 )
 __uri__ = "https://limberduck.org"
-__version__ = "0.12.2"
+__version__ = "0.12.3"
 __release_date__ = "2026.01.22"
 __author__ = "Damian Krawczyk"
 __email__ = "damian.krawczyk@limberduck.org"
