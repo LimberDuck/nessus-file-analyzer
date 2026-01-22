@@ -52,7 +52,7 @@ jobs:
       - name: Build
         run: |
           ./venv/bin/python -m pip list
-          ./venv/bin/python -m PyInstaller ${{ env.folder_package_name }}/__main__.py --name "${{ env.app_name_dash }}" --onefile --windowed --icon=./icons/${{ env.app_name_dash }}.ico --distpath dist
+          ./venv/bin/python -m PyInstaller ${{ env.folder_package_name }}/__main__.py --name "${{ env.app_name_dash }}" --onefile --windowed --icon=./icons/${{ env.app_name_dash }}.ico --distpath dist --hidden-import=nfa_plugin_software_enumeration.software_enumeration
 
       - name: Archive binary
         run: |
@@ -94,7 +94,7 @@ jobs:
       - name: Build
         run: |
           .\venv\Scripts\python -m pip list
-          .\venv\Scripts\python -m PyInstaller ${{ env.folder_package_name }}\__main__.py --name "${{ env.app_name }}" --onefile --windowed --version-file=.\version.rc --icon=.\icons\${{ env.app_name_dash }}.ico --distpath dist
+          .\venv\Scripts\python -m PyInstaller ${{ env.folder_package_name }}\__main__.py --name "${{ env.app_name }}" --onefile --windowed --version-file=.\version.rc --icon=.\icons\${{ env.app_name_dash }}.ico --distpath dist --hidden-import=nfa_plugin_software_enumeration.software_enumeration
 
       - name: Archive binary
         run: |
@@ -136,7 +136,7 @@ jobs:
       - name: Build
         run: |
           ./venv/bin/python -m pip list
-          ./venv/bin/python -m PyInstaller ${{ env.folder_package_name }}/__main__.py --name "${{ env.app_name }}" --windowed --icon=./icons/${{ env.app_name_dash }}.ico --distpath dist
+          ./venv/bin/python -m PyInstaller ${{ env.folder_package_name }}/__main__.py --name "${{ env.app_name }}" --windowed --icon=./icons/${{ env.app_name_dash }}.ico --distpath dist --hidden-import=nfa_plugin_software_enumeration.software_enumeration
 
       - name: Archive binary
         run: |
@@ -178,7 +178,7 @@ jobs:
       - name: Build
         run: |
           ./venv/bin/python -m pip list
-          ./venv/bin/python -m PyInstaller ${{ env.folder_package_name }}/__main__.py --name "${{ env.app_name }}" --windowed --icon=./icons/${{ env.app_name_dash }}.ico --distpath dist
+          ./venv/bin/python -m PyInstaller ${{ env.folder_package_name }}/__main__.py --name "${{ env.app_name }}" --windowed --icon=./icons/${{ env.app_name_dash }}.ico --distpath dist --hidden-import=nfa_plugin_software_enumeration.software_enumeration
 
       - name: Archive binary
         run: |
