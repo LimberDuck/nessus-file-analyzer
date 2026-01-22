@@ -5,6 +5,12 @@ This document records all notable changes to [nessus file analyzer (NFA) by Limb
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.3] - 2026-01-22
+
+### Fixed
+
+- Pillow added to build pipeline for macOS.
+
 ## [0.12.2] - 2026-01-22
 
 ### Fixed
@@ -250,6 +256,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
+[0.12.3]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.12.1...v0.12.2
 [0.12.1]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.11.0...v0.12.0
