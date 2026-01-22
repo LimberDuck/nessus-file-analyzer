@@ -16,6 +16,40 @@ else:
     from importlib_metadata import entry_points
 
 
+# Bundled plugins for PyInstaller frozen builds
+# Entry points don't work in frozen apps, so we register known plugins here
+BUNDLED_PLUGINS = [
+    ('nfa_plugin_software_enumeration.software_enumeration', 'SoftwareEnumerationPlugin'),
+]
+
+
+def _discover_bundled_plugins() -> List[Type[NFAPlugin]]:
+    """
+    Load plugins bundled with PyInstaller frozen builds.
+
+    Returns:
+        List of plugin classes from bundled plugins
+    """
+    discovered_plugins = []
+
+    for module_path, class_name in BUNDLED_PLUGINS:
+        try:
+            import importlib
+            module = importlib.import_module(module_path)
+            plugin_class = getattr(module, class_name)
+            if isinstance(plugin_class, type) and issubclass(plugin_class, NFAPlugin):
+                discovered_plugins.append(plugin_class)
+            else:
+                print(f"Warning: Bundled plugin {class_name} does not inherit from NFAPlugin")
+        except ImportError as e:
+            # Plugin not bundled, skip silently
+            pass
+        except Exception as e:
+            print(f"Warning: Failed to load bundled plugin {class_name}: {e}")
+
+    return discovered_plugins
+
+
 def discover_plugins() -> List[Type[NFAPlugin]]:
     """
     Discover all installed NFA plugins using entry points.
@@ -28,6 +62,9 @@ def discover_plugins() -> List[Type[NFAPlugin]]:
                 'plugin_name = package.module:PluginClass',
             ],
         }
+
+    For PyInstaller frozen builds, bundled plugins are loaded directly
+    since entry points don't work in frozen applications.
 
     Returns:
         List of plugin classes (not instances) that inherit from NFAPlugin
@@ -55,6 +92,16 @@ def discover_plugins() -> List[Type[NFAPlugin]]:
 
     except Exception as e:
         print(f"Warning: Failed to discover plugins: {e}")
+
+    # For frozen builds (PyInstaller), also try loading bundled plugins
+    # This is needed because entry points don't work in frozen applications
+    if getattr(sys, 'frozen', False):
+        bundled = _discover_bundled_plugins()
+        # Add bundled plugins that weren't already discovered via entry points
+        existing_names = {p.__name__ for p in discovered_plugins}
+        for plugin in bundled:
+            if plugin.__name__ not in existing_names:
+                discovered_plugins.append(plugin)
 
     return discovered_plugins
 

@@ -2,7 +2,7 @@
 
 **nessus file analyzer (NFA) by LimberDuck** (pronounced *ˈlɪm.bɚ dʌk*) is a GUI
 tool which enables you to parse multiple nessus files containing the results
-of scans performed by using Nessus by (C) Tenable, Inc. and exports parsed
+of scans performed by using Tenable Nessus and Tenable Security Center, and exports parsed
 data to a spreadsheet file for effortless analysis.
 
 Operational memory usage will be kept low while parsing even the largest of
@@ -40,7 +40,7 @@ decrease our workload and focus on data analysis.
   * host, 
   * vulnerabilities,
   * noncompliance
-* check advanced reports like software enumeration
+* generate advanced reports like software enumeration
 * change target directory for output file to desired one, leave it default (current working directory) or set to be the same as source files
 * add suffix for output file with `_YYYYMMDD_HHMMSS` and/or custom text
 
