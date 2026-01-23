@@ -2,8 +2,24 @@
 
 This document records all notable changes to [nessus file analyzer (NFA) by LimberDuck][1].
 
+Visit [LimberDuck.org][2] to find out more!
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.12.5] - 2026-01-23
+
+### Fixed
+
+- Fixed an issue (`unsupported operand type(s) for +=: 'NoneType' and 'int'`) that occurred when results for plugin 19506 were missing for some hosts in scan results.
+
+### Changed
+
+- Requirements update
+  - from:
+    - nessus-file-reader>=0.7.0
+  - to:
+    - nessus-file-reader>=0.7.2
 
 ## [0.12.4] - 2026-01-22
 
@@ -262,6 +278,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release
 
+[0.12.5]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.12.2...v0.12.3
 [0.12.2]: https://github.com/LimberDuck/nessus-file-analyzer/compare/v0.12.1...v0.12.2
@@ -286,3 +303,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.0]: https://github.com/LimberDuck/nessus-file-analyzer/releases/tag/v0.1.0
 
 [1]: https://github.com/LimberDuck/nessus-file-analyzer
+[2]: https://limberduck.org
